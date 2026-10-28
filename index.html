@@ -3775,6 +3775,341 @@ html[data-theme="dark"] .theme-icon-sun {
   color: var(--muted);
 }
 
+.home-purpose-hero {
+  grid-template-columns: minmax(0, 1fr) 310px;
+  align-items: center;
+}
+
+.home-entry-section {
+  margin-top: 25px;
+}
+
+.home-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.home-quick-card {
+  min-height: 132px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 16px;
+  align-items: start;
+  gap: 11px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.home-quick-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-quick-icon {
+  width: 37px;
+  height: 37px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: var(--brand-pale);
+  color: var(--brand);
+}
+
+.home-quick-card strong {
+  display: block;
+  font-size: 13px;
+}
+
+.home-quick-card small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.home-quick-card > .icon {
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  color: var(--muted);
+}
+
+.quick-error-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.65fr) minmax(320px, 1.35fr);
+  gap: 18px;
+  margin-top: 16px;
+  padding: 22px;
+}
+
+.quick-error-copy h2 {
+  margin: 5px 0 7px;
+  font-size: 19px;
+}
+
+.quick-error-copy p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.quick-error-form {
+  display: grid;
+  gap: 8px;
+}
+
+.quick-error-form textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  padding: 11px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.quick-error-form .button {
+  justify-self: end;
+}
+
+.quick-error-result {
+  grid-column: 1 / -1;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+
+.quick-error-result > span,
+.quick-error-match > span {
+  color: var(--brand);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.quick-error-result > p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 10.5px;
+}
+
+.quick-error-result:has(.quick-error-match) {
+  display: grid;
+  gap: 8px;
+}
+
+.quick-error-match {
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface);
+}
+
+.quick-error-match.primary {
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--border));
+}
+
+.quick-error-match > code {
+  display: block;
+  margin-top: 5px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  overflow-wrap: anywhere;
+}
+
+.quick-error-match > p {
+  margin: 6px 0;
+  color: var(--text-soft);
+  font-size: 10.5px;
+}
+
+.quick-error-match ol {
+  margin: 7px 0;
+  padding-left: 19px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.quick-error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.quick-error-actions .button {
+  min-height: 31px;
+  margin-left: auto;
+  padding: 5px 9px;
+  font-size: 10px;
+}
+
+.teaching-zone {
+  margin-top: 34px;
+}
+
+.teaching-groups {
+  display: grid;
+  gap: 12px;
+}
+
+.teaching-group {
+  padding: 17px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.teaching-group-head {
+  display: grid;
+  grid-template-columns: 29px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.teaching-group-head > span {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.teaching-group-head h3 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.teaching-group-head p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.teaching-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.teaching-card {
+  min-height: 138px;
+  display: grid;
+  grid-template-columns: 35px minmax(0, 1fr) 15px;
+  gap: 10px;
+  align-items: start;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease;
+}
+
+.teaching-card:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.teaching-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: var(--brand-pale);
+  color: var(--brand);
+}
+
+.teaching-card-copy small {
+  color: var(--accent);
+  font-size: 9.5px;
+  font-weight: 700;
+}
+
+.teaching-card-copy strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 12.5px;
+}
+
+.teaching-card-copy > span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.teaching-card-copy b {
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+.teaching-card > .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+}
+
+.teaching-group:first-child .teaching-card-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.ai-home-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 26px;
+  margin-top: 32px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 100% 0, var(--brand-soft), transparent 260px),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.ai-home-entry h2 {
+  margin: 6px 0 7px;
+  font-size: 22px;
+}
+
+.ai-home-entry p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.ai-home-entry .button {
+  flex: 0 0 auto;
+}
+
 .home-secondary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4579,6 +4914,14 @@ html[data-theme="dark"] .theme-icon-sun {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .home-quick-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .teaching-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .home-progress-card {
     min-width: 0;
   }
@@ -4725,6 +5068,15 @@ html[data-theme="dark"] .theme-icon-sun {
     font-size: clamp(34px, 9vw, 50px);
   }
 
+  .quick-error-panel {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .ai-home-entry {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .path-grid,
   .learning-grid,
   .two-column,
@@ -4849,6 +5201,11 @@ html[data-theme="dark"] .theme-icon-sun {
   }
 
   .goal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-quick-grid,
+  .teaching-card-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -10425,6 +10782,68 @@ function linkButton(label, href, iconName = "arrow-right", className = "text-lin
   return `<a class="${className}" href="${href}">${escapeHtml(label)}${icon(iconName)}</a>`;
 }
 
+function handleHomeLearning(element) {
+  const route = element.dataset.route;
+  if (element.dataset.workflow) state.workflow = element.dataset.workflow;
+  if (element.dataset.basicsTab) state.basicsTab = element.dataset.basicsTab;
+  if (element.dataset.category) {
+    state.functionCategory = element.dataset.category;
+    state.functionPackage = "全部";
+    state.functionQuery = "";
+  }
+  navigate(route);
+}
+
+function analyzeQuickError(text) {
+  const target = document.getElementById("quick-error-result");
+  if (!target) return;
+  const input = text.trim().toLowerCase();
+  if (!input) {
+    target.innerHTML = `<span>还没有输入</span><p>请先粘贴一条 R 报错。</p>`;
+    return;
+  }
+  const stopWords = new Set(["error", "the", "not", "for", "with", "and", "has", "can", "was", "are", "this", "that"]);
+  const scoreItem = (item) => {
+    const phrase = item.error.toLowerCase();
+    const words = phrase.match(/[a-z_][a-z0-9_.]{2,}/g) || [];
+    let score = input.includes(phrase) ? 100 : 0;
+    for (const word of words) {
+      if (!stopWords.has(word) && input.includes(word)) score += 7;
+    }
+    const chinese = item.meaning.match(/[\u4e00-\u9fa5]{2,}/g) || [];
+    for (const word of chinese) if (input.includes(word)) score += 4;
+    return score;
+  };
+  const scored = errorCatalog
+    .map((item) => ({ item, score: scoreItem(item) }))
+    .filter((entry) => entry.score > 0)
+    .sort((a, b) => b.score - a.score);
+  const bestScore = scored[0]?.score || 0;
+  const ranked = scored
+    .filter((entry) => entry.score >= Math.max(8, bestScore * 0.35))
+    .slice(0, 1);
+  if (!ranked.length) {
+    target.innerHTML = `
+      <span>没有精确匹配</span>
+      <p>先检查报错中的对象名、函数名和文件路径。你也可以打开完整报错词典，按“对象、函数、缺失值、文件”等关键词继续查找。</p>
+      <button class="button" type="button" data-action="open-error-search" data-query="${escapeHtml(text.trim())}">查看完整报错速查 ${icon("arrow-right")}</button>
+    `;
+    return;
+  }
+  target.innerHTML = ranked.map(({ item }, index) => `
+    <div class="quick-error-match ${index === 0 ? "primary" : ""}">
+      <span>${index === 0 ? "最可能的原因" : "其他可能"}</span>
+      <code>${escapeHtml(item.error)}</code>
+      <p>${escapeHtml(item.meaning)}</p>
+      <ol>${item.checks.slice(0, 3).map((check) => `<li>${escapeHtml(check)}</li>`).join("")}</ol>
+      <div class="quick-error-actions">
+        ${(item.functions || []).slice(0, 3).map((id) => peekFunctionPill(id)).join("")}
+        <button class="button" type="button" data-action="open-error-search" data-query="${escapeHtml(text.trim())}">打开完整排查步骤 ${icon("arrow-right")}</button>
+      </div>
+    </div>
+  `).join("");
+}
+
 function renderHomeLegacy() {
   const popular = functions.filter((item) => item.popular).slice(0, 6);
   const learnedLessons = courseProgressCount();
@@ -10590,95 +11009,53 @@ function renderHome() {
   const learnedLessons = courseProgressCount();
   const coursePercent = courseModules.length ? Math.round((learnedLessons / courseModules.length) * 100) : 0;
   const recommended = recommendedCourseLesson();
-  const goals = [
+  const quickEntries = [
+    ["查一个符号", "!、$、[ ]、管道、公式与正则", "#symbols", "braces"],
+    ["查一个函数", "175 个中文函数卡与参数示例", "#functions", "grid"],
+    ["报错分析", "粘贴报错，获取原因和修改思路", "#error-analyzer", "shield"],
+    ["查一个功能", "异常值、缺失值、清洗、合并和建模", "#workflows", "workflow"],
+  ];
+  const teachingGroups = [
     {
-      title: "第一次打开 RStudio",
-      description: "认识 Console、Script 和环境，运行第一条命令。",
-      meta: "零基础 · 7 分钟",
-      href: "#learn/r-1",
-      iconName: "terminal",
-      tone: "green",
+      label: "快速开始",
+      note: "先知道 R 能做什么，并完成第一次运行",
+      items: [
+        ["十分钟速成", "完全没接触过 R，想先快速跑通一次", "#learn/quick", "sparkles", "约 10 分钟"],
+      ],
     },
     {
-      title: "10 分钟快速上手",
-      description: "只学运行、对象、函数、数据框和读取 CSV。",
-      meta: "短时间入门",
-      href: "#learn/quick",
-      iconName: "sparkles",
-      tone: "accent",
+      label: "数据基础",
+      note: "依照课程顺序，从读入数据到让数据可以使用",
+      items: [
+        ["数据录入与读取", "有 CSV、Excel、SPSS 或 Stata 数据，准备开始分析", "#workflows", "database", "CSV · Excel · SPSS · Stata", { workflow: "data-entry" }],
+        ["数据清洗", "需要处理缺失值、异常值、重复记录和变量编码", "#basics", "filter", "基础 · 数据管理", { basicsTab: "cleaning" }],
+        ["控制流", "需要在多组条件、多个文件或多个对象之间重复操作", "#control-flow", "workflow", "条件 · 循环 · 函数", {}],
+      ],
     },
     {
-      title: "读取或导出数据",
-      description: "处理 CSV、Excel、SPSS、Stata 与分析副本。",
-      meta: "数据录入与导出",
-      workflow: "data-entry",
-      iconName: "database",
-      tone: "blue",
+      label: "表达与专题",
+      note: "掌握常见文本处理、图形表达和具体研究方法",
+      items: [
+        ["正则表达式", "需要查找、提取或替换复杂文本和编码", "#symbols", "search", "文本模式匹配", {}],
+        ["可视化学习", "想用 R 制作散点图、折线图、柱状图和报告图", "#functions", "scale", "图形语法与常用图层", { category: "可视化" }],
+        ["特定分析方法", "已经明确研究问题，需要回归、生存分析、量表或网络", "#workflows", "grid", "回归 · 生存 · 量表 · 网络", { workflow: "association" }],
+      ],
     },
     {
-      title: "查看变量类型",
-      description: "确认每列是数值、字符、日期还是因子。",
-      meta: "数据类型检查",
-      workflow: "data-types",
-      iconName: "grid",
-      tone: "green",
-    },
-    {
-      title: "查找缺失值",
-      description: "统计缺失比例，区分拒答、跳过题与真实缺失。",
-      meta: "数据清洗",
-      workflow: "missing-values",
-      iconName: "search",
-      tone: "accent",
-    },
-    {
-      title: "查找异常值",
-      description: "结合范围、分位数和图形回查极端记录。",
-      meta: "数据清洗",
-      workflow: "outliers",
-      iconName: "scale",
-      tone: "blue",
-    },
-    {
-      title: "检查重复记录",
-      description: "区分完全重复、重复 ID 与合法多次测量。",
-      meta: "数据清洗",
-      workflow: "duplicates",
-      iconName: "copy",
-      tone: "green",
-    },
-    {
-      title: "变量重编码",
-      description: "把原始编码转换为分类、年龄组和日期。",
-      meta: "数据整理",
-      workflow: "recode",
-      iconName: "braces",
-      tone: "accent",
-    },
-    {
-      title: "查一个符号",
-      description: "搜索 !、$、[ ]、管道或正则表达式的含义。",
-      meta: "符号与语法",
-      href: "#symbols",
-      iconName: "braces",
-      tone: "blue",
-    },
-    {
-      title: "看不懂报错",
-      description: "按报错文本查看常见原因、检查顺序和修复示例。",
-      meta: "报错速查",
-      href: "#errors",
-      iconName: "shield",
-      tone: "green",
+      label: "完整实践",
+      note: "把前面的步骤组合起来，完成一份可复现的小研究",
+      items: [
+        ["全流程深入学习", "希望按顺序系统学习，并最终独立完成分析", "#learn", "workflow", "10 节课程 · 学习进度可保存", {}],
+      ],
     },
   ];
   app.innerHTML = `
     <div class="page">
-      <section class="goal-home">
+      <section class="goal-home home-purpose-hero">
         <div class="goal-home-copy">
           <span class="eyebrow">按目标开始</span>
           <h1>你现在想用 R 做什么？</h1>
-          <p>选一个最接近当前需求的任务，直接进入步骤。第一次使用 R，可以先从 10 分钟路径开始。</p>
+          <p>首页只保留最常用的四类入口。先选你要找的东西；如果想系统学习，再往下进入教学专区。</p>
           <form class="goal-search" data-search-form>
             <label>
               <span class="sr-only">搜索任务、函数、术语或符号</span>
@@ -10706,32 +11083,79 @@ function renderHome() {
         </aside>
       </section>
 
-      <section class="goal-finder" aria-labelledby="goal-title">
+      <section class="goal-finder home-entry-section" aria-labelledby="goal-title">
         <div class="section-title-row">
-          <div><h2 class="section-title" id="goal-title">选择你的目标</h2><p class="section-copy">每张卡片对应一条可执行路径，而不是一堆散开的函数。</p></div>
+          <div><h2 class="section-title" id="goal-title">问题导航</h2><p class="section-copy">只放四个最常用入口，减少选择负担。</p></div>
           <a class="text-link" href="#workflows">查看全部问题导航 ${icon("arrow-right")}</a>
         </div>
-        <div class="goal-grid">
-          ${goals.map((goal) => goal.workflow ? `
-            <button class="goal-tile ${goal.tone}" type="button" data-action="goal-workflow" data-id="${goal.workflow}">
-              <span class="goal-icon">${icon(goal.iconName)}</span>
-              <span class="goal-copy"><small>${escapeHtml(goal.meta)}</small><strong>${escapeHtml(goal.title)}</strong><span>${escapeHtml(goal.description)}</span></span>
+        <div class="home-quick-grid">
+          ${quickEntries.map(([title, description, href, iconName], index) => `
+            ${index === 2 ? `<button class="home-quick-card" type="button" data-action="focus-error-analyzer">` : `<a class="home-quick-card" href="${href}">`}
+              <span class="home-quick-icon">${icon(iconName)}</span>
+              <span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></span>
               ${icon("arrow-right")}
-            </button>
-          ` : `
-            <a class="goal-tile ${goal.tone}" href="${goal.href}">
-              <span class="goal-icon">${icon(goal.iconName)}</span>
-              <span class="goal-copy"><small>${escapeHtml(goal.meta)}</small><strong>${escapeHtml(goal.title)}</strong><span>${escapeHtml(goal.description)}</span></span>
-              ${icon("arrow-right")}
-            </a>
+            ${index === 2 ? "</button>" : "</a>"}
           `).join("")}
         </div>
       </section>
 
-      <section class="home-secondary">
-        <a href="#functions"><strong>${functions.length} 个函数与语法条目</strong><span>按中文用途、包名和参数查找</span></a>
-        <a href="#scales"><strong>量表与心理网络</strong><span>信度、CFA、网络稳定性与研究边界</span></a>
-        <a href="#ai"><strong>AI 代码解释</strong><span>看懂函数、参数，并跳回可核验内容</span></a>
+      <section class="panel quick-error-panel" id="error-analyzer" aria-labelledby="quick-error-title">
+        <div class="quick-error-copy">
+          <span class="eyebrow">报错分析</span>
+          <h2 id="quick-error-title">把 R 报错复制进来</h2>
+          <p>网站会识别常见报错类型，告诉你先检查什么、怎么改，并给出可复制的最小示例。不会执行代码，也不需要上传数据。</p>
+        </div>
+        <form class="quick-error-form" data-quick-error-form>
+          <label class="sr-only" for="quick-error-input">粘贴 R 报错</label>
+          <textarea id="quick-error-input" name="error" rows="3" placeholder="例如：Error: object 'age' not found"></textarea>
+          <button class="button button-primary" type="submit">分析这条报错</button>
+        </form>
+        <div class="quick-error-result" id="quick-error-result" aria-live="polite">
+          <span>等待输入</span>
+          <p>复制报错中最关键的一行即可，不包含患者信息或原始数据。</p>
+        </div>
+      </section>
+
+      <section class="teaching-zone" aria-labelledby="teaching-zone-title">
+        <div class="section-title-row">
+          <div>
+            <span class="eyebrow">教学专区</span>
+            <h2 class="section-title" id="teaching-zone-title">按照学习目标循序渐进</h2>
+            <p class="section-copy">分类顺序参照课程“概述 → 数据管理 → 控制流 → 可视化 → 统计分析”的教学脉络。</p>
+          </div>
+        </div>
+        <div class="teaching-groups">
+          ${teachingGroups.map((group, groupIndex) => `
+            <section class="teaching-group">
+              <div class="teaching-group-head">
+                <span>${String(groupIndex + 1).padStart(2, "0")}</span>
+                <div><h3>${escapeHtml(group.label)}</h3><p>${escapeHtml(group.note)}</p></div>
+              </div>
+              <div class="teaching-card-grid">
+                ${group.items.map(([title, audience, route, iconName, meta, action = {}]) => `
+                  <button class="teaching-card" type="button" data-action="home-learning" data-route="${route.replace("#", "")}" data-workflow="${action.workflow || ""}" data-basics-tab="${action.basicsTab || ""}" data-category="${action.category || ""}">
+                    <span class="teaching-icon">${icon(iconName)}</span>
+                    <span class="teaching-card-copy">
+                      <small>${escapeHtml(meta)}</small>
+                      <strong>${escapeHtml(title)}</strong>
+                      <span><b>适合：</b>${escapeHtml(audience)}</span>
+                    </span>
+                    ${icon("arrow-right")}
+                  </button>
+                `).join("")}
+              </div>
+            </section>
+          `).join("")}
+        </div>
+      </section>
+
+      <section class="ai-home-entry" aria-labelledby="ai-home-title">
+        <div>
+          <span class="eyebrow">专门的代码解析入口</span>
+          <h2 id="ai-home-title">让 AI 解释代码，但判断权仍在你手里</h2>
+          <p>粘贴一段 R 代码，查看它调用了哪些函数、参数可能代表什么、常见风险在哪里。原型不会执行代码，也不接收患者原始数据。</p>
+        </div>
+        <a class="button button-primary" href="#ai">打开 AI 代码解析 ${icon("arrow-right")}</a>
       </section>
     </div>
   `;
@@ -12678,6 +13102,16 @@ document.addEventListener("click", (event) => {
   if (actionElement) {
     const action = actionElement.dataset.action;
     if (action === "quick-search") openSearch(actionElement.dataset.query);
+    if (action === "home-learning") handleHomeLearning(actionElement);
+    if (action === "focus-error-analyzer") {
+      document.getElementById("error-analyzer")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document.getElementById("quick-error-input")?.focus();
+    }
+    if (action === "open-error-search") {
+      state.errorCategory = "全部";
+      state.errorQuery = actionElement.dataset.query || "";
+      navigate("errors");
+    }
     if (action === "search-type") {
       state.searchType = actionElement.dataset.type;
       document.querySelectorAll('[data-action="search-type"]').forEach((button) => {
@@ -12782,6 +13216,12 @@ document.addEventListener("click", (event) => {
 });
 
 document.addEventListener("submit", (event) => {
+  const quickErrorForm = event.target.closest("[data-quick-error-form]");
+  if (quickErrorForm) {
+    event.preventDefault();
+    analyzeQuickError(new FormData(quickErrorForm).get("error")?.toString() || "");
+    return;
+  }
   const bmiForm = event.target.closest("[data-bmi-demo-form]");
   if (bmiForm) {
     event.preventDefault();
