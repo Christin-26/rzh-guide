@@ -5035,8 +5035,24 @@ html[data-theme="dark"] .theme-icon-sun {
   cursor: pointer;
 }
 
+.teaching-resource.has-level {
+  grid-template-columns: 34px minmax(0, 1fr) 15px;
+}
+
 .teaching-resource:hover {
   border-color: color-mix(in srgb, var(--brand) 42%, var(--border));
+}
+
+.teaching-resource-level {
+  width: 31px;
+  height: 31px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--brand-pale);
+  color: var(--brand);
+  font-size: 8.5px;
+  font-weight: 700;
 }
 
 .teaching-resource-copy strong,
@@ -5059,6 +5075,36 @@ html[data-theme="dark"] .theme-icon-sun {
   width: 14px;
   height: 14px;
   color: var(--muted);
+}
+
+.teaching-resource-levels {
+  display: grid;
+  gap: 14px;
+}
+
+.teaching-resource-level-group {
+  display: grid;
+  gap: 8px;
+}
+
+.teaching-level-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.teaching-level-heading span {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.teaching-level-heading small {
+  color: var(--muted);
+  font-size: 9.5px;
 }
 
 /* Research method, model and chart guides */
@@ -5090,12 +5136,73 @@ html[data-theme="dark"] .theme-icon-sun {
   font-weight: 650;
 }
 
-.guide-hero-copy > p:last-child {
-  max-width: 790px;
+.guide-primer {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 1px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.guide-primer > div {
+  padding: clamp(20px, 3vw, 28px);
+  background: var(--surface);
+}
+
+.guide-primer > div:first-child {
+  background:
+    radial-gradient(circle at 0 0, var(--brand-soft), transparent 260px),
+    var(--surface);
+}
+
+.guide-primer > div > span {
+  color: var(--accent);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.guide-primer h2 {
+  margin: 7px 0 9px;
+  font-size: 18px;
+}
+
+.guide-primer p {
   margin: 0;
   color: var(--text-soft);
   font-size: 12px;
   line-height: 1.8;
+}
+
+.guide-primer ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-primer li {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+  color: var(--text-soft);
+  font-size: 10.5px;
+  line-height: 1.6;
+}
+
+.guide-primer li .icon {
+  width: 17px;
+  height: 17px;
+  padding: 3px;
+  border-radius: 50%;
+  background: var(--brand-pale);
+  color: var(--brand);
 }
 
 .guide-audience-card {
@@ -5623,6 +5730,10 @@ html[data-theme="dark"] .theme-icon-sun {
   }
 
   .guide-hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guide-primer {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -10388,14 +10499,28 @@ window.RZH_TEACHING_CATEGORIES = [
     title: "可视化学习",
     subtitle: "用图形表达分布、效应与关系",
     audience: "想制作论文图、汇报图，或通过图形检查数据",
-    detail: "按图形要回答的问题选图。先确认数据结构和坐标，再调整颜色、注释与导出尺寸。",
+    detail: "参考《R语言实战（第3版）》的基础图形、ggplot2、扩展图形与高级图形内容，按入门、进阶、高阶和应用分组。先根据问题选图，再确认数据结构和坐标，最后调整颜色、标签与导出尺寸。",
     icon: "scale",
     items: [
-      { title: "箱式图", note: "比较组间中位数与离散程度", href: "#guide/plot/boxplot" },
-      { title: "小提琴图", note: "同时看分布形状与组间比较", href: "#guide/plot/violin" },
-      { title: "森林图", note: "集中展示效应量与置信区间", href: "#guide/plot/forest" },
-      { title: "桑基图", note: "展示对象在类别之间的流动", href: "#guide/plot/sankey" },
-      { title: "剂量反应关系曲线", note: "展示连续暴露与结局的非线性关系", href: "#guide/plot/dose-response" },
+      { title: "直方图", note: "看连续变量最常落在哪些区间", href: "#guide/plot/histogram", level: "入门" },
+      { title: "密度图", note: "平滑展示分布形状与峰", href: "#guide/plot/density", level: "入门" },
+      { title: "散点图", note: "观察两个连续变量的关系", href: "#guide/plot/scatter", level: "入门" },
+      { title: "条形图", note: "比较分类频数或汇总值", href: "#guide/plot/bar", level: "入门" },
+      { title: "折线图", note: "展示时间趋势或有序变化", href: "#guide/plot/line", level: "入门" },
+      { title: "箱式图", note: "比较中位数、四分位数与异常值", href: "#guide/plot/boxplot", level: "入门" },
+      { title: "小提琴图", note: "同时看完整分布形状与组间比较", href: "#guide/plot/violin", level: "进阶" },
+      { title: "误差条图", note: "表达均数、标准误和置信区间", href: "#guide/plot/errorbar", level: "进阶" },
+      { title: "相关矩阵图", note: "一次查看多变量相关关系", href: "#guide/plot/correlation-matrix", level: "进阶" },
+      { title: "六边形密度散点图", note: "大数据量下减少点重叠", href: "#guide/plot/hexbin", level: "进阶" },
+      { title: "Q-Q 图", note: "检查数据或残差是否近似正态", href: "#guide/plot/qq-plot", level: "进阶" },
+      { title: "生存曲线", note: "展示随访中无事件概率的变化", href: "#guide/plot/survival-curve", level: "进阶" },
+      { title: "森林图", note: "集中展示效应量与置信区间", href: "#guide/plot/forest", level: "高阶" },
+      { title: "桑基图", note: "展示对象在类别之间的流动", href: "#guide/plot/sankey", level: "高阶" },
+      { title: "剂量反应关系曲线", note: "展示连续暴露与结局的非线性关系", href: "#guide/plot/dose-response", level: "高阶" },
+      { title: "聚类树状图", note: "展示样本或变量如何逐步分组", href: "#guide/plot/dendrogram", level: "高阶" },
+      { title: "交互式图形", note: "支持悬停、缩放和筛选浏览", href: "#guide/plot/interactive", level: "高阶" },
+      { title: "矩形树图", note: "用面积展示层级和占比", href: "#guide/plot/treemap", level: "应用" },
+      { title: "缺失值模式图", note: "查看缺失集中在哪些变量和记录", href: "#guide/plot/missing-pattern", level: "应用" },
     ],
   },
   {
@@ -10419,15 +10544,26 @@ window.RZH_TEACHING_CATEGORIES = [
     title: "常用模型",
     subtitle: "Logistic、DLNM、LMM 与生存模型",
     audience: "知道研究问题，准备选择并解释统计模型",
-    detail: "每个专题都给出用途、数据结构、核心函数、参数、使用条件、结果解释和常见误区。",
+    detail: "参考《R语言实战（第3版）》的回归、方差分析、广义线性模型、时间序列、主成分、因子分析、聚类与分类章节，并补充公共卫生常用模型。每个专题都说明用途、数据结构、函数参数、使用条件、结果解释和常见误区。",
     icon: "grid",
     items: [
-      { title: "Logistic 回归", note: "二分类结局与 OR", href: "#guide/model/logistic" },
-      { title: "DLNM 分布滞后非线性模型", note: "暴露、滞后与非线性", href: "#guide/model/dlnm" },
-      { title: "LMM 线性混合模型", note: "重复测量与聚类数据", href: "#guide/model/lmm" },
-      { title: "多重线性回归", note: "连续结局", href: "#guide/model/linear" },
-      { title: "Poisson 回归", note: "计数与发病率", href: "#guide/model/poisson" },
-      { title: "Cox 比例风险模型", note: "随访时间与事件", href: "#guide/model/cox" },
+      { title: "多重线性回归", note: "连续结局与多个影响因素", href: "#guide/model/linear", level: "入门" },
+      { title: "Logistic 回归", note: "二分类结局与 OR", href: "#guide/model/logistic", level: "入门" },
+      { title: "方差分析 ANOVA", note: "比较多个组的平均数", href: "#guide/model/anova", level: "入门" },
+      { title: "Poisson 回归", note: "计数结局与发病率", href: "#guide/model/poisson", level: "进阶" },
+      { title: "Cox 比例风险模型", note: "随访时间与事件风险", href: "#guide/model/cox", level: "进阶" },
+      { title: "LMM 线性混合模型", note: "重复测量与多层次数据", href: "#guide/model/lmm", level: "进阶" },
+      { title: "有序 Logistic 回归", note: "低、中、高三类有序结局", href: "#guide/model/ordinal", level: "进阶" },
+      { title: "多分类 Logistic 回归", note: "三个及以上无序类别", href: "#guide/model/multinomial", level: "进阶" },
+      { title: "时间序列与 ARIMA", note: "趋势、季节和短期预测", href: "#guide/model/time-series", level: "高阶" },
+      { title: "主成分分析 PCA", note: "把多个相关变量压缩成少数成分", href: "#guide/model/pca", level: "高阶" },
+      { title: "探索性因子分析", note: "寻找量表题目背后的潜在维度", href: "#guide/model/factor-analysis", level: "高阶" },
+      { title: "聚类分析", note: "按相似性自动分组", href: "#guide/model/clustering", level: "高阶" },
+      { title: "决策树", note: "按变量阈值逐层划分结局", href: "#guide/model/classification-tree", level: "高阶" },
+      { title: "随机森林", note: "组合多棵树提高预测稳定性", href: "#guide/model/random-forest", level: "高阶" },
+      { title: "支持向量机 SVM", note: "寻找区分能力较强的边界", href: "#guide/model/svm", level: "高阶" },
+      { title: "稳健回归", note: "减轻异常值对系数的影响", href: "#guide/model/robust-regression", level: "高阶" },
+      { title: "DLNM 分布滞后非线性模型", note: "暴露、滞后与非线性", href: "#guide/model/dlnm", level: "应用" },
     ],
   },
 ];
@@ -11675,6 +11811,955 @@ window.RZH_GUIDE_FUNCTIONS = [
     ],
     tips: ["数值列与标签行必须严格对应。", "绘制后检查数值是否被裁切或小数位不统一。"],
     related: ["forest", "logistic", "cox"],
+  },
+];
+
+</script>
+  <script>
+window.RZH_ADVANCED_GUIDES = [
+  {
+    type: "plot",
+    id: "histogram",
+    title: "直方图",
+    level: "入门",
+    aliases: ["histogram", "频数分布图", "hist"],
+    hero: "先看清一个连续变量主要落在哪些区间",
+    audience: "适合第一次检查年龄、血压、BMI、量表得分等连续变量的分布。",
+    definition: "直方图把连续数值切成若干区间，再用柱子的高度表示落在每个区间的人数或比例。它最适合回答“数据集中在哪、有没有偏态或多个峰”。",
+    overview: "直方图是连续变量最基础的单变量图形。柱子的宽度由分箱决定，分箱太少会掩盖细节，太多会让图形变得零碎。它展示的是区间频数，不是每个人的精确取值。",
+    features: [
+      "能快速看出中心位置、偏态、尾部和多峰。",
+      "适合在建模前检查异常范围与分布假设。",
+      "分箱数量会改变外观，因此不能只凭一张图下结论。",
+    ],
+    whenUse: [
+      "查看单个连续变量的分布。",
+      "比较变量的大致取值范围和异常端点。",
+      "决定是否需要对偏态变量作变换或分组。",
+    ],
+    dataShape: [
+      "一行一个观测，只需要一列连续数值。",
+      "先统计缺失值，并确认单位和小数点没有混用。",
+      "极端值很多时，可先看完整范围和百分位数。",
+    ],
+    steps: [
+      {
+        title: "先看范围与缺失",
+        text: "画图前先确认最小、最大、缺失数和可信范围。医学变量的不合理端点往往提示单位错误。",
+        code: "summary(dat$age)\nsum(is.na(dat$age))\nquantile(dat$age, c(.01, .25, .5, .75, .99), na.rm = TRUE)",
+      },
+      {
+        title: "绘制直方图",
+        text: "先用适中分箱观察整体形态，再尝试不同 bins 验证结论是否稳定。",
+        code: "ggplot(dat, aes(age)) +\n  geom_histogram(bins = 25, fill = \"#2f6b5b\", color = \"white\") +\n  labs(x = \"年龄（岁）\", y = \"人数\") +\n  theme_minimal()",
+      },
+      {
+        title: "不要用图形代替数字核对",
+        text: "直方图帮助理解形状，但仍要报告样本量、均数或中位数、离散程度和异常值处理规则。",
+        code: "c(n = sum(!is.na(dat$age)),\n  median = median(dat$age, na.rm = TRUE),\n  iqr = IQR(dat$age, na.rm = TRUE))",
+      },
+    ],
+    functions: ["hist", "geom_histogram", "quantile"],
+    conditions: [
+      "变量是连续或近似连续数值。",
+      "分箱边界和单位清楚。",
+      "异常值尚未被无声删除。",
+    ],
+    interpret: "柱子越高表示该区间越多人；右尾很长通常表示少数较大值，但不能仅凭尾部判断数据错误。",
+    pitfalls: ["分箱太少或太多后直接描述形状。", "把直方图当作精确个案清单。", "先删除异常值再画图却不记录规则。"],
+    related: ["density", "boxplot"],
+  },
+  {
+    type: "plot",
+    id: "density",
+    title: "密度图",
+    level: "入门",
+    aliases: ["density plot", "核密度图", "KDE"],
+    hero: "用平滑曲线观察连续变量的分布形状",
+    audience: "适合比较多个组的分布，并快速查看偏态或多峰。",
+    definition: "密度图用一条平滑曲线近似连续变量的分布，曲线下方总面积通常为 1。它像直方图的平滑版本，更适合放在同一坐标中比较几个组。",
+    overview: "密度图依赖核密度估计和带宽。带宽太小时图形毛刺很多，太大时会抹平真实峰。曲线为空的位置不一定代表绝对没有观测，只是附近密度很低。",
+    features: [
+      "比直方图更容易叠加多个组。",
+      "能直观看到偏态、峰和尾部。",
+      "平滑程度会受带宽影响，不能过度解释细小波动。",
+    ],
+    whenUse: ["比较两组或多组连续变量分布。", "初步观察偏态和多峰。", "需要比直方图更平滑的展示。"],
+    dataShape: ["一行一个观测，包含连续变量和分组变量。", "每组最好有足够样本量。", "缺失值应提前说明。"],
+    steps: [
+      {
+        title: "检查各组人数",
+        text: "人数很少的组不适合估计复杂密度形状。",
+        code: "table(dat$group, useNA = \"ifany\")",
+      },
+      {
+        title: "绘制密度曲线",
+        text: "透明度帮助识别重叠区域，但曲线交叠多时仍应结合分位数。",
+        code: "ggplot(dat, aes(score, fill = group, color = group)) +\n  geom_density(alpha = .35) +\n  labs(x = \"得分\", y = \"密度\") +\n  theme_minimal()",
+      },
+      {
+        title: "用数字核对形状",
+        text: "按组报告有效人数、中位数和四分位距。曲线显示的“峰”不一定具有稳定统计意义。",
+        code: "aggregate(score ~ group, dat, function(x) c(n = sum(!is.na(x)), median = median(x, na.rm = TRUE)))",
+      },
+    ],
+    functions: ["density", "geom_density", "quantile"],
+    conditions: ["连续变量单位一致。", "各组样本量足以支持平滑估计。", "带宽和是否分组已写入图注。"],
+    interpret: "某一区间曲线越高，表示该区间附近的观测越密集；不同组曲线不能只比较峰值高度，还要结合面积、样本量和分位数。",
+    pitfalls: ["把带宽造成的毛刺当成真实亚组。", "样本量小时过度解释多峰。", "只画曲线而不报告组内样本量。"],
+    related: ["histogram", "violin"],
+  },
+  {
+    type: "plot",
+    id: "scatter",
+    title: "散点图",
+    level: "入门",
+    aliases: ["scatter plot", "散点", "geom_point"],
+    hero: "两个连续变量之间是什么关系",
+    audience: "适合首次查看暴露与结局、两个指标或预测值与真实值的对应关系。",
+    definition: "散点图把每个观测画成坐标中的一个点，横轴和纵轴各代表一个变量。它用来观察方向、强度、非线性、分组差异和异常点。",
+    overview: "散点图是最重要的双变量探索图之一。点重叠严重时，可能误以为数据很少；此时可降低透明度、抖动或在极端情况下改用六边形分箱。",
+    features: [
+      "能发现线性或非线性趋势。",
+      "容易看到离群点和分组差异。",
+      "点重叠时需要透明度或分箱辅助。",
+    ],
+    whenUse: ["检查两个连续变量的关系。", "回归建模前观察线性和异常点。", "比较不同组的散点模式。"],
+    dataShape: ["一行一个观测，至少有两列连续变量。", "两轴单位和取值尺度应可解释。", "分组变量建议使用不同颜色和形状。"],
+    steps: [
+      {
+        title: "画基础散点",
+        text: "先用低透明度处理重叠，不要在第一步就加入复杂主题。",
+        code: "ggplot(dat, aes(exposure, outcome)) +\n  geom_point(alpha = .45) +\n  labs(x = \"暴露\", y = \"结局\") +\n  theme_minimal()",
+      },
+      {
+        title: "按组区分",
+        text: "分组后可能出现总体趋势与组内趋势不同的情况，即辛普森悖论，要提前警惕。",
+        code: "ggplot(dat, aes(exposure, outcome, color = group)) +\n  geom_point(alpha = .5) +\n  geom_smooth(method = \"lm\", se = FALSE) +\n  theme_minimal()",
+      },
+      {
+        title: "记录异常点",
+        text: "不要直接从图中删点。先回到原始记录，核对单位、录入和生物学合理性。",
+        code: "dat[order(-dat$outcome), c(\"id\", \"exposure\", \"outcome\")][1:10, ]",
+      },
+    ],
+    functions: ["geom_point", "geom_smooth", "smoothScatter"],
+    conditions: ["两个变量均为连续或可视为连续。", "坐标尺度不会掩盖主要范围。", "重叠和分组结构已经处理。"],
+    interpret: "点向右上分布通常表示正向关系；点分布成曲线表示线性模型可能不合适，但图形本身不能证明因果。",
+    pitfalls: ["点大量重叠就断言没有关系。", "只画总趋势而忽略分组。", "按外观删除不符合预期的点。"],
+    related: ["hexbin", "linear"],
+  },
+  {
+    type: "plot",
+    id: "bar",
+    title: "条形图",
+    level: "入门",
+    aliases: ["bar chart", "柱状图", "geom_bar"],
+    hero: "比较类别的人数和汇总值",
+    audience: "适合展示分类变量频数、各组患病率、平均值或其他已汇总指标。",
+    definition: "条形图用柱子的长度表示每个类别的频数、比例或某个汇总值。它适合比较离散组别，不适合展示连续分布。",
+    overview: "需要先区分柱子代表的是计数还是已经算好的均值/比例。`geom_bar()` 默认统计行数，`geom_col()` 直接使用 y 值。错误混用会让图中数字含义发生变化。",
+    features: ["类别比较直观。", "可排序后突出主要差异。", "堆积和并排表达的是不同问题。"],
+    whenUse: ["比较分类频数或比例。", "展示各组均值、率或得分。", "制作汇报中的简明类别比较。"],
+    dataShape: ["一行一个人时可直接统计频数。", "如展示率或均数，应先确认分母和汇总表。", "类别顺序和颜色要固定。"],
+    steps: [
+      {
+        title: "确认柱子代表什么",
+        text: "频数用 count，比例或率需要有明确分母。不要在绘图阶段悄悄改变总量。",
+        code: "tab <- as.data.frame(table(dat$group))\nnames(tab) <- c(\"group\", \"n\")",
+      },
+      {
+        title: "绘制计数条形图",
+        text: "按数值排序可提高可读性，但类别顺序有专业含义时不要为了美观重排。",
+        code: "ggplot(tab, aes(reorder(group, -n), n)) +\n  geom_col(fill = \"#2f6b5b\") +\n  labs(x = \"组别\", y = \"人数\") +\n  theme_minimal()",
+      },
+      {
+        title: "并排比较率或均数",
+        text: "若柱子代表率，y 轴必须写清分母；若代表均数，应同时提供不确定性。",
+        code: "ggplot(summary_dat, aes(group, rate, fill = sex)) +\n  geom_col(position = position_dodge()) +\n  labs(y = \"患病率（%）\") +\n  theme_minimal()",
+      },
+    ],
+    functions: ["barplot", "geom_bar", "geom_col"],
+    conditions: ["类别数量适中。", "y 轴含义和分母清楚。", "柱子起点应保持 0。"],
+    interpret: "柱子长度直接对应显示的统计量；不要看到柱子更高就说差异有统计学意义。",
+    pitfalls: ["把计数柱和均值柱混在一张图中。", "截断 y 轴夸大差异。", "类别太多时仍使用拥挤的纵列条形图。"],
+    related: ["histogram", "treemap"],
+  },
+  {
+    type: "plot",
+    id: "line",
+    title: "折线图",
+    level: "入门",
+    aliases: ["line chart", "时间趋势图", "geom_line"],
+    hero: "按时间或顺序追踪变化",
+    audience: "适合展示每日病例、年度趋势、重复测量均值或连续时间上的变化。",
+    definition: "折线图用线连接相邻时间点或有序位置，强调变化方向和速率。线本身暗示两点之间存在连续过程，因此 x 轴必须有合理顺序。",
+    overview: "时间序列折线图是流行病学和环境研究的基础图形。作图前要核对日期顺序、间隔是否均匀、有没有缺日和重复日期。",
+    features: ["最适合时间趋势。", "可同时区分多个组。", "连接无序类别会产生误导。"],
+    whenUse: ["展示时间趋势或季节变化。", "比较不同组随时间的轨迹。", "预测前检查趋势和异常日期。"],
+    dataShape: ["一行通常是一个时间点或一个对象的一个时间点。", "日期、时间间隔和单位必须统一。", "重复测量需指定分组 ID 和组别。"],
+    steps: [
+      {
+        title: "核对日期和缺口",
+        text: "先检查重复日期、缺失日期和排序，再连接折线。",
+        code: "table(duplicated(dat$date))\nrange(dat$date)\nhead(dat[order(dat$date), c(\"date\", \"outcome\")])",
+      },
+      {
+        title: "画时间趋势",
+        text: "分组曲线应使用一致颜色；若点太密，可先汇总为周或月并写清聚合规则。",
+        code: "ggplot(dat, aes(date, outcome, color = group)) +\n  geom_line(linewidth = .8) +\n  labs(x = \"日期\", y = \"结局\") +\n  theme_minimal()",
+      },
+      {
+        title: "区分原始值和移动平均",
+        text: "平滑线便于观察趋势，但会改变读者对短期波动的感知，应保留原始数据层。",
+        code: "ggplot(dat, aes(date, outcome)) +\n  geom_line(alpha = .25) +\n  geom_smooth(method = \"loess\", span = .15, se = FALSE)",
+      },
+    ],
+    functions: ["geom_line", "geom_smooth", "ts"],
+    conditions: ["x 轴顺序有实际意义。", "时间间隔和缺失时间已说明。", "多条线不会因颜色过于相似而混淆。"],
+    interpret: "线的上升、下降和转折描述观察到的变化；没有对照设计时，不能把变化直接归因于某个事件。",
+    pitfalls: ["把无序分类用折线连接。", "不同时间间隔却按等距读取。", "过度平滑导致隐藏短期风险。"],
+    related: ["time-series", "ecological"],
+  },
+  {
+    type: "plot",
+    id: "errorbar",
+    title: "误差条图",
+    level: "进阶",
+    aliases: ["error bar", "errorbar", "均值置信区间图"],
+    hero: "同时展示估计值和不确定性",
+    audience: "适合展示各组均值、比例、回归效应及其标准误或置信区间。",
+    definition: "误差条图在点或柱子的上下添加线段，表示标准误、标准差或置信区间。图形是否正确，首先取决于误差条到底代表哪一种统计量。",
+    overview: "只画均值而省略不确定性，会让读者高估结果精度。误差条必须写清是 SD、SE 还是 95% CI；它们含义和宽度规律不同。",
+    features: ["把点估计与不确定性放在同一张图。", "适合组间比较和时间趋势。", "误差尺度不说明就容易被误读。"],
+    whenUse: ["展示各组均值或比例。", "比较效应随时间的变化。", "需要强调估计精度和区间。"],
+    dataShape: ["预先计算每组的估计值、下限和上限。", "记录每组样本量。", "确认误差条对应的统计量。"],
+    steps: [
+      {
+        title: "先算估计和区间",
+        text: "均值、标准误和 95% CI 应由分析步骤计算，不能手填看起来合适的长度。",
+        code: "summary_dat <- aggregate(score ~ group, dat, function(x) {\n  n <- sum(!is.na(x)); m <- mean(x, na.rm = TRUE)\n  se <- sd(x, na.rm = TRUE) / sqrt(n)\n  c(mean = m, low = m - 1.96 * se, high = m + 1.96 * se)\n})",
+      },
+      {
+        title: "绘制误差条",
+        text: "线和点保持清晰，图注注明是 SE 还是 95% CI。",
+        code: "ggplot(summary_dat, aes(group, mean)) +\n  geom_errorbar(aes(ymin = low, ymax = high), width = .2) +\n  geom_point(size = 2.5) +\n  labs(y = \"均值及 95% CI\") +\n  theme_minimal()",
+      },
+    ],
+    functions: ["geom_errorbar", "plotmeans", "summary"],
+    conditions: ["误差条定义明确。", "各组样本量和分母可核查。", "y 轴尺度不夸大微小差异。"],
+    interpret: "误差条越窄表示估计越精确；区间是否跨过无效值要结合效应尺度，而不能只看点高。",
+    pitfalls: ["把 SD 写成 95% CI。", "标准误随样本量变小却解释为个体变异变小。", "误差条被截断或与柱子不匹配。"],
+    related: ["forest", "bar"],
+  },
+  {
+    type: "plot",
+    id: "correlation-matrix",
+    title: "相关矩阵图",
+    level: "进阶",
+    aliases: ["correlation matrix", "相关图", "corrgram"],
+    hero: "一次查看多个变量之间的相关方向",
+    audience: "适合在建模前筛查多个连续变量之间的相关结构。",
+    definition: "相关矩阵图把多个变量的两两相关系数排成矩阵，并用颜色、圆或散点表示方向和强度。它帮助发现高度相关、冗余或需要进一步检查的变量。",
+    overview: "相关矩阵容易产生大量比较，不能只挑颜色最深的一格解释。相关系数的尺度、是否使用 Spearman、缺失处理和多重比较都要提前确定。",
+    features: ["适合快速浏览多个变量关系。", "能发现潜在共线性。", "高相关不等于变量重复或因果。"],
+    whenUse: ["多个连续变量建模前探索。", "检查量表条目之间的相关模式。", "初步发现可合并或需删除的冗余变量。"],
+    dataShape: ["每行一个观测，多列连续变量。", "变量单位和缺失模式应可比较。", "分类变量不能直接放入 Pearson 相关矩阵。"],
+    steps: [
+      {
+        title: "选择相关类型",
+        text: "近似正态连续变量可用 Pearson；秩关系或偏态变量可考虑 Spearman。",
+        code: "num <- dat[, c(\"age\", \"bmi\", \"score\", \"exposure\")]\ncor(num, use = \"pairwise.complete.obs\", method = \"pearson\")",
+      },
+      {
+        title: "绘制相关矩阵",
+        text: "颜色和数值同时呈现，避免只看图形猜大小。",
+        code: "library(GGally)\nggpairs(num, upper = list(continuous = wrap(\"cor\", size = 3)), lower = list(continuous = \"points\"))",
+      },
+    ],
+    functions: ["cor", "ggpairs", "corrgram", "scatterplotMatrix"],
+    conditions: ["变量关系大致单调或线性。", "缺失处理和相关系数方法相同。", "矩阵规模和比较数量可解释。"],
+    interpret: "相关系数接近 1 或 -1 表示线性或单调关系较强；接近 0 只表示没有明显单调线性关系，不代表变量之间没有关系。",
+    pitfalls: ["把相关直接解释为因果。", "对几十个变量逐个用 p 值筛选。", "忽略非线性关系和高影响点。"],
+    related: ["scatter", "pca", "factor-analysis"],
+  },
+  {
+    type: "plot",
+    id: "hexbin",
+    title: "六边形密度散点图",
+    level: "进阶",
+    aliases: ["hexbin", "六边形分箱", "density scatter"],
+    hero: "点太多时，用格子颜色显示密度",
+    audience: "适合大样本散点图，尤其是普通散点严重重叠、难以看出集中区域时。",
+    definition: "六边形密度散点图把平面划分成六边形格子，再按格内点数着色。它仍然是散点关系图，但显示的是局部密度，而不是每个原始点。",
+    overview: "当样本达到几千或几万时，透明散点仍可能糊成一片。六边形分箱能恢复集中趋势，但会隐藏格内个体的分布和极端点。",
+    features: ["适合大样本。", "突出局部密度。", "会失去原始点身份，不适合逐点核对。"],
+    whenUse: ["散点大量重叠。", "需要看关系的主要集中区域。", "数据量较大但仍关注双变量关系。"],
+    dataShape: ["两列连续变量，观测数量较多。", "坐标范围应一致并处理极端值。", "需要说明分箱数量和颜色尺度。"],
+    steps: [
+      {
+        title: "判断是否需要分箱",
+        text: "先画低透明度散点；若已经无法辨认密度，再使用六边形图。",
+        code: "ggplot(dat, aes(exposure, outcome)) + geom_point(alpha = .05)",
+      },
+      {
+        title: "绘制六边形图",
+        text: "颜色越亮通常表示格内点数越多，分箱数量会影响图形细节。",
+        code: "ggplot(dat, aes(exposure, outcome)) +\n  geom_hex(bins = 35) +\n  scale_fill_viridis_c() +\n  labs(fill = \"人数\") +\n  theme_minimal()",
+      },
+    ],
+    functions: ["geom_hex", "smoothScatter"],
+    conditions: ["样本量足够大。", "分箱尺度在相同数据范围中比较。", "图注说明颜色表示数量而不是结局风险。"],
+    interpret: "颜色越深或越亮表示该区域观测越密集；密度高低不等于结局概率，仍要结合研究设计。",
+    pitfalls: ["小样本也使用密度分箱。", "不同图用不同分箱和色阶比较。", "只展示密集区而忽略稀疏极端区。"],
+    related: ["scatter", "density"],
+  },
+  {
+    type: "plot",
+    id: "qq-plot",
+    title: "Q-Q 图",
+    level: "进阶",
+    aliases: ["QQ plot", "分位数图", "正态QQ图"],
+    hero: "数据分布与参考分布差在哪里",
+    audience: "适合检查连续变量或模型残差是否近似正态，并识别尾部异常。",
+    definition: "Q-Q 图把样本分位数和理论分布分位数画在一起。点越接近参考直线，说明两者越相似；头尾偏离通常比中间偏离更值得关注。",
+    overview: "Q-Q 图常用来检查线性模型残差，但它不是“通过/不通过”的正态性判决器。样本量过大时微小偏离也会明显，样本量过小时图形本身很不稳定。",
+    features: ["对尾部和偏态较敏感。", "适合回归后检查残差。", "需结合直方图、数值和样本量理解。"],
+    whenUse: ["线性回归后检查残差。", "比较变量与正态分布。", "识别尾部过重或偏态。"],
+    dataShape: ["一列连续变量或模型残差。", "记录样本量。", "模型残差应与模型结构对应。"],
+    steps: [
+      {
+        title: "提取残差",
+        text: "先确认模型拟合正确，再检查学生化或普通残差；不要对原始结局和残差混为一谈。",
+        code: "fit <- lm(outcome ~ exposure + age, data = dat)\nr <- residuals(fit)",
+      },
+      {
+        title: "绘制 Q-Q 图",
+        text: "点围绕直线波动是常见的；明显的弯曲或两端系统性偏离才提示偏态或重尾。",
+        code: "library(car)\nqqPlot(r, id = FALSE)\n# 或\nggplot(data.frame(r = r), aes(sample = r)) +\n  stat_qq() + stat_qq_line()",
+      },
+    ],
+    functions: ["qqPlot", "stat_qq", "stat_qq_line", "qqnorm"],
+    conditions: ["变量或残差是连续尺度。", "样本量足够读图形。", "理解残差是否应近似正态。"],
+    interpret: "点沿参考线分布表示与参考分布接近；中间弯曲提示偏态，尾部偏离提示极端值或重尾。",
+    pitfalls: ["只凭一点偏离就删除观测。", "把 Q-Q 图当作正态性唯一证据。", "对异方差模型仍检查无条件原始残差。"],
+    related: ["histogram", "linear"],
+  },
+  {
+    type: "plot",
+    id: "survival-curve",
+    title: "生存曲线",
+    level: "进阶",
+    aliases: ["Kaplan-Meier", "KM curve", "生存曲线"],
+    hero: "随访时间增加时，还没有发生事件的比例",
+    audience: "适合队列研究、随机试验和时间到事件数据。",
+    definition: "生存曲线用阶梯线表示在随访过程中仍未发生目标事件的概率。它同时利用事件时间和删失信息，是生存分析最常用的描述图。",
+    overview: "估计曲线前必须区分事件与删失，并统一时间单位。曲线呈台阶状，是因为只有在事件发生时才下降；删失只会减少仍在风险中的人数。",
+    features: ["适合有随访时间的数据。", "能展示时间变化和组间差异。", "风险人数表和删失说明不可缺。"],
+    whenUse: ["队列研究描述累积事件风险。", "试验比较两组结局发生时间。", "Cox 建模前作总体展示。"],
+    dataShape: ["一行一个研究对象。", "必须有随访时间与事件状态两列。", "明确时间起点、终点和删失原因。"],
+    steps: [
+      {
+        title: "构建生存对象",
+        text: "事件编码 1/0 含义要核对，时间单位统一。",
+        code: "library(survival)\nSurv(dat$follow_up, dat$event)[1:5]",
+      },
+      {
+        title: "估计并绘制 KM 曲线",
+        text: "同时显示风险人数，避免曲线末端在样本很少时被过度解读。",
+        code: "km <- survfit(Surv(follow_up, event) ~ group, data = dat)\nlibrary(survminer)\nggsurvplot(km, data = dat, conf.int = TRUE, risk.table = TRUE)",
+      },
+    ],
+    functions: ["Surv", "survfit", "ggsurvplot", "survdiff"],
+    conditions: ["随访时间和事件定义准确。", "右删失处理合理。", "样本量和事件数足以支持曲线末端。"],
+    interpret: "曲线在某一时间点的高度表示到该时点仍未发生事件的比例；曲线下降表示事件发生，不是总体生存率一直连续变化。",
+    pitfalls: ["把删失当成无事件。", "忽略风险人数和随访时长。", "曲线交叉仍用一个 HR 解释全部时期。"],
+    related: ["cohort", "cox"],
+  },
+  {
+    type: "plot",
+    id: "dendrogram",
+    title: "聚类树状图",
+    level: "高阶",
+    aliases: ["dendrogram", "树状图", "层次聚类图"],
+    hero: "观察样本或变量怎样逐步合并成组",
+    audience: "适合层次聚类、量表条目分组或多变量相似性探索。",
+    definition: "树状图是层次聚类结果的图形表示：叶子是对象，分支高度表示合并时的不相似程度。它在哪个高度剪断，就决定得到几个簇。",
+    overview: "树状图看起来直观，但分支顺序不一定稳定，表示的主要是合并层级。必须同时说明距离度量、连接方法和变量标准化方式。",
+    features: ["能展示完整合并过程。", "便于探索多个可能簇数。", "微小旋转和距离选择会改变外观。"],
+    whenUse: ["展示层次聚类结果。", "探索样本或变量的相似结构。", "比较不同距离和连接方法。"],
+    dataShape: ["每个对象一行，多列数值特征。", "变量量纲不同需标准化。", "缺失值不能悄悄当作 0。"],
+    steps: [
+      {
+        title: "计算距离",
+        text: "欧氏距离适合连续变量且已标准化；混合类型数据需要专门距离。",
+        code: "x <- scale(dat[, c(\"x1\", \"x2\", \"x3\")])\nd <- dist(x, method = \"euclidean\")",
+      },
+      {
+        title: "层次聚类并绘图",
+        text: "连接方法影响簇的形状，平均连接、完全连接往往比单连接更稳定。",
+        code: "hc <- hclust(d, method = \"average\")\nplot(hc, cex = .7)\nrect.hclust(hc, k = 3)",
+      },
+    ],
+    functions: ["hclust", "plot.dendrogram", "fviz_dend", "cutree"],
+    conditions: ["变量已按研究意义标准化。", "距离和连接方法明确。", "聚类结构经过稳定性或外部指标检查。"],
+    interpret: "两个对象越早在较低高度合并，通常表示越相似；在较高位置剪枝会得到更多、更分散的簇。",
+    pitfalls: ["把横轴叶子的左右顺序解释成定量大小。", "不同量纲变量不缩放。", "只看树形就确定最终簇数。"],
+    related: ["clustering", "pca"],
+  },
+  {
+    type: "plot",
+    id: "interactive",
+    title: "交互式图形",
+    level: "高阶",
+    aliases: ["interactive plot", "plotly", "交互图"],
+    hero: "让读者悬停、缩放和筛选数据",
+    audience: "适合网页报告、探索性分析和合作者讨论，不适合直接作为静态论文主图。",
+    definition: "交互式图形是在网页组件中呈现的图，支持悬停查看数值、缩放、筛选图例或旋转。它扩展了探索能力，但必须保证不依赖交互也能读到核心结论。",
+    overview: "交互图适合数据探索和补充材料。发表论文或打印报告仍应提供静态图、清晰标题和关键数值，因为读者可能无法交互。",
+    features: ["可显示更多细节。", "适合探索和演示。", "导出、无障碍和移动端体验需要额外检查。"],
+    whenUse: ["网页报告和教学。", "合作者探索数据。", "需要悬停查看个案或缩放区间。"],
+    dataShape: ["与对应静态图相同。", "避免在悬浮文本放入敏感信息。", "数据量很大时需先聚合或抽样。"],
+    steps: [
+      {
+        title: "先完成静态图",
+        text: "先确保无交互也能读懂，再添加悬停信息。",
+        code: "p <- ggplot(dat, aes(exposure, outcome, color = group)) +\n  geom_point() +\n  labs(title = \"暴露与结局\")",
+      },
+      {
+        title: "转换为交互图",
+        text: "检查工具栏、图例和悬停信息是否清楚，并导出独立 HTML 测试。",
+        code: "library(plotly)\nggplotly(p, tooltip = c(\"x\", \"y\", \"colour\"))",
+      },
+    ],
+    functions: ["ggplotly", "plot3d", "autoplot"],
+    conditions: ["有静态替代版本。", "不展示敏感信息。", "浏览器和移动端都能正常打开。"],
+    interpret: "交互只改变查看方式，不改变数据和分析结论。",
+    pitfalls: ["只在 RStudio Viewer 中测试。", "悬停信息过多导致无法阅读。", "把交互图直接截图成低分辨率论文图。"],
+    related: ["scatter", "treemap"],
+  },
+  {
+    type: "plot",
+    id: "treemap",
+    title: "矩形树图",
+    level: "应用",
+    aliases: ["treemap", "矩形树状图", "层级面积图"],
+    hero: "用面积同时展示类别大小和层级",
+    audience: "适合展示类别组成、子类别占比和预算或人数分布。",
+    definition: "矩形树图用矩形面积表示数量或比例，并用嵌套矩形表示层级。它适合类别较多、需要同时看总量和子类的场景。",
+    overview: "面积判断不如长度判断精确，适合展示总体结构，不适合要求读者比较非常接近的小数值。类别标签不足时，图会变成无法解释的色块。",
+    features: ["适合层级数据。", "面积映射占比。", "精确比较弱于条形图。"],
+    whenUse: ["类别和子类别的组成占比。", "展示总人数或资源的分配。", "条形图类别太多时作为替代。"],
+    dataShape: ["三列左右：一级类别、二级类别、数值。", "每个层级名称要统一。", "零值和缺失值的显示规则要说明。"],
+    steps: [
+      {
+        title: "整理层级和数值",
+        text: "先确认父类和子类是否唯一对应，再检查总数。",
+        code: "dat_tm <- aggregate(n ~ region + cause, data = dat, sum)",
+      },
+      {
+        title: "绘制矩形树图",
+        text: "标签只保留重要类别，颜色要和分组对应。",
+        code: "library(treemapify)\nggplot(dat_tm, aes(area = n, fill = region, label = cause)) +\n  geom_treemap() +\n  geom_treemap_text(place = \"centre\", reflow = TRUE)",
+      },
+    ],
+    functions: ["geom_treemap", "geom_treemap_text"],
+    conditions: ["层级结构不超过三到四层。", "数值非负且分母清楚。", "标签数量可控。"],
+    interpret: "矩形面积越大表示数值或占比越大；只比较面积相近的矩形时容易出错，应同时提供数值。",
+    pitfalls: ["不同层级混在同一层计算。", "用面积图比较细微差异。", "文字太小或颜色过多。"],
+    related: ["bar", "sankey"],
+  },
+  {
+    type: "plot",
+    id: "missing-pattern",
+    title: "缺失值模式图",
+    level: "应用",
+    aliases: ["missing pattern", "缺失模式", "VIM missing plot"],
+    hero: "看清缺失集中在哪里",
+    audience: "适合数据清洗、问卷整理和多重插补之前检查缺失结构。",
+    definition: "缺失值模式图用矩阵、颜色或聚合图展示哪些变量和记录存在缺失。它帮助判断缺失是分散出现、集中在少数变量，还是与某些组别有关。",
+    overview: "图形只能描述缺失模式，不能自动告诉你缺失机制。需要结合问卷流程、跳转题、测量时间和专业知识判断 MCAR、MAR 或 MNAR。",
+    features: ["快速发现缺失集中的变量和样本。", "适合插补前检查。", "不等于证明缺失机制。"],
+    whenUse: ["清洗问卷后检查缺失。", "决定完整案例还是多重插补。", "检查某个变量缺失是否与组别有关。"],
+    dataShape: ["一行一个对象，多列包含 NA。", "要区分真正的 NA、空字符串和特殊缺失码。", "先检查不应缺失的 ID 和关键字段。"],
+    steps: [
+      {
+        title: "统一缺失编码",
+        text: "把“未知”“拒答”“跳过”等按研究规则转成缺失或单独类别。",
+        code: "key_vars <- c(\"age\", \"sex\", \"score\", \"outcome\")\ncolSums(is.na(dat[key_vars]))",
+      },
+      {
+        title: "画缺失矩阵",
+        text: "行数太多时抽样或按变量聚合，颜色只编码“是否缺失”。",
+        code: "library(VIM)\naggr(dat[key_vars], numbers = TRUE, prop = FALSE)\nmatrixplot(dat[key_vars])",
+      },
+      {
+        title: "继续检查缺失与变量关系",
+        text: "比较缺失组和非缺失组的其他变量，并记录缺失比例；不要只看一张图就选择插补方法。",
+        code: "dat$score_missing <- is.na(dat$score)\ntable(dat$score_missing, dat$sex, useNA = \"ifany\")",
+      },
+    ],
+    functions: ["aggr", "matrixplot", "md.pattern", "is.na"],
+    conditions: ["缺失码已统一。", "敏感信息不应显示在图中。", "缺失机制结合数据来源解释。"],
+    interpret: "成块出现的缺失可能提示问卷结构或测量流程问题；零散缺失仍需结合缺失比例和变量角色决定处理方式。",
+    pitfalls: ["把所有缺失直接填 0。", "只看缺失比例，不区分原因。", "用完整案例分析却忽略选择偏倚。"],
+    related: ["missing-values", "clustering"],
+  },
+  {
+    type: "model",
+    id: "anova",
+    title: "方差分析 ANOVA",
+    level: "入门",
+    aliases: ["analysis of variance", "方差分析", "aov"],
+    hero: "比较三个或更多组的平均值",
+    audience: "适合一个连续结局与一个或多个分类因素，例如不同治疗方案、地区或时间组。",
+    definition: "方差分析用组间差异相对于组内差异来判断多个组均值是否整体存在差异。它回答“这些组中是否至少有一组不同”，不直接告诉你每一对组的差异。",
+    overview: "单因素 ANOVA 是连续结局加一个分类因素；双因素或协方差分析可处理多个因素和调整连续变量。显著后还要做事先计划或校正后的多重比较。",
+    features: ["适合三个及以上组的均值比较。", "可以同时考察交互作用。", "需要检查独立性、近似正态和方差齐性。"],
+    whenUse: ["连续结局按三个以上类别比较。", "实验设计中有多个因素。", "需要在回归框架下比较组均值。"],
+    dataShape: ["一行一个独立观测。", "连续结局一列，分类因素使用因子。", "重复测量不能当作普通独立 ANOVA。"],
+    steps: [
+      {
+        title: "描述各组",
+        text: "先看每组人数、均值、标准差和分布，不急着看 p 值。",
+        code: "aggregate(score ~ group, dat, function(x) c(n = length(x), mean = mean(x), sd = sd(x)))",
+      },
+      {
+        title: "拟合 ANOVA",
+        text: "`aov()` 与 `lm()` 使用公式；`summary()` 输出整体检验。因素顺序会影响不平衡设计下的平方和。",
+        code: "fit <- aov(score ~ group, data = dat)\nsummary(fit)",
+      },
+      {
+        title: "检查假设并做多重比较",
+        text: "独立性由设计决定，另检查残差和方差。若整体显著，再做控制错误率的两两比较。",
+        code: "TukeyHSD(fit)\nplot(fit, 1)\nplot(fit, 2)",
+      },
+    ],
+    functions: ["aov", "Anova", "TukeyHSD", "leveneTest", "plotmeans"],
+    conditions: ["观测相互独立。", "各组残差近似正态且方差不过度不齐。", "多重比较方法在分析前计划。"],
+    interpret: "整体 p 值小说明组均值并非全部相同，但具体哪两组不同要看后续比较和效应大小。",
+    pitfalls: ["整体检验显著后任意比较所有组。", "把重复测量当独立样本。", "只看 p 值不看均数差和置信区间。"],
+    related: ["linear", "rct"],
+  },
+  {
+    type: "model",
+    id: "ordinal",
+    title: "有序 Logistic 回归",
+    level: "进阶",
+    aliases: ["ordinal logistic", "比例优势模型", "polr"],
+    hero: "结局有顺序，但不一定是等距数值",
+    audience: "适合自评健康差/一般/好、疼痛轻/中/重或 Likert 频次结局。",
+    definition: "有序 Logistic 回归处理三个或更多有自然顺序的类别。它通常假设不同切点处的累积优势比近似相同，因此用一个 OR 概括暴露与更高类别倾向的关系。",
+    overview: "类别顺序必须真实存在；不能把无序的城市或血型强行排序。比例优势假设若明显不成立，可考虑偏比例优势模型或多项模型。",
+    features: ["保留结局顺序。", "比把有序类别当连续变量更符合数据结构。", "依赖比例优势假设。"],
+    whenUse: ["结局是三个以上有序类别。", "类别间隔不明确，不宜直接当作连续分数。", "希望估计向更高类别移动的 OR。"],
+    dataShape: ["一行一个观测。", "结局用有序因子，并按从低到高排列水平。", "协变量可为连续或分类。"],
+    steps: [
+      {
+        title: "设置结局顺序",
+        text: "顺序错误会反转整个模型解释。",
+        code: "dat$health <- factor(dat$health, levels = c(\"差\", \"一般\", \"好\"), ordered = TRUE)\ntable(dat$health)",
+      },
+      {
+        title: "拟合比例优势模型",
+        text: "MASS::polr 输出累积 logits，指数化后得到向更高类别移动的 OR。",
+        code: "library(MASS)\nfit <- polr(health ~ exposure + age + sex, data = dat, Hess = TRUE)\nsummary(fit)\nexp(cbind(OR = coef(fit), confint(fit)))",
+      },
+      {
+        title: "检查比例优势",
+        text: "可用图形或专门检验比较不同切点的效应；若差异明显，需换模型而不是强行解释一个 OR。",
+        code: "# 使用 ordinal 包的 nominal_test(fit) 作敏感性检查\nlibrary(ordinal)",
+      },
+    ],
+    functions: ["polr", "glm", "confint"],
+    conditions: ["类别有明确顺序。", "比例优势近似成立。", "每个类别有足够观测。"],
+    interpret: "OR > 1 通常表示暴露增加时更可能落在更高结局类别；不同软件的参数化方向要核对。",
+    pitfalls: ["把无序类别当作有序。", "比例优势不成立仍只报一个 OR。", "把 OR 解释成连续分数差异。"],
+    related: ["logistic", "multinomial"],
+  },
+  {
+    type: "model",
+    id: "multinomial",
+    title: "多分类 Logistic 回归",
+    level: "进阶",
+    aliases: ["multinomial logistic", "多项Logistic", "multinom"],
+    hero: "结局有多个无序类别时分别与参照类比较",
+    audience: "适合疾病亚型、职业类别、交通方式等三个以上没有自然顺序的结局。",
+    definition: "多分类 Logistic 回归把多个无序结局中的一个设为参照，再分别估计其他每个类别相对于参照类的效应。它会产生多组 OR，而不是一个总 OR。",
+    overview: "结果表会比二分类 Logistic 大很多，最容易出错的是参照类别和每组系数的方向。也可使用 softmax 参数化，但解释原则相同。",
+    features: ["适用于无序多类别。", "结果为 K-1 组相对参照的 OR。", "需要更多事件数和更谨慎的报告。"],
+    whenUse: ["结局有三个以上无序类别。", "希望同时比较各类别与参照组的差异。", "每个类别有足够样本。"],
+    dataShape: ["一行一个观测。", "结局设为因子并明确参照类。", "协变量在各组中需有足够变异。"],
+    steps: [
+      {
+        title: "设定参照类",
+        text: "通常选样本最多、对照意义最强或临床基线类别。",
+        code: "dat$outcome <- relevel(factor(dat$outcome), ref = \"A\")\ntable(dat$outcome)",
+      },
+      {
+        title: "拟合多分类模型",
+        text: "每个结局类别相对参照类各有一组系数；不要把所有 OR 混成一个方向。",
+        code: "library(nnet)\nfit <- multinom(outcome ~ exposure + age + sex, data = dat)\nsummary(fit)\nexp(coef(fit))",
+      },
+      {
+        title: "报告效应和预测表现",
+        text: "按结局类别分别报告 OR、95% CI 和样本数，并检查分类模型的区分与校准。",
+        code: "predict(fit, type = \"probs\")[1:5, ]",
+      },
+    ],
+    functions: ["multinom", "predict", "confint"],
+    conditions: ["结局类别无序或顺序不应用有序模型表达。", "各类别有足够事件数。", "参照类别固定并写清楚。"],
+    interpret: "某一类别的 OR = 1.8 表示相对于参照结局，该暴露与属于这一类的优势更高；必须同时写出比较的是哪两类。",
+    pitfalls: ["只报告一个类别的结果。", "参照类中途改变。", "类别事件数很少仍纳入很多协变量。"],
+    related: ["logistic", "ordinal"],
+  },
+  {
+    type: "model",
+    id: "time-series",
+    title: "时间序列与 ARIMA",
+    level: "高阶",
+    aliases: ["time series", "ARIMA", "时间序列"],
+    hero: "观察到有序时间点上的趋势、季节和自相关",
+    audience: "适合空气污染、气温、每日死亡数、传染病报告等按时间排列的数据。",
+    definition: "时间序列是带时间间隔的连续观测。ARIMA 模型用过去的取值和过去误差描述当前值，适合在序列平稳后拟合和短期预测。",
+    overview: "时间序列不能把每个时间点当成互不相关的样本。趋势、季节、节假日、报告延迟和自相关都会影响模型；先画图、分解和差分，再选择模型。",
+    features: ["显式处理自相关。", "可用于趋势和季节建模。", "预测并不等于因果解释。"],
+    whenUse: ["观测按固定时间间隔重复。", "存在趋势、季节或自相关。", "需要短期预测或控制时间混杂。"],
+    dataShape: ["一行一个等间隔时间点。", "日期连续，缺失时间和报告延迟要核对。", "结局计数和非负变量需选择匹配模型。"],
+    steps: [
+      {
+        title: "建立时间序列对象",
+        text: "频率必须与研究周期一致，例如日数据有 7 天周周期或 365.25 天年周期。",
+        code: "y <- ts(dat$outcome, start = c(2018, 1), frequency = 365.25)\nplot(y)",
+      },
+      {
+        title: "分解和检查平稳性",
+        text: "观察趋势与季节；用 ACF/PACF 和差分判断是否需要 d 阶差分。",
+        code: "decompose(y)\nAcf(y)\nPacf(y)\nndiffs(y)",
+      },
+      {
+        title: "拟合 ARIMA 并预测",
+        text: "自动选阶只是起点，仍需检查残差是否白噪声和模型是否可解释。",
+        code: "library(forecast)\nfit <- auto.arima(y)\ncheckresiduals(fit)\nforecast(fit, h = 30)",
+      },
+    ],
+    functions: ["ts", "decompose", "adf.test", "auto.arima", "forecast", "Acf", "Pacf"],
+    conditions: ["时间顺序和间隔可靠。", "模型残差近似无自相关。", "预测范围和外部变化边界明确。"],
+    interpret: "预测线给出未来均值和不确定区间，不代表一定会发生；趋势外推越远越依赖强假设。",
+    pitfalls: ["把一天当一个独立样本。", "忽略季节和节假日。", "看到 forecast 图就直接作因果结论。"],
+    related: ["ecological", "dlnm"],
+  },
+  {
+    type: "model",
+    id: "pca",
+    title: "主成分分析 PCA",
+    level: "高阶",
+    aliases: ["principal component analysis", "主成分", "prcomp"],
+    hero: "把许多相关变量压缩成少数综合方向",
+    audience: "适合变量很多、相关性较强，需要降维、可视化或减少共线性的数据。",
+    definition: "主成分分析把原始变量线性组合成少数互不相关的主成分，并让前几个成分尽可能保留方差。它描述数据变异，不是验证某个潜在心理结构。",
+    overview: "PCA 的尺度很敏感。不同单位变量应标准化；需要查看载荷、解释方差和碎石图。主成分方向可旋转符号，必须结合原始变量解释。",
+    features: ["可压缩高维数据。", "可发现样本整体模式和异常。", "主成分是数学组合，不一定有专业名称。"],
+    whenUse: ["变量多且相关。", "需要二维可视化高维样本。", "想减少回归共线性或生成综合指标。"],
+    dataShape: ["每行一个对象，多列数值变量。", "检查缺失、异常和量纲。", "建议先标准化。"],
+    steps: [
+      {
+        title: "标准化并选择完整数据",
+        text: "不同量纲会导致方差最大的变量主导 PCA。缺失处理必须与后续分析一致。",
+        code: "x <- scale(na.omit(dat[, numeric_vars]))",
+      },
+      {
+        title: "运行 PCA",
+        text: "查看每个主成分解释的方差和累计比例，再决定保留几个。",
+        code: "pca <- prcomp(x, center = TRUE, scale. = TRUE)\nsummary(pca)\nplot(pca, type = \"l\")",
+      },
+      {
+        title: "解释载荷和样本图",
+        text: "载荷表示变量对成分的贡献；旋转符号改变不改变实质。",
+        code: "pca$rotation[, 1:3]\nbiplot(pca)",
+      },
+    ],
+    functions: ["prcomp", "princomp", "principal", "scree"],
+    conditions: ["变量均为数值或可合理量化。", "量纲问题已通过标准化处理。", "保留成分数有数值和专业依据。"],
+    interpret: "第一主成分解释的方差越多，说明这个综合方向越能概括线性变异；它不一定对应某个真实疾病机制。",
+    pitfalls: ["不标准化就混合不同单位。", "把主成分直接命名为某个潜变量。", "只根据累计方差机械保留成分。"],
+    related: ["factor-analysis", "correlation-matrix"],
+  },
+  {
+    type: "model",
+    id: "factor-analysis",
+    title: "探索性因子分析",
+    level: "高阶",
+    aliases: ["exploratory factor analysis", "EFA", "因子分析"],
+    hero: "寻找量表题目背后可能共享的潜在维度",
+    audience: "适合量表开发、问卷结构探索和多题测量工具的维度分析。",
+    definition: "探索性因子分析假设多个可观测题目受到较少的潜在因子影响，并用因子载荷描述题目与潜在维度的关系。它更接近测量模型，和 PCA 的降维目标不同。",
+    overview: "EFA 不是“看到结果后给因子起名字”。题目编码、反向计分、样本量、因子数、提取方法和旋转方式都要提前规划；最好再用独立样本验证。",
+    features: ["用于探索测量结构。", "因子载荷帮助解释维度。", "结果需要理论和后续验证。"],
+    whenUse: ["新量表题目结构未知。", "多个题目可能共享潜在维度。", "需要初步删题或调整维度。"],
+    dataShape: ["一行一个受试者，多列同量纲题目。", "反向题已转换，缺失规则明确。", "样本量和题目数足以支持稳定估计。"],
+    steps: [
+      {
+        title: "检查题目与适当性",
+        text: "先看题目分布、相关矩阵、KMO 和 Bartlett 检验；不要只凭一个门槛决定做不做。",
+        code: "items <- dat[, paste0(\"item\", 1:12)]\nlibrary(psych)\nKMO(items)\ncortest.bartlett(cor(items), n = nrow(items))",
+      },
+      {
+        title: "选择因子数",
+        text: "碎石图、平行分析和理论可解释性一起使用。",
+        code: "fa.parallel(items, fa = \"fa\", fm = \"ml\")",
+      },
+      {
+        title: "提取与旋转因子",
+        text: "选择提取方法和旋转后查看载荷、共同度和交叉载荷。",
+        code: "fit <- fa(items, nfactors = 3, rotate = \"promax\", fm = \"ml\")\nprint(fit$loadings, cutoff = .3)\nfa.diagram(fit)",
+      },
+    ],
+    functions: ["fa", "fa.parallel", "fa.diagram", "KMO"],
+    conditions: ["题目测量方向一致。", "样本与题目比例足够。", "因子数和命名有理论依据。"],
+    interpret: "载荷高表示题目与该潜在因子关联更强；载荷是探索结果，不是绝对证明了该维度存在。",
+    pitfalls: ["对反向题不重编码。", "把 PCA 结果直接称为因子分析。", "在同一数据中不断改因子数直到结果好看。"],
+    related: ["pca", "scale"],
+  },
+  {
+    type: "model",
+    id: "clustering",
+    title: "聚类分析",
+    level: "高阶",
+    aliases: ["cluster analysis", "无监督聚类", "kmeans"],
+    hero: "在没有结局标签时按相似性分组",
+    audience: "适合发现样本类型、行为模式、疾病表型或变量分组。",
+    definition: "聚类分析根据对象之间的距离或相似度自动组群，使同组对象更接近、不同组更远。它没有真实标签，因此簇数和方法都需要验证。",
+    overview: "聚类结果不是天然存在的“真实分类”。变量选择、标准化、距离和算法都会改变分组。应检查稳定性，并用专业解释和外部变量验证。",
+    features: ["无需预先给定结局。", "适合探索和分型。", "结果对预处理和算法敏感。"],
+    whenUse: ["没有标签但想探索人群亚型。", "需要从多变量中找相似模式。", "作为后续分类或机制研究的线索。"],
+    dataShape: ["每行一个对象，多列特征。", "量纲必须标准化。", "缺失值和异常点需单独处理。"],
+    steps: [
+      {
+        title: "选择变量并标准化",
+        text: "只放入与研究问题相关的变量，避免把泄漏身份的 ID 放进距离。",
+        code: "x <- scale(na.omit(dat[, c(\"bmi\", \"sbp\", \"glucose\", \"crp\")]))",
+      },
+      {
+        title: "比较簇数",
+        text: "肘部图、轮廓系数和稳定性一起判断，不能只选图形最好看的解。",
+        code: "library(factoextra)\nfviz_nbclust(x, kmeans, method = \"silhouette\")",
+      },
+      {
+        title: "拟合并解释簇",
+        text: "描述各簇在每个原始变量上的特征，检查簇大小和稳定性。",
+        code: "set.seed(123)\nkm <- kmeans(x, centers = 3, nstart = 50)\nfviz_cluster(km, data = x)\ntable(km$cluster)",
+      },
+    ],
+    functions: ["kmeans", "pam", "hclust", "fviz_cluster", "silhouette"],
+    conditions: ["特征与距离度量匹配。", "变量已标准化并检查异常值。", "簇数和稳定性有证据。"],
+    interpret: "轮廓系数越接近 1 表示对象更接近本簇、分离更清楚；但高轮廓不等于有临床意义。",
+    pitfalls: ["把簇名当作已证实疾病亚型。", "不缩放变量。", "只报告一次聚类结果。"],
+    related: ["dendrogram", "pca"],
+  },
+  {
+    type: "model",
+    id: "classification-tree",
+    title: "决策树",
+    level: "高阶",
+    aliases: ["classification tree", "CART", "rpart"],
+    hero: "按变量阈值逐层把样本分到不同结局组",
+    audience: "适合探索分类规则、识别交互，或向非统计读者展示简单预测模型。",
+    definition: "决策树通过一系列“变量是否超过某个阈值”的问题把样本分成小群体，并为最终叶节点给出预测类别或概率。",
+    overview: "树很容易解释，但也很容易过拟合。深度、最小叶节点样本数和剪枝规则决定复杂度；应在训练集或交叉验证中评估。",
+    features: ["图形直观，适合教学。", "能自动发现阈值和交互。", "单棵树对数据扰动可能不稳定。"],
+    whenUse: ["需要可解释分类规则。", "探索变量之间的层级交互。", "作为随机森林等模型的基线。"],
+    dataShape: ["一行一个对象。", "结局为分类因子，候选变量数值或分类。", "训练集与测试集分开。"],
+    steps: [
+      {
+        title: "划分训练与验证",
+        text: "先在训练集建树，再在测试集评估，不能用同一批数据同时调参和报告表现。",
+        code: "set.seed(2026)\nidx <- sample(seq_len(nrow(dat)), .7 * nrow(dat))\ntrain <- dat[idx, ]; test <- dat[-idx, ]",
+      },
+      {
+        title: "拟合并剪枝",
+        text: "用 CP 或其他复杂度参数控制树的大小，避免每个小样本都单独成叶。",
+        code: "library(rpart)\nfit <- rpart(outcome ~ ., data = train, method = \"class\", cp = .01)\nplotcp(fit)\nprune(fit, cp = fit$cptable[which.min(fit$cptable[, 4]), \"CP\"])",
+      },
+      {
+        title: "绘制并评估",
+        text: "用混淆矩阵、灵敏度、特异度和校准评价测试集表现。",
+        code: "library(rpart.plot)\nrpart.plot(fit)\npred <- predict(fit, test, type = \"class\")\ntable(pred, test$outcome)",
+      },
+    ],
+    functions: ["rpart", "rpart.plot", "predict", "table"],
+    conditions: ["有足够的训练和验证样本。", "分类阈值和评价指标事先定义。", "模型复杂度受到控制。"],
+    interpret: "从根到叶的路径是一组分类规则，但叶节点中的比例仍受训练样本影响，不能视为因果机制。",
+    pitfalls: ["让树无限生长。", "只在训练集报告准确率。", "把变量重要性解释为因果作用。"],
+    related: ["random-forest", "logistic"],
+  },
+  {
+    type: "model",
+    id: "random-forest",
+    title: "随机森林",
+    level: "高阶",
+    aliases: ["random forest", "随机森林", "RF"],
+    hero: "用许多棵不同的树做出更稳定的预测",
+    audience: "适合变量较多、关系非线性的分类或回归预测，也可用于变量重要性探索。",
+    definition: "随机森林训练许多棵决策树，每棵树使用不同的样本抽样和变量子集，再汇总各树的预测。它通常比单棵树稳定，但解释方式不能沿用一个树分支。",
+    overview: "随机森林是预测方法，不是自动寻找因果模型。原始变量重要性会偏向连续或类别多的变量；更可靠的解释需要置换重要性、局部解释和外部验证。",
+    features: ["适合非线性与交互。", "对单棵树波动更稳健。", "模型复杂，需关注过拟合和可解释性。"],
+    whenUse: ["预测比解释更重要。", "变量多、关系非线性。", "需要变量重要性筛查。"],
+    dataShape: ["一行一个对象，结局分类或连续。", "分类变量合理编码，缺失规则明确。", "区分训练、验证和测试。"],
+    steps: [
+      {
+        title: "用训练集拟合",
+        text: "先用默认参数建立基线，再通过交叉验证调整树数和每次分裂变量数。",
+        code: "library(randomForest)\nset.seed(2026)\nfit <- randomForest(outcome ~ ., data = train, ntree = 500, na.action = na.omit)",
+      },
+      {
+        title: "查看 OOB 和重要性",
+        text: "OOB 是内部泛化估计，但不能代替独立测试集；重要性不是因果效应。",
+        code: "fit\nimportance(fit)\nvarImpPlot(fit)",
+      },
+      {
+        title: "在测试集验证",
+        text: "比较预测类别与真实结局，并检查不同人群中的稳定性。",
+        code: "pred <- predict(fit, newdata = test)\ntable(pred, test$outcome)",
+      },
+    ],
+    functions: ["randomForest", "importance", "varImpPlot", "predict"],
+    conditions: ["样本量与变量数匹配。", "训练和测试数据分布相似。", "预测指标与临床决策目标一致。"],
+    interpret: "置换后准确度下降越多，表示该变量对当前预测越重要；这仍不等于改变该变量会改变结局。",
+    pitfalls: ["把 OOB 准确率当作外部验证。", "用原始重要性直接排因果。", "在不平衡分类中只看准确率。"],
+    related: ["classification-tree", "svm"],
+  },
+  {
+    type: "model",
+    id: "svm",
+    title: "支持向量机 SVM",
+    level: "高阶",
+    aliases: ["support vector machine", "支持向量机", "e1071"],
+    hero: "寻找能较好分开类别样本的边界",
+    audience: "适合中小规模、边界较复杂的分类或回归预测任务。",
+    definition: "支持向量机寻找一个间隔尽可能大的决策边界；通过核函数可以在变换后的空间中处理非线性关系。分类时输出预测类别，某些设置还能给出决策值。",
+    overview: "SVM 对特征缩放和超参数很敏感。核函数、成本参数和 gamma 通常需要交叉验证；高分类准确率不能替代概率校准和外部验证。",
+    features: ["适合非线性边界。", "对高维数据有一定优势。", "调参和解释比 Logistic 更复杂。"],
+    whenUse: ["分类边界明显非线性。", "样本规模中等。", "相比参数解释更重视预测。"],
+    dataShape: ["一行一个对象，数值特征需标准化。", "分类变量需要合理编码。", "训练集与测试集严格分开。"],
+    steps: [
+      {
+        title: "标准化并设置验证",
+        text: "标准化参数只能从训练集学习，再应用到测试集，避免数据泄漏。",
+        code: "x_train <- scale(train[, predictors])\ncenter <- attr(x_train, \"scaled:center\")\nscale <- attr(x_train, \"scaled:scale\")\nx_test <- scale(test[, predictors], center, scale)",
+      },
+      {
+        title: "训练与调参",
+        text: "使用交叉验证搜索成本参数和 gamma，并记录完整搜索空间。",
+        code: "library(e1071)\ntuned <- tune.svm(x = x_train, y = train$outcome,\n                  cost = 10^(-2:2), gamma = 10^(-3:1))",
+      },
+      {
+        title: "评估预测表现",
+        text: "测试集报告混淆矩阵和适合研究目标的指标；若需要概率，检查校准。",
+        code: "fit <- tuned$best.model\npred <- predict(fit, x_test)\ntable(pred, test$outcome)",
+      },
+    ],
+    functions: ["svm", "tune.svm", "predict", "roc"],
+    conditions: ["特征已正确缩放。", "超参数通过验证选择。", "训练测试划分反映真实应用场景。"],
+    interpret: "预测类别取决于训练后的决策边界；复杂核函数的内部系数不宜像线性回归系数那样直接解释。",
+    pitfalls: ["用全部数据标准化和调参。", "只报告最好一次准确率。", "忽略类别不平衡和概率校准。"],
+    related: ["random-forest", "diagnostic"],
+  },
+  {
+    type: "model",
+    id: "robust-regression",
+    title: "稳健回归",
+    level: "高阶",
+    aliases: ["robust regression", "稳健回归", "rlm"],
+    hero: "减少少数异常观测对回归系数的影响",
+    audience: "适合连续结局、存在合理极端值或普通最小二乘结果被少数点主导的情况。",
+    definition: "稳健回归使用不易被极端残差主导的损失函数，例如 Huber 或双权重，来估计回归关系。它不是自动删除异常值，而是降低个别点对系数的影响。",
+    overview: "发现异常值时，第一步始终是核查数据而不是直接换模型。稳健回归适合极端值真实存在且无法合理删除的场景，但它也要满足自身的模型假设。",
+    features: ["降低极端点影响。", "比普通 OLS 更稳健。", "解释仍是条件关系，不自动带来因果性。"],
+    whenUse: ["真实存在重尾或合理极端值。", "普通线性回归受少数点强烈影响。", "需要与 OLS 作敏感性比较。"],
+    dataShape: ["一行一个独立观测。", "连续结局和解释变量。", "记录异常值核查和变换决定。"],
+    steps: [
+      {
+        title: "先比较 OLS 与诊断",
+        text: "查看残差、杠杆值和 Cook 距离，更新原始记录而不是盲目删点。",
+        code: "ols <- lm(outcome ~ exposure + age, data = dat)\nplot(ols)\nwhich(cooks.distance(ols) > 4 / nrow(dat))",
+      },
+      {
+        title: "拟合稳健模型",
+        text: "MASS::rlm 使用稳健损失，可与 OLS 比较系数和置信区间。",
+        code: "library(MASS)\nrob <- rlm(outcome ~ exposure + age, data = dat)\nsummary(rob)\ncbind(ols = coef(ols), robust = coef(rob))",
+      },
+    ],
+    functions: ["rlm", "lm", "cooks.distance", "rstandard"],
+    conditions: ["异常值来源已经核查。", "研究设计仍满足独立观测等基本要求。", "稳健结果与 OLS 一并报告。"],
+    interpret: "暴露系数表示调整其他变量后结局的平均变化估计；与 OLS 差异很大说明少数观测可能对原始结果影响较大。",
+    pitfalls: ["把稳健回归当作清理数据的替代品。", "不报告与普通回归的敏感性比较。", "把稳健标准误和稳健回归混为一谈。"],
+    related: ["linear", "qq-plot"],
+  },
+];
+
+window.RZH_ADVANCED_GUIDE_FUNCTIONS = [
+  {
+    id: "polr",
+    name: "polr()",
+    package: "MASS",
+    category: "回归与建模",
+    aliases: ["有序Logistic", "比例优势模型", "ordinal logistic"],
+    summary: "拟合比例优势有序 Logistic 回归，用于有自然顺序的多分类结局。",
+    syntax: "polr(formula, data, weights, Hess = FALSE, method = c(\"logistic\", \"probit\", \"cloglog\", \"cauchit\"))",
+    returns: "返回 polr 模型对象，可继续用 summary、predict 和 confint。",
+    level: "进阶",
+    example: `library(MASS)\nfit <- polr(health ~ exposure + age, data = dat, Hess = TRUE)\nsummary(fit)`,
+    output: "估计不同累积切点下的 logit 模型并得到比例优势系数。",
+    params: [
+      ["formula", "有序结局与解释变量。", "必填", "结局应使用有序因子。"],
+      ["data", "输入数据框。", "必填", "先检查水平顺序。"],
+      ["Hess", "是否计算 Hessian 以支持标准误。", "FALSE", "通常应设为 TRUE。"],
+      ["method", "链接函数。", "logistic", "换成其他链接会改变效应尺度。"],
+    ],
+    tips: ["比例优势假设需要单独检查。", "回归系数方向会受结局水平顺序影响。"],
+    related: ["multinom", "glm"],
+  },
+  {
+    id: "multinom",
+    name: "multinom()",
+    package: "nnet",
+    category: "回归与建模",
+    aliases: ["多分类Logistic", "多项Logistic", "multinomial logistic"],
+    summary: "拟合无序多分类 Logistic 回归，输出多个结局类别相对参照类的系数。",
+    syntax: "multinom(formula, data, weights, maxit = 100, trace = TRUE, ...)",
+    returns: "返回 multinom 模型对象；coef 的每一行对应一个非参照类别。",
+    level: "进阶",
+    example: `library(nnet)\ndat$outcome <- relevel(factor(dat$outcome), ref = \"A\")\nfit <- multinom(outcome ~ exposure + age, data = dat, trace = FALSE)\nexp(coef(fit))`,
+    output: "得到每个结局类别相对于参照类的 OR。",
+    params: [
+      ["formula", "无序多分类结局与解释变量。", "必填", "参照类别要明确。"],
+      ["data", "输入数据框。", "必填", "检查每个类别的样本量。"],
+      ["maxit", "最大迭代次数。", "100", "不收敛时先检查分离和变量缩放。"],
+      ["trace", "是否输出迭代信息。", "TRUE", "脚本中可设为 FALSE。"],
+    ],
+    tips: ["指数化后 coefficient 才是 OR。", "每一行只对应一个结局类别，不能混成一个总体效应。"],
+    related: ["polr", "glm"],
+  },
+  {
+    id: "rlm",
+    name: "rlm()",
+    package: "MASS",
+    category: "回归与建模",
+    aliases: ["稳健回归", "robust regression", "Huber regression"],
+    summary: "拟合稳健线性模型，降低极端残差观测对系数的影响。",
+    syntax: "rlm(formula, data, weights, psi = c(\"psi.huber\", \"psi.hampel\", \"psi.bisquare\"), ...)",
+    returns: "返回 rlm 模型对象。",
+    level: "高阶",
+    example: `library(MASS)\nfit <- rlm(outcome ~ exposure + age, data = dat)\nsummary(fit)`,
+    output: "得到受异常观测影响较小的回归系数及稳健标准误。",
+    params: [
+      ["formula", "连续结局与解释变量。", "必填", "仍需考虑非线性与交互。"],
+      ["data", "输入数据框。", "必填", "先保留并核查异常值。"],
+      ["psi", "稳健权重函数。", "psi.huber", "不同函数控制极端残差影响的方式不同。"],
+    ],
+    tips: ["稳健回归不替代数据核查。", "应与 OLS 结果并排比较。"],
+    related: ["lm", "cooks.distance"],
   },
 ];
 
@@ -52232,6 +53317,7 @@ functions.push(...(window.RZH_EXTRA_FUNCTIONS_2 || []));
 functions.push(...(window.RZH_EXTRA_FUNCTIONS_3 || []));
 functions.push(...(window.RZH_EXTRA_FUNCTIONS_4 || []));
 functions.push(...(window.RZH_GUIDE_FUNCTIONS || []));
+functions.push(...(window.RZH_ADVANCED_GUIDE_FUNCTIONS || []));
 functions.push(...(window.RZH_COURSE_FUNCTIONS || []));
 functions.push(...(window.RZH_MANUAL_FUNCTIONS || []));
 
@@ -52485,7 +53571,7 @@ const glossary = window.RZH_GLOSSARY || [];
 const problemCategories = window.RZH_NAV_CATEGORIES || [];
 const errorCatalog = window.RZH_ERRORS || [];
 const teachingCategories = window.RZH_TEACHING_CATEGORIES || [];
-const learningGuides = window.RZH_GUIDES || [];
+const learningGuides = [...(window.RZH_GUIDES || []), ...(window.RZH_ADVANCED_GUIDES || [])];
 
 const scaleItems = [
   { text: "我最近能专注于日常任务", reverse: false },
@@ -52929,18 +54015,41 @@ function renderHomeLegacy() {
 }
 
 function teachingCategoryItemMarkup(item, categoryId, context) {
+  const className = `teaching-resource${item.level ? " has-level" : ""}`;
   const shared = `
+    ${item.level ? `<span class="teaching-resource-level">${escapeHtml(item.level)}</span>` : ""}
     <span class="teaching-resource-copy"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.note || "")}</small></span>
     ${icon("arrow-right")}
   `;
   if (item.basicsTab) {
-    return `<button class="teaching-resource" type="button" data-action="home-learning" data-route="basics" data-basics-tab="${escapeHtml(item.basicsTab)}">${shared}</button>`;
+    return `<button class="${className}" type="button" data-action="home-learning" data-route="basics" data-basics-tab="${escapeHtml(item.basicsTab)}">${shared}</button>`;
   }
   if (item.workflow) {
-    return `<button class="teaching-resource" type="button" data-action="home-learning" data-route="workflows" data-workflow="${escapeHtml(item.workflow)}">${shared}</button>`;
+    return `<button class="${className}" type="button" data-action="home-learning" data-route="workflows" data-workflow="${escapeHtml(item.workflow)}">${shared}</button>`;
   }
   const href = item.href === "#course-roadmap" && context === "home" ? "#learn" : item.href;
-  return `<a class="teaching-resource" href="${escapeHtml(href)}">${shared}</a>`;
+  return `<a class="${className}" href="${escapeHtml(href)}">${shared}</a>`;
+}
+
+function teachingCategoryResourcesMarkup(category, context) {
+  const items = category.items || [];
+  const preferredOrder = ["入门", "进阶", "高阶", "应用"];
+  const levels = preferredOrder.filter((level) => items.some((item) => item.level === level));
+  if (!levels.length) {
+    return `<div class="teaching-resource-grid">${items.map((item) => teachingCategoryItemMarkup(item, category.id, context)).join("")}</div>`;
+  }
+  return `
+    <div class="teaching-resource-levels">
+      ${levels.map((level) => `
+        <section class="teaching-resource-level-group">
+          <div class="teaching-level-heading"><span>${escapeHtml(level)}</span><small>${items.filter((item) => item.level === level).length} 个专题</small></div>
+          <div class="teaching-resource-grid">
+            ${items.filter((item) => item.level === level).map((item) => teachingCategoryItemMarkup(item, category.id, context)).join("")}
+          </div>
+        </section>
+      `).join("")}
+    </div>
+  `;
 }
 
 function teachingZoneMarkup(context = "home", limit = teachingCategories.length) {
@@ -52974,9 +54083,7 @@ function teachingZoneMarkup(context = "home", limit = teachingCategories.length)
               ${active ? `
                 <div class="teaching-category-panel" id="${panelId}">
                   <p>${escapeHtml(category.detail)}</p>
-                  <div class="teaching-resource-grid">
-                    ${(category.items || []).map((item) => teachingCategoryItemMarkup(item, category.id, context)).join("")}
-                  </div>
+                  ${teachingCategoryResourcesMarkup(category, context)}
                 </div>
               ` : ""}
             </article>
@@ -53115,6 +54222,8 @@ function renderGuide(type, id) {
     return;
   }
   const typeLabel = guideTypeLabel(type);
+  const definition = guide.definition || guide.overview;
+  const features = guide.features || guide.whenUse;
   const relatedGuides = (guide.related || []).map((relatedId) => learningGuides.find((item) => item.id === relatedId)).filter(Boolean);
   app.innerHTML = `
     <div class="page">
@@ -53124,7 +54233,6 @@ function renderGuide(type, id) {
           <div class="function-tags">${badge(typeLabel, "brand")}${guide.aliases.map((alias) => badge(alias)).join("")}</div>
           <h1>${escapeHtml(guide.title)}</h1>
           <p class="guide-lead">${escapeHtml(guide.hero)}</p>
-          <p>${escapeHtml(guide.overview)}</p>
         </div>
         <aside class="guide-audience-card">
           <span>适合谁</span>
@@ -53133,24 +54241,32 @@ function renderGuide(type, id) {
         </aside>
       </header>
 
+      <section class="guide-primer">
+        <div>
+          <span>先用一句话理解</span>
+          <h2>它是什么？</h2>
+          <p>${escapeHtml(definition)}</p>
+        </div>
+        <div>
+          <span>用途与特点</span>
+          <h2>什么时候值得使用</h2>
+          <ul>
+            ${features.map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}
+          </ul>
+        </div>
+      </section>
+
       <div class="guide-layout">
         <article class="guide-main">
           <section class="panel guide-section">
-            <div class="guide-section-title"><span>01</span><div><h2>什么时候适合使用</h2><p>先确认研究问题、数据结构和解释边界。</p></div></div>
-            <ul class="guide-check-list">
-              ${guide.whenUse.map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}
-            </ul>
-          </section>
-
-          <section class="panel guide-section">
-            <div class="guide-section-title"><span>02</span><div><h2>开始前先核对数据</h2><p>很多错误不是函数不会用，而是一行代表什么、时间和单位没有先写清楚。</p></div></div>
+            <div class="guide-section-title"><span>01</span><div><h2>开始前先核对数据</h2><p>很多错误不是函数不会用，而是一行代表什么、时间和单位没有先写清楚。</p></div></div>
             <ul class="guide-check-list">
               ${guide.dataShape.map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}
             </ul>
           </section>
 
           <section class="panel guide-section guide-steps-section">
-            <div class="guide-section-title"><span>03</span><div><h2>按顺序完成分析</h2><p>每一步都先说明目的，再给出可修改的最小代码。</p></div></div>
+            <div class="guide-section-title"><span>02</span><div><h2>按顺序完成分析</h2><p>每一步都先说明目的，再给出可修改的最小代码。</p></div></div>
             <div class="guide-steps">
               ${guide.steps.map((step, index) => `
                 <article class="guide-step">
@@ -53169,7 +54285,7 @@ function renderGuide(type, id) {
           </section>
 
           <section class="panel guide-section">
-            <div class="guide-section-title"><span>04</span><div><h2>核心函数与参数</h2><p>点击函数名可以在当前页面打开中文速览，不需要丢失学习位置。</p></div></div>
+            <div class="guide-section-title"><span>03</span><div><h2>核心函数与参数</h2><p>点击函数名可以在当前页面打开中文速览，不需要丢失学习位置。</p></div></div>
             <div class="guide-function-grid">
               ${guide.functions.map(guideFunctionMarkup).join("")}
             </div>
@@ -53189,7 +54305,7 @@ function renderGuide(type, id) {
           </section>
 
           <section class="panel guide-section">
-            <div class="guide-section-title"><span>05</span><div><h2>新手最容易犯的错误</h2><p>把模型跑出来只是开始，解释和核查同样重要。</p></div></div>
+            <div class="guide-section-title"><span>04</span><div><h2>新手最容易犯的错误</h2><p>把模型跑出来只是开始，解释和核查同样重要。</p></div></div>
             <div class="guide-pitfalls">
               ${guide.pitfalls.map((item, index) => `<div><span>${index + 1}</span><p>${escapeHtml(item)}</p></div>`).join("")}
             </div>
