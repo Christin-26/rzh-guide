@@ -5589,6 +5589,437 @@ html[data-theme="dark"] .theme-icon-sun {
   flex: 0 0 auto;
 }
 
+/* Compact home and expanded course */
+.home-simple-hero {
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 0;
+  padding: clamp(30px, 5vw, 52px);
+}
+
+.home-simple-hero .goal-home-copy {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.home-simple-hero .goal-search {
+  max-width: 760px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.home-simple-hero .hero-actions {
+  justify-content: center;
+}
+
+.home-stats-inline {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  max-width: 620px;
+  margin: 20px auto 0;
+  padding-top: 16px;
+}
+
+.home-stats-inline b {
+  display: inline;
+  margin-right: 3px;
+}
+
+.home-start-panel {
+  margin-top: 16px;
+  padding: clamp(20px, 3vw, 30px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.home-start-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr;
+  gap: 10px;
+}
+
+.home-start-card {
+  min-height: 190px;
+  display: flex;
+  flex-direction: column;
+  padding: 19px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-subtle);
+  color: var(--text);
+}
+
+.home-start-card.primary {
+  border-color: color-mix(in srgb, var(--brand) 32%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0, var(--brand-soft), transparent 220px),
+    var(--surface);
+}
+
+.home-start-card > span {
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.home-start-card h3 {
+  margin: 10px 0 7px;
+  font-size: 16px;
+}
+
+.home-start-card p {
+  margin: 0 0 15px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.home-start-card strong {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: auto;
+  color: var(--brand);
+  font-size: 10.5px;
+}
+
+.home-start-card strong .icon {
+  width: 14px;
+  height: 14px;
+}
+
+.course-unit + .course-unit {
+  margin-top: 18px;
+}
+
+.course-unit {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.course-unit-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 10px;
+}
+
+.course-unit-head h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.course-unit-head p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.course-unit-head > span {
+  flex: 0 0 auto;
+  color: var(--brand);
+  font-family: var(--mono);
+  font-size: 9.5px;
+}
+
+.structure-blocks {
+  margin: 22px 0;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+}
+
+.structure-block-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.structure-block-grid article {
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.structure-block-grid article.wide {
+  grid-column: 1 / -1;
+}
+
+.block-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.block-heading strong {
+  font-size: 12px;
+}
+
+.block-heading span {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.block-row,
+.block-matrix,
+.block-cubes,
+.list-blocks,
+.block-table {
+  margin-bottom: 10px;
+}
+
+.block-row {
+  display: flex;
+  gap: 4px;
+}
+
+.block-row i,
+.block-matrix i,
+.block-cubes i {
+  min-width: 34px;
+  height: 29px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  font-style: normal;
+  font-size: 9px;
+}
+
+.block-cubes {
+  display: grid;
+  grid-template-columns: repeat(2, 32px);
+  gap: 4px;
+}
+
+.block-matrix {
+  width: fit-content;
+  display: grid;
+  grid-template-columns: repeat(3, 34px);
+  gap: 3px;
+}
+
+.block-table {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.block-table > * {
+  min-height: 28px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-subtle);
+  font-size: 9.5px;
+}
+
+.block-table > span {
+  color: white;
+  font-family: var(--mono);
+}
+
+.list-blocks {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.list-blocks > div {
+  padding: 9px;
+  border: 1px dashed var(--border-strong);
+  border-radius: 8px;
+}
+
+.list-blocks span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+}
+
+.list-blocks i {
+  display: block;
+  padding: 5px;
+  border-radius: 5px;
+  color: var(--text);
+  font-style: normal;
+  font-size: 9px;
+}
+
+.structure-block-grid code {
+  display: block;
+  overflow: auto;
+  color: var(--brand);
+  font-family: var(--mono);
+  font-size: 9px;
+  white-space: nowrap;
+}
+
+.tone-a { background: #dcebe5; color: #214f43; }
+.tone-b { background: #f7e1d7; color: #8c4f39; }
+.tone-c { background: #e2eaf4; color: #455f7c; }
+.tone-d { background: var(--brand); }
+.tone-e { background: #a98b57; }
+.tone-f { background: #dcebe5; }
+.tone-g { background: #f3e9d5; }
+.tone-h { background: #e2eaf4; }
+
+/* Collapsible problem navigation */
+.workflow-category-list {
+  display: grid;
+  gap: 9px;
+  margin-bottom: 16px;
+}
+
+.workflow-category {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.workflow-category.open {
+  border-color: color-mix(in srgb, var(--brand) 36%, var(--border));
+}
+
+.workflow-category-trigger {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 17px;
+  gap: 12px;
+  align-items: center;
+  padding: 15px 16px;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.workflow-category-trigger:hover {
+  background: var(--surface-subtle);
+}
+
+.workflow-category-trigger strong,
+.workflow-category-trigger small {
+  display: block;
+}
+
+.workflow-category-trigger strong {
+  font-size: 13px;
+}
+
+.workflow-category-trigger small {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.workflow-category-trigger > .icon:last-child {
+  width: 16px;
+  height: 16px;
+  color: var(--muted);
+  transition: transform 160ms ease;
+}
+
+.workflow-category.open .workflow-category-trigger > .icon:last-child {
+  transform: rotate(180deg);
+}
+
+.workflow-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 14px 14px;
+}
+
+.workflow-choice {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 15px;
+  gap: 9px;
+  align-items: center;
+  min-height: 78px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-subtle);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.workflow-choice:hover,
+.workflow-choice.active {
+  border-color: var(--brand);
+  background: var(--brand-pale);
+}
+
+.workflow-choice strong,
+.workflow-choice small {
+  display: block;
+}
+
+.workflow-choice strong {
+  font-size: 11.5px;
+}
+
+.workflow-choice small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 9.5px;
+  line-height: 1.5;
+}
+
+.workflow-choice .icon {
+  width: 14px;
+  height: 14px;
+  color: var(--muted);
+}
+
+.workflow-empty {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 22px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--muted);
+}
+
+.workflow-empty > .icon {
+  width: 25px;
+  height: 25px;
+  color: var(--brand);
+}
+
+.workflow-empty strong {
+  display: block;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.workflow-empty p {
+  margin: 4px 0 0;
+  font-size: 10.5px;
+}
+
 @media (max-width: 1080px) {
   :root {
     --sidebar: 226px;
@@ -5616,6 +6047,14 @@ html[data-theme="dark"] .theme-icon-sun {
 
   .teaching-resource-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-start-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .home-start-card.primary {
+    grid-column: 1 / -1;
   }
 
   .guide-layout {
@@ -5783,6 +6222,17 @@ html[data-theme="dark"] .theme-icon-sun {
 
   .guide-primer {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-start-grid,
+  .workflow-choice-grid,
+  .structure-block-grid,
+  .list-blocks {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-start-card.primary {
+    grid-column: auto;
   }
 
   .teaching-category-trigger {
@@ -5995,6 +6445,57 @@ html[data-theme="dark"] .theme-icon-sun {
   .guide-check-list,
   .guide-aside {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-simple-hero {
+    padding: 25px 20px;
+  }
+
+  .home-simple-hero .hero-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .home-simple-hero .hero-actions .button {
+    width: 100%;
+  }
+
+  .home-stats-inline {
+    gap: 12px;
+  }
+
+  .home-start-panel,
+  .structure-blocks {
+    padding: 16px;
+  }
+
+  .course-unit {
+    padding: 9px;
+  }
+
+  .course-unit-head {
+    display: block;
+  }
+
+  .course-unit-head > span {
+    display: inline-block;
+    margin-top: 6px;
+  }
+
+  .workflow-category-trigger {
+    grid-template-columns: minmax(0, 1fr) 17px;
+  }
+
+  .workflow-category-trigger .badge {
+    display: none;
+  }
+
+  .workflow-category-trigger > .icon:last-child {
+    grid-column: 2;
+  }
+
+  .workflow-choice-grid {
+    padding: 0 10px 10px;
   }
 
   .guide-hero {
@@ -8772,6 +9273,757 @@ window.RZH_GLOSSARY = [
 
 </script>
   <script>
+window.RZH_COURSE_UNITS = [
+  { id: "start", title: "第一部分：认识工具", note: "从 R、RStudio 和项目目录开始，先把运行环境弄清楚。" },
+  { id: "language", title: "第二部分：R 语言基础", note: "对象、程序包、符号、语法和数据结构是后面所有分析的基础。" },
+  { id: "data", title: "第三部分：数据管理", note: "完成读取、整理、清洗、重塑和连接，得到适合分析的表格。" },
+  { id: "programming", title: "第四部分：控制流与文本处理", note: "学习条件、循环、函数、日期和正则表达式。" },
+  { id: "visual", title: "第五部分：描述与可视化", note: "从描述统计开始，使用 Base R 和 ggplot2 表达结果。" },
+  { id: "analysis", title: "第六部分：统计分析与研究应用", note: "覆盖常用检验、回归、生存分析、时间序列和高级方法。" },
+  { id: "project", title: "第七部分：完成一份分析", note: "把读取、清洗、分析、图形和报告连接成可重复运行的脚本。" },
+];
+
+window.RZH_COURSE_MODULES = [
+  {
+    id: "r-1",
+    number: 1,
+    unit: "start",
+    title: "R 是什么，能做什么",
+    subtitle: "认识 R 的用途、优点和学习路线",
+    minutes: 10,
+    outcome: "能说明 R 适合处理哪些任务，并知道学习 R 时先掌握什么。",
+    sections: [
+      {
+        heading: "R 是统计计算和绘图环境",
+        text: "R 是一门开源编程语言，也是运行 R 代码的软件环境。它包含基础函数，也可以通过程序包获得更多统计方法。",
+      },
+      {
+        heading: "常见用途",
+        text: "读取问卷和数据库、整理变量、计算描述统计、拟合模型、绘制图形、生成报告，都能在同一套代码中完成。",
+      },
+      {
+        heading: "为什么要学习 R",
+        text: "R 免费、跨平台，统计方法更新较快，图形系统完整，分析步骤可以写成脚本并重复运行。",
+      },
+      {
+        heading: "新手先学什么",
+        text: "先学对象、函数、参数、数据类型和基本数据操作，再进入建模。开始阶段不必背函数，重点是看懂输入、处理和输出。",
+      },
+    ],
+    code: `age <- c(22, 25, 31, 28)\nmean(age)\nsummary(age)\nplot(age, c(18.2, 19.0, 22.1, 20.4))`,
+    functions: ["c", "mean", "summary", "plot"],
+    practice: "运行示例并说出 mean(age) 的输入对象和返回结果。",
+  },
+  {
+    id: "r-install",
+    number: 2,
+    unit: "start",
+    title: "安装 R 与 RStudio",
+    subtitle: "R 负责计算，RStudio 负责编写和查看结果",
+    minutes: 8,
+    outcome: "能按正确顺序安装 R 和 RStudio，并完成第一次启动。",
+    sections: [
+      {
+        heading: "先安装 R",
+        text: "R 是底层计算环境，必须先从 CRAN 或可信镜像安装适合当前操作系统的版本。",
+      },
+      {
+        heading: "再安装 RStudio",
+        text: "RStudio 是集成开发环境。它不能代替 R，启动时会调用已经安装好的 R。",
+      },
+      {
+        heading: "检查安装是否成功",
+        text: "打开 RStudio 后，在 Console 输入 R.version.string 和 sessionInfo()，可以查看 R 版本与运行环境。",
+      },
+    ],
+    code: `R.version.string\nsessionInfo()\n# 第一次启动可在 Console 运行\n1 + 1`,
+    functions: ["sessionInfo"],
+    practice: "在 Console 中找到 R 版本和当前操作系统信息。",
+  },
+  {
+    id: "rstudio",
+    number: 3,
+    unit: "start",
+    title: "RStudio 界面",
+    subtitle: "Script、Console、Environment、Files、Plots、Packages 和 Help",
+    minutes: 14,
+    outcome: "能说清 RStudio 各窗口的用途，并知道代码、对象、图形和帮助分别在哪个区域查看。",
+    diagram: "rstudio",
+    sections: [
+      {
+        heading: "Script 与 Console",
+        text: "Script 用来保存完整代码，Console 用来立即执行命令。临时测试可以写在 Console，真正需要保留的步骤应写进脚本。",
+      },
+      {
+        heading: "Environment 与 History",
+        text: "Environment 列出当前会话创建的对象，History 记录执行过的命令。对象不见了，通常是没有运行创建它的代码。",
+      },
+      {
+        heading: "Files、Plots 与 Packages",
+        text: "Files 查看项目文件，Plots 查看和导出图形，Packages 查看、安装和载入程序包。",
+      },
+      {
+        heading: "Help",
+        text: "Help 页通常包含 Description、Usage、Arguments、Details、Examples 和 See Also。先看函数参数，再运行示例。",
+      },
+    ],
+    code: `# Script 中保存代码\nscore <- c(72, 85, 91)\nmean(score)\n\n# Console 中查看帮助\n?mean\nhelp(package = "stats")`,
+    functions: ["help", "library", "sessionInfo"],
+    practice: "在 Environment 中找到 score，在 Plots 中查看一张图，再用 Help 打开 mean() 的说明。",
+  },
+  {
+    id: "r-project",
+    number: 4,
+    unit: "start",
+    title: "项目、脚本与工作目录",
+    subtitle: "让文件路径和运行结果可以复现",
+    minutes: 10,
+    outcome: "能建立项目目录、保存脚本，并使用相对路径读取文件。",
+    sections: [
+      {
+        heading: "一个项目一个文件夹",
+        text: "建议分别建立 raw、R、output 和 report 目录。原始数据只读，处理后的数据与结果另存。",
+      },
+      {
+        heading: "工作目录是什么",
+        text: "相对路径以工作目录为起点。getwd() 查看当前目录，setwd() 修改目录；使用 RStudio Project 或 here 包更容易保持一致。",
+      },
+      {
+        heading: "脚本要有顺序",
+        text: "读取、检查、清洗、分析、作图、导出分段书写。每次从头运行脚本，才能确认结果确实可以重复生成。",
+      },
+    ],
+    code: `getwd()\nlist.files()\n# 推荐项目结构\n# project/\n#   raw/  R/  output/  report/`,
+    functions: ["getwd", "setwd", "list.files", "source"],
+    practice: "新建一个项目文件夹，并在脚本中写出你的数据、代码和输出目录。",
+  },
+  {
+    id: "r-2",
+    number: 5,
+    unit: "language",
+    title: "对象、函数与参数",
+    subtitle: "读取一行 R 代码的基本结构",
+    minutes: 12,
+    outcome: "能识别对象、函数、命名参数和返回值。",
+    sections: [
+      {
+        heading: "对象是有名字的数据或结果",
+        text: "赋值符号 <- 把右侧结果保存到左侧名字。对象可以是向量、表格、列表、模型或图形参数。",
+      },
+      {
+        heading: "函数由函数名和括号组成",
+        text: "mean(age) 中 mean 是函数，age 是输入对象。括号内可以有多个参数，参数之间用逗号分隔。",
+      },
+      {
+        heading: "命名参数写清选项",
+        text: "mean(age, na.rm = TRUE) 中 na.rm 是参数名，TRUE 是值。先理解必填参数，再按需调整默认值。",
+      },
+      {
+        heading: "返回值要继续保存或检查",
+        text: "结果不会自动变成你想要的表格。把返回值赋给对象，再用 class()、str() 或 summary() 检查。",
+      },
+    ],
+    code: `age <- c(22, 25, 31, NA)\nmean(age)\nmean(age, na.rm = TRUE)\nresult <- summary(age)\nclass(result)`,
+    functions: ["mean", "length", "summary", "class"],
+    practice: "比较两次 mean() 的结果，并解释 na.rm 的作用。",
+  },
+  {
+    id: "r-packages",
+    number: 6,
+    unit: "language",
+    title: "程序包、函数与帮助",
+    subtitle: "会安装、载入、查找和核对函数",
+    minutes: 12,
+    outcome: "能区分安装与载入程序包，并使用 args()、help() 和 example() 查函数。",
+    sections: [
+      {
+        heading: "程序包是一组函数的集合",
+        text: "install.packages() 把包装到电脑；library() 把已安装的包载入当前 R 会话。每次打开新会话通常都要重新 library()。",
+      },
+      {
+        heading: "函数名不是唯一的",
+        text: "不同包可能有同名函数。可用 包名::函数名() 明确指定来源，例如 dplyr::filter()。",
+      },
+      {
+        heading: "参数和示例怎样查",
+        text: "args() 快速看参数，help() 或 ?函数名 打开完整帮助，example() 运行官方示例。先看 Usage 和 Arguments，再看 Examples。",
+      },
+      {
+        heading: "包文档",
+        text: "help(package = \"包名\") 查看包内函数索引，vignette() 查找较长教程。",
+      },
+    ],
+    code: `install.packages(c("dplyr", "ggplot2"))\nlibrary(dplyr)\nargs(mean)\n?mean\nexample(mean)\nhelp(package = "dplyr")`,
+    functions: ["install.packages", "library", "help", "args", "example", "vignette"],
+    practice: "查找一个函数的 Usage 和 Arguments，并运行一个官方示例。",
+  },
+  {
+    id: "r-3",
+    number: 7,
+    unit: "language",
+    title: "基础符号与运算",
+    subtitle: "算术、比较、逻辑、赋值和取子集",
+    minutes: 15,
+    outcome: "能读懂并写出常见的数值运算、比较和逻辑表达式。",
+    sections: [
+      {
+        heading: "算术运算",
+        text: "+、-、*、/、^、%%、%/% 分别表示加减乘除、乘方、取余和整除。运算顺序遵循常规数学规则。",
+      },
+      {
+        heading: "比较与逻辑",
+        text: "== 和 != 判断是否相等，<、<=、>、>= 比较大小。&、|、! 组合逻辑条件，筛选整列时使用向量化写法。",
+      },
+      {
+        heading: "赋值与提取",
+        text: "<- 保存对象，$ 按名称提取列，[] 按位置或条件取子集，[[]] 从一个元素中取出内部对象。",
+      },
+      {
+        heading: "特殊值",
+        text: "NA 表示缺失；NULL 表示空对象；NaN 表示非数；Inf 表示无穷。它们不能混为一谈。",
+      },
+    ],
+    code: `score <- c(72, 85, 91, NA)\nscore >= 80\nscore[which(score >= 80)]\nmean(score, na.rm = TRUE)\n!is.na(score)`,
+    functions: ["is.na", "length", "mean", "subset"],
+    practice: "创建一个含 NA 的分数向量，筛出大于等于 80 的值并计算均数。",
+  },
+  {
+    id: "r-syntax",
+    number: 8,
+    unit: "language",
+    title: "基础语法与变量命名",
+    subtitle: "注释、大小写、命名规则和代码书写",
+    minutes: 10,
+    outcome: "能写出命名清楚、带有注释且容易重跑的 R 代码。",
+    sections: [
+      {
+        heading: "变量名要清楚",
+        text: "名称可包含字母、数字、下划线和点，不能以数字开头，并且区分大小写。优先使用 age_years、waist_cm 这样的名称。",
+      },
+      {
+        heading: "避免保留词",
+        text: "if、else、for、while、function、TRUE、FALSE、NA 等有特殊含义，不应直接作为变量名。",
+      },
+      {
+        heading: "注释解释原因",
+        text: "# 后面的文字不会执行。注释可说明数据来源、转换规则和为什么选择某个参数，不要逐字复述代码。",
+      },
+      {
+        heading: "代码格式",
+        text: "运算符两侧留空格，每行只做一件事。括号成对出现；Console 出现 + 时，通常是语句尚未结束。",
+      },
+    ],
+    code: `# 计算平均年龄并保留缺失信息\nage <- c(22, 25, NA, 31)\nage_mean <- mean(age, na.rm = TRUE)\nage_mean`,
+    functions: ["c", "mean", "paste0"],
+    practice: "为年龄、性别和 BMI 各起一个清楚的变量名，并添加说明性注释。",
+  },
+  {
+    id: "r-4",
+    number: 9,
+    unit: "language",
+    title: "数据类型与数据结构",
+    subtitle: "向量、因子、矩阵、数组、数据框和列表",
+    minutes: 18,
+    outcome: "能根据数据的行列结构和变量类型选择合适对象。",
+    diagram: "data-structures",
+    sections: [
+      {
+        heading: "基本数据类型",
+        text: "常见类型包括 numeric（数值）、integer（整数）、character（字符）、logical（逻辑）、factor（分类）和 Date（日期）。",
+      },
+      {
+        heading: "向量是最基本的容器",
+        text: "c() 把同类型值组合成向量。向量可以参与整体运算，例如 x * 2 会逐个元素计算。",
+      },
+      {
+        heading: "矩阵和数据框",
+        text: "矩阵只能存放一种基本类型；数据框每列可不同类型，是问卷和表格数据的常用结构。",
+      },
+      {
+        heading: "因子与列表",
+        text: "因子适合固定类别的变量，并控制水平顺序。列表可以装不同类型对象，很多模型结果都以列表返回。",
+      },
+    ],
+    code: `id <- c(1L, 2L, 3L)\nage <- c(22, 31, 45)\nsex <- factor(c("女", "男", "女"))\n\nm <- matrix(1:6, nrow = 2, byrow = TRUE)\ndat <- data.frame(id, age, sex)\nfit <- list(model = "example", coefficients = c(1.2, 0.8))\n\nstr(dat)`,
+    functions: ["c", "factor", "matrix", "data.frame", "list", "str"],
+    practice: "创建三行数据框，并用 str() 辨认每列类型。",
+  },
+  {
+    id: "r-index",
+    number: 10,
+    unit: "language",
+    title: "查看、提取和检查对象",
+    subtitle: "$、[]、[[]] 与常用检查函数",
+    minutes: 14,
+    outcome: "能从数据框中提取行列，并用 str、head、summary 检查结果。",
+    sections: [
+      {
+        heading: "先看对象结构",
+        text: "str() 显示类型与字段，head() 和 tail() 查看首尾，summary() 给出范围与缺失概况。",
+      },
+      {
+        heading: "取列和取子集",
+        text: "dat$age 取一列；dat[1:3, 1:2] 按行列位置取子集；dat[dat$age >= 18, ] 按条件保留行。",
+      },
+      {
+        heading: "列表用双层方括号",
+        text: "lst[\"score\"] 仍返回列表，lst[[\"score\"]] 返回列表中的具体对象。",
+      },
+      {
+        heading: "每次提取后核对",
+        text: "查看返回对象的 class()、长度或行列数，确认是否需要向量、数据框还是列表。",
+      },
+    ],
+    code: `dat <- data.frame(id = 1:4, age = c(17, 22, 35, 41), score = c(8, 9, 7, 10))\ndat$age\ndat[dat$age >= 18, c("id", "age")]\nclass(dat[["age"]])\nstr(dat)`,
+    functions: ["str", "head", "tail", "summary", "class", "dim"],
+    practice: "从示例数据中取出年龄不小于 18 岁的 id 和 score 两列。",
+  },
+  {
+    id: "r-5",
+    number: 11,
+    unit: "data",
+    title: "数据录入与读取",
+    subtitle: "CSV、TXT、Excel、SPSS 和 Stata",
+    minutes: 15,
+    outcome: "能按文件类型读取数据，并检查编码、表头、列类型和丢失值。",
+    sections: [
+      {
+        heading: "选择读取函数",
+        text: "CSV 可用 read.csv() 或 read_csv()，Excel 用 read_excel()，SPSS 用 read_sav()，Stata 用 read_dta()。",
+      },
+      {
+        heading: "明确表头和编码",
+        text: "header、sep、sheet、range、fileEncoding 和 na 设置要与文件实际结构一致。中文乱码通常先检查编码。",
+      },
+      {
+        heading: "保护编号与日期",
+        text: "编号列应使用字符型，避免前导零消失；日期先按原格式读入，再转换成 Date。",
+      },
+      {
+        heading: "读取后立刻检查",
+        text: "查看行数、列名、类型和前几行。字符列中出现大量数字或日期，通常提示列类型需要调整。",
+      },
+    ],
+    code: `dat <- read.csv("raw/survey.csv", fileEncoding = "UTF-8",\n                stringsAsFactors = FALSE)\nhead(dat)\nstr(dat)\nnrow(dat)\nsum(is.na(dat))`,
+    functions: ["read.csv", "read_csv", "read_excel", "read_sav", "read_dta", "str"],
+    practice: "读取一份文件后，写下行数、列数和至少一个需要修正的列类型。",
+  },
+  {
+    id: "r-6",
+    number: 12,
+    unit: "data",
+    title: "基础数据整理",
+    subtitle: "新增变量、筛选、排序、重命名和汇总",
+    minutes: 18,
+    outcome: "能使用 dplyr 把原始表整理成分析需要的数据框。",
+    sections: [
+      {
+        heading: "管道把步骤连接起来",
+        text: "|> 把上一步的输出传给下一个函数。每一步只完成筛选、选列、新增或汇总中的一个动作。",
+      },
+      {
+        heading: "行与列的选择",
+        text: "filter() 保留符合条件的行，select() 选择变量，arrange() 排序，rename() 修改列名。",
+      },
+      {
+        heading: "创建和修改变量",
+        text: "mutate() 新增列或覆盖旧列。公式、单位和分类边界必须写清楚，尽量保留原始变量。",
+      },
+      {
+        heading: "分组汇总",
+        text: "group_by() 与 summarise() 按组计算人数、均数或缺失数；summarise() 会压缩行数。",
+      },
+    ],
+    code: `library(dplyr)\n\nclean <- dat |>\n  filter(age >= 18) |>\n  select(id, age, sex, height, weight) |>\n  mutate(bmi = weight / (height / 100)^2) |>\n  arrange(sex, desc(age))\n\nclean |> group_by(sex) |> summarise(n = n(), mean_bmi = mean(bmi, na.rm = TRUE))`,
+    functions: ["filter", "select", "mutate", "arrange", "group_by", "summarise"],
+    practice: "筛选成年人，保留五个分析变量，并新增 BMI。",
+  },
+  {
+    id: "r-clean",
+    number: 13,
+    unit: "data",
+    title: "缺失值、异常值与重复记录",
+    subtitle: "先检查原因，再决定怎样处理",
+    minutes: 18,
+    outcome: "能统计缺失、识别候选异常值并制定可追溯的清洗规则。",
+    sections: [
+      {
+        heading: "缺失值",
+        text: "is.na() 识别缺失。删除、保留和填补会产生不同偏倚，处理前要区分未作答、拒答、跳过和录入错误。",
+      },
+      {
+        heading: "异常值",
+        text: "先看单位、范围、分位数和图形，再回到原始记录核查。统计上的极端值不一定是录入错误。",
+      },
+      {
+        heading: "重复记录",
+        text: "分别检查整行重复和 ID 重复。同一 ID 可能是合法随访，也可能是一次记录被重复录入。",
+      },
+      {
+        heading: "留下处理记录",
+        text: "写明规则、处理数量和原因。保留原始列，新增清洗列或单独保存清洗后的分析副本。",
+      },
+    ],
+    code: `colSums(is.na(dat))\ndat |> count(id, sort = TRUE) |> filter(n > 1)\nrange(dat$bmi, na.rm = TRUE)\nboxplot.stats(dat$bmi)$out`,
+    functions: ["is.na", "na.omit", "duplicated", "distinct", "range", "quantile"],
+    practice: "写出一项缺失值或异常值处理规则，并说明为什么这样做。",
+  },
+  {
+    id: "r-reshape",
+    number: 14,
+    unit: "data",
+    title: "长宽转换与数据连接",
+    subtitle: "重塑问卷条目，连接多张表并核对行数",
+    minutes: 16,
+    outcome: "能转换长宽格式、按关键字段连接数据，并核对连接结果。",
+    sections: [
+      {
+        heading: "宽表与长表",
+        text: "宽表一行可以有多列测量值，长表把测量名称和值拆成列。ggplot 和重复测量模型常需要长表。",
+      },
+      {
+        heading: "pivot_longer 与 pivot_wider",
+        text: "前者把多列变成长表，后者把名称和值重新展开。转换前要确认各列含义与单位一致。",
+      },
+      {
+        heading: "连接键必须可靠",
+        text: "left_join() 保留左表全部行匹配右表。连接键的格式、唯一性和缺失会影响匹配。",
+      },
+      {
+        heading: "连接后检查",
+        text: "比较连接前后行数、未匹配记录和重复键。行数意外增加通常说明连接键不唯一。",
+      },
+    ],
+    code: `library(tidyr)\nlibrary(dplyr)\n\nlong <- dat |>\n  pivot_longer(starts_with("item"), names_to = "item", values_to = "score")\n\nmerged <- survey |> left_join(city, by = c("city_code" = "code"))\nnrow(survey); nrow(merged)`,
+    functions: ["pivot_longer", "pivot_wider", "left_join", "merge", "bind_rows"],
+    practice: "把三列量表条目转成长表，并说明转换后每行的含义。",
+  },
+  {
+    id: "r-8",
+    number: 15,
+    unit: "programming",
+    title: "控制流",
+    subtitle: "条件判断、循环、批量处理和自定义函数",
+    minutes: 18,
+    outcome: "能写条件分支，并选择 ifelse、case_when、for、lapply 解决重复任务。",
+    sections: [
+      {
+        heading: "if 与 else",
+        text: "if 接收一个逻辑结果，适合控制一段脚本是否执行。else 处理条件不成立的情况。",
+      },
+      {
+        heading: "整列条件用向量化函数",
+        text: "ifelse() 适合两分支，case_when() 适合多分支。它们会返回与输入长度相同的向量。",
+      },
+      {
+        heading: "for 与 lapply",
+        text: "for 适合清楚地逐项执行并保存结果；lapply 把函数应用到列表或向量并返回列表。",
+      },
+      {
+        heading: "自定义函数",
+        text: "当同一段计算需要反复使用时，可以写成 function()。函数应有明确输入、处理步骤和返回值。",
+      },
+    ],
+    code: `library(dplyr)\n\ndat <- dat |>\n  mutate(age_group = case_when(\n    age < 30 ~ "<30",\n    age < 60 ~ "30-59",\n    TRUE ~ "60+"\n  ))\n\nmeans <- lapply(dat[c("age", "bmi")], mean, na.rm = TRUE)`,
+    functions: ["if", "ifelse", "case_when", "for-loop", "while-loop", "lapply", "function"],
+    practice: "为年龄创建三组，并用 lapply 同时计算两列的均数。",
+  },
+  {
+    id: "r-functions",
+    number: 16,
+    unit: "programming",
+    title: "函数与 apply 族",
+    subtitle: "把重复计算组织成可复用的代码",
+    minutes: 15,
+    outcome: "能定义简单函数，并使用 apply、lapply 和 sapply 批量处理。",
+    sections: [
+      {
+        heading: "函数的输入与输出",
+        text: "函数参数是输入，return() 或最后一个表达式是输出。先写清函数只负责哪一件事。",
+      },
+      {
+        heading: "lapply 与 sapply",
+        text: "lapply() 总是返回列表，sapply() 会尝试简化结果。结果类型不确定时优先使用 lapply。",
+      },
+      {
+        heading: "apply 与 tapply",
+        text: "apply() 按矩阵行列计算，tapply() 按分组变量对向量计算。",
+      },
+      {
+        heading: "调试函数",
+        text: "先输入一个最小例子，再逐步检查中间对象。不要在函数里直接依赖未传入的全局变量。",
+      },
+    ],
+    code: `safe_mean <- function(x) {\n  if (all(is.na(x))) return(NA_real_)\n  mean(x, na.rm = TRUE)\n}\n\nsapply(dat[c("age", "bmi")], safe_mean)`,
+    functions: ["function", "lapply", "sapply", "tapply", "apply", "do.call"],
+    practice: "写一个函数，忽略缺失值计算均数；若所有值都缺失则返回 NA。",
+  },
+  {
+    id: "r-text",
+    number: 17,
+    unit: "programming",
+    title: "文本、日期与正则表达式",
+    subtitle: "清理编码、提取文字和转换时间",
+    minutes: 16,
+    outcome: "能处理常见字符串、日期和正则匹配任务。",
+    sections: [
+      {
+        heading: "基础字符串函数",
+        text: "paste0() 拼接文本，nchar() 数长度，substr() 截取，trimws() 去首尾空格，toupper() 和 tolower() 统一大小写。",
+      },
+      {
+        heading: "日期类型",
+        text: "as.Date() 把字符按格式转成日期。日期相减得到时间间隔，日期不能与普通字符串可靠比较大小。",
+      },
+      {
+        heading: "正则表达式",
+        text: "grepl() 判断是否匹配，gsub() 替换，stringr 的 str_detect()、str_extract() 和 str_replace_all() 命名更统一。",
+      },
+      {
+        heading: "先在小样本测试",
+        text: "正则模式先对少量字符串运行，确认匹配范围后再用于整列数据，并区分整条匹配与局部提取。",
+      },
+    ],
+    code: `library(stringr)\n\ntext <- c("ID-001", "ID-002", "缺失")\nstr_detect(text, "^ID-\\\\d{3}$")\nstr_extract(text, "\\\\d+")\nd <- as.Date(c("2026-01-01", "2026-02-01"))\nd[2] - d[1]`,
+    functions: ["paste0", "nchar", "substr", "as.Date", "grep", "gsub", "str_detect", "str_extract"],
+    practice: "从一组样本编号中提取数字部分，并把日期字符转换成 Date。",
+  },
+  {
+    id: "r-7",
+    number: 18,
+    unit: "visual",
+    title: "描述统计与数据检查",
+    subtitle: "人数、缺失、中心位置、离散程度和列联表",
+    minutes: 14,
+    outcome: "能选择合适指标描述连续和分类变量，并制作基线表所需的基础统计。",
+    sections: [
+      {
+        heading: "连续变量",
+        text: "近似对称分布可报告均数和标准差，偏态分布可报告中位数和四分位距。同时报告有效样本量和缺失数。",
+      },
+      {
+        heading: "分类变量",
+        text: "使用人数和百分比描述。先明确分母，再计算构成比、患病率或分组比例。",
+      },
+      {
+        heading: "先检查再建模",
+        text: "先看分布、异常值、样本量和缺失，再决定后续统计方法。数据问题不应留到模型报错时才发现。",
+      },
+    ],
+    code: `summary(dat$bmi)\nquantile(dat$bmi, c(.25, .5, .75), na.rm = TRUE)\ntable(dat$sex, dat$group, useNA = "ifany")\nprop.table(table(dat$group))`,
+    functions: ["summary", "mean", "median", "sd", "quantile", "table", "prop.table"],
+    practice: "为一个连续变量和一个分类变量分别选择描述指标。",
+  },
+  {
+    id: "r-basegraph",
+    number: 19,
+    unit: "visual",
+    title: "基础绘图与 Plots 窗口",
+    subtitle: "直方图、箱式图、散点图、折线图和导出",
+    minutes: 16,
+    outcome: "能绘制基础图形，并在 Plots 窗口查看、翻页和导出。",
+    sections: [
+      {
+        heading: "按问题选图",
+        text: "分布用直方图或密度图，组间比较用箱式图，两个连续变量用散点图，时间变化用折线图。",
+      },
+      {
+        heading: "Base R 快速绘图",
+        text: "hist()、boxplot()、plot() 和 lines() 适合快速检查。图形会显示在 RStudio 的 Plots 窗口中。",
+      },
+      {
+        heading: "坐标轴与图例",
+        text: "标题、轴标签、单位、图例和颜色都应能独立说明图形含义，不要依赖正文猜测。",
+      },
+      {
+        heading: "导出图形",
+        text: "Plots 窗口可导出图片，但正式报告更适合在代码中显式设置尺寸、分辨率和输出路径。",
+      },
+    ],
+    code: `hist(dat$age, main = "年龄分布", xlab = "年龄（岁）")\nboxplot(bmi ~ sex, data = dat, xlab = "性别", ylab = "BMI")\nplot(dat$height, dat$weight, xlab = "身高", ylab = "体重")`,
+    functions: ["hist", "boxplot", "plot", "lines", "legend"],
+    practice: "为一个连续变量画直方图，并为两个分组画箱式图。",
+  },
+  {
+    id: "r-ggplot",
+    number: 20,
+    unit: "visual",
+    title: "ggplot2 图形语法",
+    subtitle: "数据、映射、几何对象、标尺和主题",
+    minutes: 20,
+    outcome: "能使用 ggplot2 绘制并保存适合报告使用的图形。",
+    sections: [
+      {
+        heading: "一张图的五个部分",
+        text: "数据交给 ggplot()，aes() 指定变量映射，geom_*() 决定点、线或箱体，scale_*() 控制坐标与颜色，theme_*() 调整外观。",
+      },
+      {
+        heading: "图层可以叠加",
+        text: "用 + 叠加箱式图、散点、误差条和参考线。图层顺序会影响遮挡与可见性。",
+      },
+      {
+        heading: "标签与分面",
+        text: "labs() 设置标题和轴标题，facet_wrap() 按分类变量拆分小图。所有图形都要保留单位和样本量说明。",
+      },
+      {
+        heading: "保存图形",
+        text: "ggsave() 显式指定文件、宽高和 dpi。先检查导出图，不要只查看 RStudio 中的预览。",
+      },
+    ],
+    code: `library(ggplot2)\n\np <- ggplot(dat, aes(age, bmi, color = sex)) +\n  geom_point(alpha = 0.55) +\n  geom_smooth(method = "lm", se = FALSE) +\n  labs(title = "年龄与 BMI", x = "年龄（岁）", y = "BMI") +\n  theme_minimal()\n\nggsave("output/age_bmi.png", p, width = 7, height = 5, dpi = 300)`,
+    functions: ["ggplot", "aes", "geom_point", "geom_smooth", "labs", "theme_minimal", "ggsave"],
+    practice: "绘制按性别分组的散点图，设置标题和单位并导出。",
+  },
+  {
+    id: "r-stats",
+    number: 21,
+    unit: "analysis",
+    title: "基本统计检验",
+    subtitle: "t 检验、方差分析、卡方、秩和检验和相关",
+    minutes: 20,
+    outcome: "能根据变量类型和分布选择基本统计检验，并正确理解 p 值与置信区间。",
+    sections: [
+      {
+        heading: "先确认变量角色",
+        text: "区分结局、分组变量和协变量，确认连续、二分类或多分类类型，再选择方法。",
+      },
+      {
+        heading: "连续结局",
+        text: "两组比较可用 t 检验或 Wilcoxon 秩和检验，多组可用方差分析或 Kruskal-Wallis 检验。",
+      },
+      {
+        heading: "分类结局",
+        text: "列联表用卡方或 Fisher 精确检验。同时报告人数、比例、效应量和置信区间。",
+      },
+      {
+        heading: "相关不等于因果",
+        text: "相关分析描述关联方向和强度。研究设计、时间顺序和混杂控制决定能否讨论因果。",
+      },
+    ],
+    code: `t.test(bmi ~ sex, data = dat)\nchisq.test(table(dat$sex, dat$outcome))\nwilcox.test(bmi ~ group, data = dat)\ncor.test(dat$age, dat$bmi, method = "spearman")`,
+    functions: ["t.test", "aov", "chisq.test", "fisher.test", "wilcox.test", "kruskal.test", "cor.test"],
+    practice: "根据结局和分组变量类型选择一种检验，并写出选择理由。",
+  },
+  {
+    id: "r-models",
+    number: 22,
+    unit: "analysis",
+    title: "回归与预测模型",
+    subtitle: "线性回归、Logistic、Poisson 和 Cox",
+    minutes: 22,
+    outcome: "能按结局类型选择回归模型，并解释系数、OR、IRR 或 HR。",
+    sections: [
+      {
+        heading: "线性回归",
+        text: "连续结局使用 lm()。系数表示调整其他变量后，解释变量每变化一个单位，结局的平均变化。",
+      },
+      {
+        heading: "二分类与计数结局",
+        text: "二分类结局常用 glm(family = binomial())，计数或发病率常用 Poisson 模型。OR、IRR 不等于风险本身。",
+      },
+      {
+        heading: "生存结局",
+        text: "有随访时间和事件状态时用 Surv() 与 coxph()，并检查比例风险假设。",
+      },
+      {
+        heading: "结果解释与核查",
+        text: "报告效应量、95% 置信区间、参照组、调整变量和模型假设，不要只报告 p 值。",
+      },
+    ],
+    code: `fit_lm <- lm(bmi ~ age + sex, data = dat)\nsummary(fit_lm)\n\nfit_logit <- glm(outcome ~ exposure + age + sex,\n                 data = dat, family = binomial())\nexp(cbind(OR = coef(fit_logit), confint(fit_logit)))\n\nlibrary(survival)\nfit_cox <- coxph(Surv(time, event) ~ exposure + age, data = dat)\ncox.zph(fit_cox)`,
+    functions: ["lm", "glm", "coxph", "survfit", "confint", "predict"],
+    practice: "根据二分类结局写出 Logistic 回归公式，并说明 OR 的含义。",
+  },
+  {
+    id: "r-advanced",
+    number: 23,
+    unit: "analysis",
+    title: "专题分析方法",
+    subtitle: "时间序列、主成分、因子分析、聚类与量表",
+    minutes: 18,
+    outcome: "知道何时需要专题方法，并能从教学专区继续查看完整操作步骤。",
+    sections: [
+      {
+        heading: "时间与滞后暴露",
+        text: "时间序列先检查趋势和季节性；DLNM 适合研究暴露在当天及随后多天的非线性影响。",
+      },
+      {
+        heading: "降维与测量结构",
+        text: "PCA 用于压缩相关变量，因子分析用于探索量表题目背后的维度。两者用途不同。",
+      },
+      {
+        heading: "聚类与分类",
+        text: "聚类没有真实标签，需要检查簇数和稳定性；决策树、随机森林和 SVM 更偏向预测，不能自动给出因果解释。",
+      },
+      {
+        heading: "量表与心理网络",
+        text: "先核对版本、反向题和计分，再分析信度、结构和网络稳定性。",
+      },
+    ],
+    code: `# 示例：主成分分析\npca <- prcomp(scale(dat[c("age", "bmi", "sbp", "glucose")]))\nsummary(pca)\n\n# 完整方法请从教学专区进入对应专题`,
+    functions: ["prcomp", "fa", "hclust", "kmeans", "alpha", "cfa", "auto.arima"],
+    practice: "从“常用模型”中选择与你当前研究最接近的一种方法，阅读其使用条件。",
+  },
+  {
+    id: "r-9",
+    number: 24,
+    unit: "project",
+    title: "完成一份可重复的分析",
+    subtitle: "读取、清洗、描述、建模、图形和导出",
+    minutes: 24,
+    outcome: "能从原始数据开始，运行一份结构清楚、结果可核对的分析脚本。",
+    sections: [
+      {
+        heading: "先写分析计划",
+        text: "写清研究问题、样本纳排、主要变量、结局、统计方法和输出文件，再开始写代码。",
+      },
+      {
+        heading: "按阶段组织脚本",
+        text: "读取、检查、清洗、分析、作图、导出分别成段。每段都可以从头运行并产生明确对象。",
+      },
+      {
+        heading: "设置核对点",
+        text: "记录原始行数、清洗后行数、关键变量缺失、模型事件数和图形数据来源。",
+      },
+      {
+        heading: "输出与复核",
+        text: "保存清洗数据、模型表、图形和会话信息。由另一次空会话重跑脚本，确认结果一致。",
+      },
+    ],
+    code: `# 01 读取\nraw <- read.csv("raw/survey.csv")\n\n# 02 清洗\nlibrary(dplyr)\nclean <- raw |> filter(age >= 18) |> mutate(bmi = weight / (height / 100)^2)\n\n# 03 描述与模型\nsummary(clean$bmi)\nfit <- glm(outcome ~ bmi + age + sex, data = clean, family = binomial())\n\n# 04 保存\nwrite.csv(clean, "output/analysis_data.csv", row.names = FALSE)\nwriteLines(capture.output(summary(fit)), "output/model_summary.txt")`,
+    functions: ["read.csv", "filter", "mutate", "summary", "glm", "write.csv", "sessionInfo"],
+    practice: "用课程示例完成一次从读取到模型摘要的完整运行，并保存分析副本。",
+  },
+  {
+    id: "r-10",
+    number: 25,
+    unit: "project",
+    title: "继续学习与排错",
+    subtitle: "建立函数笔记、排查报错和规划下一阶段",
+    minutes: 10,
+    outcome: "能使用帮助、报错信息和函数卡片独立解决常见问题。",
+    sections: [
+      {
+        heading: "先读报错结构",
+        text: "定位错误类型、对象名、函数名和文件路径。按“对象是否存在、类型是否正确、包是否载入、参数是否正确”的顺序检查。",
+      },
+      {
+        heading: "用最小例子复现",
+        text: "把问题缩小到几行代码。若最小例子正常，再逐步加回原数据的步骤，找出从哪一步开始出错。",
+      },
+      {
+        heading: "建立个人笔记",
+        text: "记录函数的用途、关键参数、适用条件、最小例子和实际报错。比起收藏大量链接，这更便于长期复习。",
+      },
+    ],
+    code: `# 排错顺序\n# 1. 对象是否存在\nls()\n# 2. 类型和结构是否正确\nclass(dat); str(dat)\n# 3. 参数是否正确\nargs(glm)\n# 4. 记录版本\nsessionInfo()`,
+    functions: ["help", "args", "class", "str", "sessionInfo"],
+    practice: "选一个你遇到过的报错，写下对象、函数、参数和解决步骤。",
+  },
+];
+
+</script>
+  <script>
 window.RZH_EXTRA_FUNCTIONS_3 = [
   {
     id: "read_csv",
@@ -10487,10 +11739,10 @@ window.RZH_TEACHING_CATEGORIES = [
     title: "全流程深入学习",
     subtitle: "从对象到一份完整分析",
     audience: "希望按顺序系统学习，并保存学习进度",
-    detail: "沿“认识对象 → 整理数据 → 描述与检验 → 建模 → 输出结果”的顺序完成 10 节系统课。",
+    detail: "从 R 与 RStudio 入门开始，依次学习语法、数据结构、数据管理、控制流、文本处理、可视化、统计分析和完整项目，共 25 节系统课。",
     icon: "workflow",
     items: [
-      { title: "从第一节系统课程开始", note: "共 10 节，进度保存在当前浏览器", href: "#learn/r-1" },
+      { title: "从第一节系统课程开始", note: "共 25 节，进度保存在当前浏览器", href: "#learn/r-1" },
     ],
   },
   {
@@ -52892,6 +54144,7 @@ workflows.forEach((workflow) => {
 });
 
 const courseModules = window.RZH_COURSE_MODULES || [];
+const courseUnits = window.RZH_COURSE_UNITS || [];
 const quickStartSteps = window.RZH_QUICK_START || [];
 const glossary = window.RZH_GLOSSARY || [];
 const problemCategories = window.RZH_NAV_CATEGORIES || [];
@@ -52952,6 +54205,8 @@ const state = {
   searchItems: [],
   searchIndex: 0,
   openTeachingCategory: "",
+  homeErrorOpen: false,
+  workflowCategory: "",
 };
 
 const favoritesList = () => [...state.favorites];
@@ -53107,7 +54362,10 @@ function linkButton(label, href, iconName = "arrow-right", className = "text-lin
 
 function handleHomeLearning(element) {
   const route = element.dataset.route;
-  if (element.dataset.workflow) state.workflow = element.dataset.workflow;
+  if (element.dataset.workflow) {
+    state.workflow = element.dataset.workflow;
+    state.workflowCategory = workflows.find((item) => item.id === state.workflow)?.group || "";
+  }
   if (element.dataset.basicsTab) state.basicsTab = element.dataset.basicsTab;
   if (element.dataset.category) {
     state.functionCategory = element.dataset.category;
@@ -53189,7 +54447,7 @@ function renderHomeLegacy() {
         <div>
           <span class="eyebrow">为公共卫生、医学与心理学研究而设计</span>
           <h1 class="hero-title">从一个问题开始，找到<em>下一行 R 代码</em></h1>
-          <p class="hero-copy">不用先记住函数名。说出你想完成的分析任务，R知会把研究思路、函数参数、最小示例和 AI 生成代码的解释连在一起。</p>
+          <p class="hero-copy">不用先记住函数名。输入分析任务，可以查看研究思路、函数参数、最小示例和代码解释。</p>
           <form class="hero-search" data-search-form>
             <label class="hero-search-box">
               <span class="sr-only">搜索分析任务、函数或报错</span>
@@ -53285,11 +54543,11 @@ function renderHomeLegacy() {
             <p>中文解释语法、参数、返回值、示例输出和常见误区。</p>
             ${linkButton("打开函数词典", "#functions")}
           </a>
-          <a class="path-card blue" href="#ai">
+          <a class="path-card blue" href="#code-parser">
             <span class="path-icon">${icon("sparkles")}</span>
-            <h3>AI 写出了代码，但我不确定它在做什么</h3>
+            <h3>代码能运行，但不确定每一步在做什么</h3>
             <p>逐段识别包、函数与参数，把关键函数链接回可核验的知识卡。</p>
-            ${linkButton("试试代码解释", "#ai")}
+            ${linkButton("打开代码解析", "#code-parser")}
           </a>
         </div>
       </section>
@@ -53421,9 +54679,6 @@ function teachingZoneMarkup(context = "home", limit = teachingCategories.length)
 }
 
 function renderHome() {
-  const learnedLessons = courseProgressCount();
-  const coursePercent = courseModules.length ? Math.round((learnedLessons / courseModules.length) * 100) : 0;
-  const recommended = recommendedCourseLesson();
   const quickEntries = [
     ["查一个符号", "!、$、[ ]、管道、公式与正则", "#symbols", "braces"],
     ["查一个函数", `${functions.length} 个常用函数条目`, "#functions", "grid"],
@@ -53432,11 +54687,11 @@ function renderHome() {
   ];
   app.innerHTML = `
     <div class="page">
-      <section class="goal-home home-purpose-hero">
+      <section class="goal-home home-purpose-hero home-simple-hero">
         <div class="goal-home-copy">
           <span class="eyebrow">按目标开始</span>
           <h1>查找 R 函数、方法与示例代码</h1>
-          <p>输入符号、函数名、报错信息或研究任务，即可进入对应内容；需要系统学习时，可查看教学专区。</p>
+          <p>输入函数名、符号、报错或研究任务。已经知道要查什么，可以直接搜索；刚开始学习，可以从下方选择入口。</p>
           <form class="goal-search" data-search-form>
             <label>
               <span class="sr-only">搜索任务、函数、术语或符号</span>
@@ -53446,22 +54701,15 @@ function renderHome() {
             <button class="button button-primary" type="submit">查找</button>
           </form>
           <div class="hero-actions">
-            <a class="button button-primary" href="#learn/quick">10 分钟快速入门 ${icon("arrow-right")}</a>
-            <a class="button" href="#learn">系统从 0 开始</a>
+            <a class="button button-primary" href="#learn/quick">不知道从哪开始？先学 10 分钟 ${icon("arrow-right")}</a>
+            <a class="button" href="#learn">查看完整课程</a>
+          </div>
+          <div class="home-mini-stats home-stats-inline">
+            <span><b>${functions.length}</b> 函数</span>
+            <span><b>${courseModules.length}</b> 系统课</span>
+            <span><b>19</b> 图形示例</span>
           </div>
         </div>
-        <aside class="home-progress-card">
-          <span class="eyebrow">我的学习</span>
-          <strong>${learnedLessons ? `已完成 ${learnedLessons} / ${courseModules.length} 课` : "还没有开始系统课程"}</strong>
-          <div class="progress-track" role="progressbar" aria-label="系统课程进度" aria-valuenow="${coursePercent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${coursePercent}%"></span></div>
-          <p>下一步：${escapeHtml(recommended.title)}</p>
-          <a class="text-link" href="#learn/${recommended.id}">${learnedLessons ? "继续学习" : "开始第一课"} ${icon("arrow-right")}</a>
-          <div class="home-mini-stats">
-            <span><b>${state.favorites.size}</b> 收藏</span>
-            <span><b>${functions.length}</b> 函数条目</span>
-            <span><b>${glossary.length}</b> 专业术语</span>
-          </div>
-        </aside>
       </section>
 
       <section class="goal-finder home-entry-section" aria-labelledby="goal-title">
@@ -53471,7 +54719,7 @@ function renderHome() {
         </div>
         <div class="home-quick-grid">
           ${quickEntries.map(([title, description, href, iconName], index) => `
-            ${index === 2 ? `<button class="home-quick-card" type="button" data-action="focus-error-analyzer">` : `<a class="home-quick-card" href="${href}">`}
+            ${index === 2 ? `<button class="home-quick-card" type="button" data-action="toggle-home-error">` : `<a class="home-quick-card" href="${href}">`}
               <span class="home-quick-icon">${icon(iconName)}</span>
               <span><strong>${escapeHtml(title)}</strong><small>${escapeHtml(description)}</small></span>
               ${icon("arrow-right")}
@@ -53480,6 +54728,7 @@ function renderHome() {
         </div>
       </section>
 
+      ${state.homeErrorOpen ? `
       <section class="panel quick-error-panel" id="error-analyzer" aria-labelledby="quick-error-title">
         <div class="quick-error-copy">
           <span class="eyebrow">报错分析</span>
@@ -53496,16 +54745,45 @@ function renderHome() {
           <p>复制报错中最关键的一行即可，不包含患者信息或原始数据。</p>
         </div>
       </section>
+      ` : ""}
 
-      ${teachingZoneMarkup("home", 9)}
+      <section class="home-start-panel" aria-labelledby="home-start-title">
+        <div class="section-title-row">
+          <div>
+            <span class="eyebrow">学习入口</span>
+            <h2 class="section-title" id="home-start-title">不知道从哪里开始？</h2>
+            <p class="section-copy">可以先体验短课，再决定是否进入完整课程或专题学习。</p>
+          </div>
+        </div>
+        <div class="home-start-grid">
+          <a class="home-start-card primary" href="#learn/quick">
+            <span>先试试</span>
+            <h3>10 分钟快速上手</h3>
+            <p>认识 RStudio，运行第一条命令，创建对象并读取一份简单数据。</p>
+            <strong>开始快速入门 ${icon("arrow-right")}</strong>
+          </a>
+          <a class="home-start-card" href="#learn">
+            <span>系统学习</span>
+            <h3>${courseModules.length} 节完整课程</h3>
+            <p>从安装和界面开始，依次学习语法、数据结构、数据管理、可视化与建模。</p>
+            <strong>查看课程目录 ${icon("arrow-right")}</strong>
+          </a>
+          <a class="home-start-card" href="#learn">
+            <span>按需学习</span>
+            <h3>方法与图形专题</h3>
+            <p>队列研究、Logistic、DLNM、LMM、森林图、桑基图等专题可按需展开。</p>
+            <strong>选择专题 ${icon("arrow-right")}</strong>
+          </a>
+        </div>
+      </section>
 
       <section class="ai-home-entry" aria-labelledby="ai-home-title">
         <div>
           <span class="eyebrow">代码辅助</span>
-          <h2 id="ai-home-title">AI 代码解析</h2>
+          <h2 id="ai-home-title">R 代码解析</h2>
           <p>粘贴一段 R 代码，可以查看调用的函数、关键参数和常见风险。代码不会被执行，也不会上传患者原始数据。</p>
         </div>
-        <a class="button button-primary" href="#ai">打开 AI 代码解析 ${icon("arrow-right")}</a>
+        <a class="button button-primary" href="#code-parser">打开代码解析 ${icon("arrow-right")}</a>
       </section>
     </div>
   `;
@@ -53867,6 +55145,42 @@ function quickProgressCount() {
   return quickStartSteps.filter((step) => state.quickCompleted.has(step.id)).length;
 }
 
+function courseRoadmapMarkup(recommended) {
+  const units = courseUnits.length
+    ? courseUnits
+    : [{ id: "", title: "系统课程", note: "" }];
+  return units.map((unit) => {
+    const modules = courseModules.filter((module) => (unit.id ? module.unit === unit.id : true));
+    if (!modules.length) return "";
+    const completedInUnit = modules.filter((module) => state.courseCompleted.has(module.id)).length;
+    return `
+      <section class="course-unit">
+        <div class="course-unit-head">
+          <div><h3>${escapeHtml(unit.title)}</h3><p>${escapeHtml(unit.note)}</p></div>
+          <span>${completedInUnit} / ${modules.length} 课</span>
+        </div>
+        <div class="course-roadmap">
+          ${modules.map((module) => {
+            const done = state.courseCompleted.has(module.id);
+            const current = !done && module.id === recommended.id;
+            return `
+              <a class="course-module ${done ? "done" : ""} ${current ? "current" : ""}" href="#learn/${module.id}">
+                <span class="module-number">${done ? icon("check") : String(module.number).padStart(2, "0")}</span>
+                <span class="module-copy">
+                  <strong>${escapeHtml(module.title)}</strong>
+                  <small>${escapeHtml(module.subtitle)}</small>
+                </span>
+                <span class="module-time">${module.minutes} 分</span>
+                ${icon("arrow-right")}
+              </a>
+            `;
+          }).join("")}
+        </div>
+      </section>
+    `;
+  }).join("");
+}
+
 function renderLearnHub() {
   const completed = courseProgressCount();
   const recommended = recommendedCourseLesson();
@@ -53907,23 +55221,7 @@ function renderLearnHub() {
           </div>
           <span class="badge badge-brand">约 ${courseModules.reduce((sum, module) => sum + module.minutes, 0)} 分钟</span>
         </div>
-        <div class="course-roadmap">
-          ${courseModules.map((module) => {
-            const done = state.courseCompleted.has(module.id);
-            const current = !done && module.id === recommended.id;
-            return `
-              <a class="course-module ${done ? "done" : ""} ${current ? "current" : ""}" href="#learn/${module.id}">
-                <span class="module-number">${done ? icon("check") : String(module.number).padStart(2, "0")}</span>
-                <span class="module-copy">
-                  <strong>${escapeHtml(module.title)}</strong>
-                  <small>${escapeHtml(module.subtitle)}</small>
-                </span>
-                <span class="module-time">${module.minutes} 分</span>
-                ${icon("arrow-right")}
-              </a>
-            `;
-          }).join("")}
-        </div>
+        ${courseRoadmapMarkup(recommended)}
       </section>
 
       <section class="section-block two-column">
@@ -54052,6 +55350,61 @@ function rstudioInterfaceMarkup(selected = state.rstudioPanel) {
   `;
 }
 
+function dataStructureBlocksMarkup() {
+  return `
+    <section class="structure-blocks" aria-labelledby="structure-blocks-title">
+      <div class="section-title-row">
+        <div>
+          <span class="eyebrow">示意图</span>
+          <h2 class="section-title" id="structure-blocks-title">用积木理解 R 数据结构</h2>
+          <p class="section-copy">颜色表示数据类型。向量要求同色，数据框可以每列用一种颜色，列表可以继续嵌套其他积木。</p>
+        </div>
+      </div>
+      <div class="structure-block-grid">
+        <article>
+          <div class="block-heading"><strong>向量 vector</strong><span>一列同类型值</span></div>
+          <div class="block-row"><i class="tone-a">22</i><i class="tone-a">31</i><i class="tone-a">45</i><i class="tone-a">NA</i></div>
+          <code>c(22, 31, 45, NA)</code>
+        </article>
+        <article>
+          <div class="block-heading"><strong>因子 factor</strong><span>有限分类与顺序</span></div>
+          <div class="block-row"><i class="tone-b">低</i><i class="tone-b">中</i><i class="tone-b">高</i></div>
+          <code>factor(level, levels = c("低", "中", "高"))</code>
+        </article>
+        <article>
+          <div class="block-heading"><strong>矩阵 matrix</strong><span>二维且类型相同</span></div>
+          <div class="block-matrix"><i class="tone-c">1</i><i class="tone-c">2</i><i class="tone-c">3</i><i class="tone-c">4</i><i class="tone-c">5</i><i class="tone-c">6</i></div>
+          <code>matrix(1:6, nrow = 2, byrow = TRUE)</code>
+        </article>
+        <article>
+          <div class="block-heading"><strong>数组 array</strong><span>超过二维的同类型数据</span></div>
+          <div class="block-cubes"><i class="tone-c"></i><i class="tone-c"></i><i class="tone-c"></i><i class="tone-c"></i></div>
+          <code>array(1:8, dim = c(2, 2, 2))</code>
+        </article>
+        <article class="wide">
+          <div class="block-heading"><strong>数据框 data.frame</strong><span>每列一个变量，每行一个对象</span></div>
+          <div class="block-table">
+            <span class="tone-d">id</span><span class="tone-a">age</span><span class="tone-b">sex</span><span class="tone-e">score</span>
+            <b>1</b><b>22</b><b>女</b><b>8.5</b>
+            <b>2</b><b>31</b><b>男</b><b>9.2</b>
+            <b>3</b><b>45</b><b>女</b><b>7.8</b>
+          </div>
+          <code>data.frame(id, age, sex, score)</code>
+        </article>
+        <article class="wide">
+          <div class="block-heading"><strong>列表 list</strong><span>可以同时装表格、向量和模型</span></div>
+          <div class="list-blocks">
+            <div><span>$data</span><i class="tone-f">数据框积木</i></div>
+            <div><span>$model</span><i class="tone-g">模型结果积木</i></div>
+            <div><span>$note</span><i class="tone-h">"已完成"</i></div>
+          </div>
+          <code>list(data = dat, model = fit, note = "已完成")</code>
+        </article>
+      </div>
+    </section>
+  `;
+}
+
 function selectRStudioPanel(panel) {
   state.rstudioPanel = panel;
   const info = rstudioPanelInfo[panel];
@@ -54075,13 +55428,17 @@ function renderCourseLesson(id) {
   const done = state.courseCompleted.has(module.id);
   const previous = courseModules[index - 1];
   const next = courseModules[index + 1];
+  const currentUnit = courseUnits.find((unit) => unit.id === module.unit);
+  const railModules = module.unit
+    ? courseModules.filter((item) => item.unit === module.unit)
+    : courseModules;
   app.innerHTML = `
     <div class="page">
       <a class="detail-back" href="#learn">${icon("arrow-left")} 返回课程路线</a>
       <div class="lesson-layout">
         <aside class="lesson-rail" aria-label="课程章节">
-          <span class="eyebrow">系统课程</span>
-          ${courseModules.map((item) => `
+          <span class="eyebrow">${escapeHtml(currentUnit?.title || "系统课程")}</span>
+          ${railModules.map((item) => `
             <a href="#learn/${item.id}" class="${item.id === module.id ? "active" : ""} ${state.courseCompleted.has(item.id) ? "done" : ""}">
               <span>${state.courseCompleted.has(item.id) ? icon("check") : String(item.number).padStart(2, "0")}</span>
               <strong>${escapeHtml(item.title)}</strong>
@@ -54101,7 +55458,8 @@ function renderCourseLesson(id) {
             <div class="lesson-outcome"><span>学完能够</span><strong>${escapeHtml(module.outcome)}</strong></div>
           </header>
 
-          ${module.id === "r-1" ? rstudioInterfaceMarkup() : ""}
+          ${module.diagram === "rstudio" ? rstudioInterfaceMarkup() : ""}
+          ${module.diagram === "data-structures" ? dataStructureBlocksMarkup() : ""}
 
           <div class="lesson-sections">
             ${module.sections.map((section, sectionIndex) => `
@@ -54703,7 +56061,9 @@ function renderSymbols() {
 }
 
 function renderWorkflows() {
-  const selected = workflows.find((item) => item.id === state.workflow) || workflows[0];
+  const selected = state.workflowCategory
+    ? workflows.find((item) => item.id === state.workflow)
+    : null;
   const workflowGroups = [
     ["data", "录入与结构", "数据导入、数据类型和导出"],
     ["clean", "清洗与检查", "缺失值、异常值、重复记录和变量重编码"],
@@ -54715,24 +56075,33 @@ function renderWorkflows() {
       <header class="page-header">
         <span class="eyebrow">问题导航</span>
         <h1 class="page-title">按任务查找分析流程</h1>
-        <p class="page-subtitle">数据操作和研究设计分开列出。选一个更具体的任务，沿着输入、步骤和检查点完成，不必先知道函数名。</p>
+        <p class="page-subtitle">先选择一个分类，再查看分类下的具体任务。任务展开后会显示输入、检查步骤、函数和代码示例。</p>
       </header>
-      <div class="problem-nav" aria-label="问题分类">
+      <div class="workflow-category-list" aria-label="问题分类">
         ${workflowGroups.map(([groupId, title, description]) => `
-          <section class="problem-nav-group">
-            <div><strong>${title}</strong><small>${description}</small></div>
-            <div class="problem-nav-buttons">
-              ${workflows.filter((item) => item.group === groupId).map((item) => `
-                <button class="problem-nav-button ${item.id === selected.id ? "active" : ""}" type="button" data-action="workflow-select" data-id="${item.id}" aria-pressed="${item.id === selected.id}">
-                  <span>${escapeHtml(item.short)}</span>
-                  ${item.id === selected.id ? icon("check") : ""}
-                </button>
-              `).join("")}
-            </div>
+          <section class="workflow-category ${state.workflowCategory === groupId ? "open" : ""}">
+            <button class="workflow-category-trigger" type="button" data-action="workflow-category" data-group="${groupId}" aria-expanded="${state.workflowCategory === groupId}">
+              <span>
+                <strong>${title}</strong>
+                <small>${description}</small>
+              </span>
+              ${badge(`${workflows.filter((item) => item.group === groupId).length} 个任务`)}
+              ${icon("chevron-down")}
+            </button>
+            ${state.workflowCategory === groupId ? `
+              <div class="workflow-choice-grid">
+                ${workflows.filter((item) => item.group === groupId).map((item) => `
+                  <button class="workflow-choice ${item.id === state.workflow ? "active" : ""}" type="button" data-action="workflow-select" data-id="${item.id}" aria-pressed="${item.id === state.workflow}">
+                    <span><strong>${escapeHtml(item.short)}</strong><small>${escapeHtml(item.summary)}</small></span>
+                    ${icon("arrow-right")}
+                  </button>
+                `).join("")}
+              </div>
+            ` : ""}
           </section>
         `).join("")}
       </div>
-      <div class="workflow-layout">
+      ${selected ? `<div class="workflow-layout">
         <section class="panel workflow-panel">
           <div class="workflow-summary">
             <span class="eyebrow">${escapeHtml(selected.level)} · ${escapeHtml(selected.time)}</span>
@@ -54775,7 +56144,12 @@ function renderWorkflows() {
             ${escapeHtml(selected.code)}
           </div>
         </aside>
-      </div>
+      </div>` : `
+        <div class="workflow-empty">
+          ${icon("workflow")}
+          <div><strong>先选择一个分类</strong><p>展开分类后，再选择具体任务；详细步骤和代码只会在选定任务后显示。</p></div>
+        </div>
+      `}
     </div>
   `;
 }
@@ -54899,7 +56273,7 @@ function renderAI() {
   app.innerHTML = `
     <div class="page">
       <header class="page-header">
-        <span class="eyebrow">AI 代码解释</span>
+        <span class="eyebrow">代码辅助</span>
         <h1 class="page-title">解读一段 R 代码</h1>
         <p class="page-subtitle">粘贴代码后，可以查看调用的包、函数和关键参数，并跳转到对应的中文说明。代码不会被执行，也不会上传患者原始数据。</p>
       </header>
@@ -54921,18 +56295,18 @@ model <- glm(event ~ age + sex,
              family = binomial())
 summary(model)</textarea>
           <div class="ai-actions">
-            <button class="button button-primary" type="button" data-action="analyze-code">${icon("sparkles")}解释这段代码</button>
+            <button class="button button-primary" type="button" data-action="analyze-code">${icon("sparkles")}解析这段代码</button>
             <button class="button" type="button" data-action="copy-code-input">${icon("copy")}复制代码</button>
             <span class="privacy-note">${icon("shield")}仅解释，不执行</span>
           </div>
         </section>
         <section class="panel ai-output" id="ai-output">
           <div class="ai-output-head">
-            <h2>解释结果</h2>
+            <h2>解析结果</h2>
             ${badge("等待分析")}
           </div>
           <div class="ai-placeholder">
-            <div>${icon("sparkles")}<p>点击“解释这段代码”后，这里会按执行目的拆分步骤，并列出识别到的函数。</p></div>
+            <div>${icon("sparkles")}<p>点击“解析这段代码”后，这里会按执行目的拆分步骤，并列出识别到的函数。</p></div>
           </div>
         </section>
       </div>
@@ -55031,7 +56405,7 @@ function routeMeta(route) {
   }
   const map = {
     home: ["home", "学习首页", "学习首页"],
-    learn: ["learn", "从 0 开始学", "从 0 开始学"],
+    learn: ["learn", "教学与专题", "教学与专题"],
     reference: ["reference", "基础速查", "基础速查"],
     basics: ["reference", "入门与运算", "基础速查 / 入门与运算"],
     functions: ["functions", "函数词典", "函数词典"],
@@ -55042,7 +56416,8 @@ function routeMeta(route) {
     glossary: ["glossary", "专业术语", "专业术语"],
     workflows: ["workflows", "问题导航", "问题导航"],
     scales: ["workflows", "量表与心理网络", "问题导航 / 量表与心理网络"],
-    ai: ["workflows", "AI 代码解释", "问题导航 / AI 代码解释"],
+    ai: ["workflows", "R 代码解析", "问题导航 / R 代码解析"],
+    "code-parser": ["workflows", "R 代码解析", "问题导航 / R 代码解析"],
     saved: ["saved", "收藏与笔记", "我的学习 / 收藏与笔记"],
   };
   return { nav: map[route]?.[0] || "home", title: map[route]?.[1] || "R知", crumb: map[route]?.[2] || "R知" };
@@ -55074,7 +56449,7 @@ function renderRoute() {
   else if (route === "glossary") renderGlossary();
   else if (route === "workflows") renderWorkflows();
   else if (route === "scales") renderScales();
-  else if (route === "ai") renderAI();
+  else if (route === "ai" || route === "code-parser") renderAI();
   else if (route === "saved") renderSaved();
   else renderNotFound();
 
@@ -55582,7 +56957,10 @@ function updateSearchSelection() {
 function openSearchResult(index) {
   const item = state.searchItems[index];
   if (!item) return;
-  if (item.workflowId) state.workflow = item.workflowId;
+  if (item.workflowId) {
+    state.workflow = item.workflowId;
+    state.workflowCategory = workflows.find((workflow) => workflow.id === state.workflow)?.group || "";
+  }
   if (item.basicsTab) state.basicsTab = item.basicsTab;
   if (item.symbolValue) state.symbolFocus = item.symbolValue;
   if (item.glossaryId) {
@@ -55650,9 +57028,13 @@ document.addEventListener("click", (event) => {
     if (action === "quick-search") openSearch(actionElement.dataset.query);
     if (action === "home-learning") handleHomeLearning(actionElement);
     if (action === "toggle-teaching-category") toggleTeachingCategory(actionElement.dataset.categoryId);
-    if (action === "focus-error-analyzer") {
-      document.getElementById("error-analyzer")?.scrollIntoView({ behavior: "smooth", block: "center" });
-      document.getElementById("quick-error-input")?.focus();
+    if (action === "toggle-home-error") {
+      state.homeErrorOpen = !state.homeErrorOpen;
+      renderHome();
+      requestAnimationFrame(() => {
+        document.getElementById("error-analyzer")?.scrollIntoView({ behavior: "smooth", block: "center" });
+        document.getElementById("quick-error-input")?.focus();
+      });
     }
     if (action === "open-error-search") {
       state.errorCategory = "全部";
@@ -55690,6 +57072,13 @@ document.addEventListener("click", (event) => {
     }
     if (action === "workflow-select") {
       state.workflow = actionElement.dataset.id;
+      state.workflowCategory = workflows.find((item) => item.id === state.workflow)?.group || "";
+      renderWorkflows();
+    }
+    if (action === "workflow-category") {
+      const group = actionElement.dataset.group;
+      state.workflowCategory = state.workflowCategory === group ? "" : group;
+      state.workflow = "";
       renderWorkflows();
     }
     if (action === "basics-tab") {
