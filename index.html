@@ -5496,7 +5496,7 @@ html[data-theme="dark"] .theme-icon-sun {
 
       <div class="sidebar-tip">
         <span class="tip-icon">⌘</span>
-        <p><strong>快速查找</strong><br>随时按 <kbd>⌘ K</kbd> 搜索函数或任务</p>
+        <p><strong>快速查找</strong><br>随时按 <kbd>⌘ K</kbd> 搜索函数、任务或符号</p>
       </div>
     </aside>
 
@@ -5509,9 +5509,9 @@ html[data-theme="dark"] .theme-icon-sun {
         </button>
         <div class="breadcrumb" id="breadcrumb">学习首页</div>
         <div class="topbar-actions">
-          <button class="search-trigger" id="open-search" type="button">
+          <button class="search-trigger" id="open-search" type="button" aria-label="搜索函数、任务、符号、术语或报错">
             <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-            <span>搜索函数、用途或报错</span>
+            <span>搜索函数、用途、符号或报错</span>
             <kbd>⌘ K</kbd>
           </button>
           <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深浅色主题">
@@ -10838,7 +10838,7 @@ function analyzeQuickError(text) {
       <ol>${item.checks.slice(0, 3).map((check) => `<li>${escapeHtml(check)}</li>`).join("")}</ol>
       <div class="quick-error-actions">
         ${(item.functions || []).slice(0, 3).map((id) => peekFunctionPill(id)).join("")}
-        <button class="button" type="button" data-action="open-error-search" data-query="${escapeHtml(text.trim())}">打开完整排查步骤 ${icon("arrow-right")}</button>
+        <button class="button" type="button" data-action="open-error-search" data-query="${escapeHtml(item.error)}">打开完整排查步骤 ${icon("arrow-right")}</button>
       </div>
     </div>
   `).join("");
