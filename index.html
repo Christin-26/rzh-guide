@@ -1500,6 +1500,104 @@ html[data-theme="dark"] .theme-icon-sun {
   font-size: 13px;
 }
 
+.plain-language-section {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--border));
+  background:
+    radial-gradient(circle at 100% 0, color-mix(in srgb, var(--accent-soft) 70%, transparent), transparent 38%),
+    var(--surface);
+}
+
+.plain-language-head {
+  display: grid;
+  grid-template-columns: 70px minmax(0, 1fr);
+  gap: 13px;
+  align-items: start;
+}
+
+.plain-language-label {
+  display: inline-flex;
+  justify-content: center;
+  padding: 6px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.06em;
+}
+
+.plain-language-head h2 {
+  margin-bottom: 8px;
+  font-size: 18px;
+}
+
+.plain-language-head p {
+  font-size: 13.5px;
+  line-height: 1.8;
+}
+
+.plain-language-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 16px;
+}
+
+.plain-language-grid article {
+  padding: 13px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--surface) 88%, var(--accent-soft));
+}
+
+.plain-language-grid span,
+.plain-walkthrough > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--accent);
+  font-size: 9.5px;
+  font-weight: 750;
+  letter-spacing: 0.05em;
+}
+
+.plain-language-grid p {
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.plain-walkthrough {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+}
+
+.plain-walkthrough ol {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding-left: 20px;
+  color: var(--text-soft);
+  font-size: 11.5px;
+  line-height: 1.65;
+}
+
+.plain-example-note {
+  margin-top: 10px !important;
+  padding-top: 9px;
+  border-top: 1px dashed var(--border);
+  color: var(--muted) !important;
+  font-size: 10.5px !important;
+  line-height: 1.65;
+}
+
+.plain-language-caveat {
+  margin-top: 10px !important;
+  color: var(--muted) !important;
+  font-size: 10px !important;
+  line-height: 1.6;
+}
+
 .code-block {
   position: relative;
   margin: 13px 0 0;
@@ -1595,6 +1693,23 @@ html[data-theme="dark"] .theme-icon-sun {
   color: var(--muted);
   font-size: 10.5px;
   line-height: 1.55;
+}
+
+.param-plain {
+  display: block;
+  margin-top: 7px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  background: var(--brand-pale);
+  color: var(--text-soft);
+  font-size: 10.5px;
+  line-height: 1.55;
+}
+
+.param-plain b {
+  margin-right: 6px;
+  color: var(--brand);
+  font-size: 9px;
 }
 
 .tip-list {
@@ -4555,6 +4670,29 @@ html[data-theme="dark"] .theme-icon-sun {
   line-height: 1.7;
 }
 
+.peek-plain {
+  margin: 0 0 12px;
+  padding: 11px 12px;
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--border));
+  border-radius: 9px;
+  background: var(--accent-soft);
+}
+
+.peek-plain span {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--accent);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.peek-plain p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1.65;
+}
+
 .peek-section {
   margin-top: 18px;
 }
@@ -4608,6 +4746,15 @@ html[data-theme="dark"] .theme-icon-sun {
   color: var(--text-soft);
   font-size: 10px;
   line-height: 1.5;
+}
+
+.peek-params small {
+  grid-column: 1 / -1;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+  color: var(--brand);
+  font-size: 9.5px;
+  line-height: 1.55;
 }
 
 .peek-footer {
@@ -6674,6 +6821,19 @@ html[data-theme="dark"] .theme-icon-sun {
 }
 
 @media (max-width: 560px) {
+  .plain-language-head {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .plain-language-label {
+    width: max-content;
+  }
+
+  .plain-language-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .lesson-reading-keys {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -11021,6 +11181,726 @@ window.RZH_PACKAGE_INFO = [
     functions: ["sankeyNetwork"],
   },
 ];
+
+</script>
+  <script>
+window.RZH_PLAIN_CATEGORY_ANALOGIES = {
+  "基础与对象": "像拿到一件新工具，先看它长什么样、能做什么，再决定下一步。",
+  "基础运算": "像计算器：把数字或表达式放进去，按键得到结果。",
+  "数据导入": "像把文件从仓库搬进 R 的工作台，搬完还要清点数量和列类型。",
+  "数据整理": "像整理一张大表：留下需要的行和列，改好名称，再计算新内容。",
+  "数据清洗": "像校对手稿：先找问题，再记录修改理由，不能看到不顺眼就整段删掉。",
+  "描述统计": "像给一组数据拍一张全景照，先看中心、范围和波动。",
+  "统计检验": "像拿一把有刻度的尺子比较结果；尺子选错，读数再精确也没有意义。",
+  "回归与建模": "像画一张带前提条件的关系地图，帮助整理变量之间的联系。",
+  "可视化": "像把数据的意思摊开给人看：先表达清楚，再考虑装饰。",
+  "量表分析": "像检查一套题是否在测同一件事，以及各个维度能不能站得住。",
+  "心理网络": "像画人物关系图：点和线只表示关联，不自动说明谁造成了谁。",
+  "文本处理": "像整理一批格式不一的标签，先看懂规律，再批量查找、提取或替换。",
+  "报告与开发": "像准备一份会自动更新的实验记录，文字、代码和结果从同一处生成。",
+  "高级分析": "像更精细的专业工具，先确认研究问题真的需要它，再学参数。",
+  "符号与正则": "像 R 的标点和速记：位置不同，作用可能完全不一样。",
+  "编程与控制": "像给 R 安排一套流程：满足条件走哪条路，重复动作做几次。",
+};
+
+window.RZH_PLAIN_PARAMETER_HINTS = {
+  "...": "这里用来接收其他可选设置；新手先留空，不必为了填满而猜参数。",
+  x: "就是交给函数处理的那一列数据或那个 R 对象。",
+  y: "常表示结局、纵轴变量或另一个要一起比较的对象，具体看函数用途。",
+  object: "把想检查、打印或处理的对象放在这里。",
+  data: "告诉函数去哪张数据框里找变量。",
+  ".data": "接收上一步传来的数据框；在管道里通常不需要再重复写表名。",
+  formula: "用“结局 ~ 解释变量”写清要研究谁和谁的关系，例如 y ~ age + sex。",
+  file: "文件放在哪里。推荐使用项目文件夹内的相对路径。",
+  path: "文件放在哪里。写之前先用 list.files() 或文件窗口核对。",
+  na: "哪些内容要当成缺失值，例如空字符串或问卷中的特殊拒答码。",
+  "na.rm": "TRUE 表示本次计算先忽略缺失值；它不会修改或删除原始数据。",
+  probs: "想要哪几个分位点，例如 c(0.25, 0.5, 0.75) 就是下四分位、中位数和上四分位。",
+  "conf.level": "置信水平；0.95 就是常用的 95% 置信区间。",
+  alternative: "选择双侧检验，还是只看结果偏向升高或降低的一侧。",
+  method: "让函数采用哪一种计算方法；不知道时先保留默认值，并核对研究假设。",
+  FUN: "告诉函数“对每一组或每个元素要执行什么操作”，例如 mean。",
+  fun: "告诉函数“对每一组或每个元素要执行什么操作”。",
+  expr: "要计算、检查或延迟执行的表达式。",
+  n: "数量、行数或样本大小，具体看当前函数。",
+  by: "按什么规则分组或按什么间隔计算。",
+  package: "要安装、载入或查看的 R 包名称。",
+  "lib.loc": "R 包安装在哪个库目录；普通使用通常不用手填。",
+  header: "第一行是不是列名。确认是表头才使用 TRUE。",
+  sep: "文件里用哪个字符分隔字段；CSV 通常是逗号。",
+  encoding: "文件内容的文字编码；中文乱码时经常需要检查这一项。",
+  "ignore.case": "匹配文字时是否忽略大小写。",
+  fixed: "TRUE 表示按普通文字匹配；FALSE 才把 pattern 当作正则表达式。",
+  pattern: "要查找的文字或正则表达式；先用少量文本测试更安全。",
+  labels: "给图形的组别、坐标轴或节点显示可读名称。",
+  title: "图的标题或对象名称，用来告诉读者这张图讲什么。",
+  p: "概率、p 值或绘图位置，具体含义由函数决定。",
+  "lower.tail": "TRUE 计算分布左侧概率；FALSE 计算右侧概率。",
+  weights: "每条观测在计算中占多大分量，常用于加权调查或先验信息。",
+  subset: "只对符合条件的一部分数据或元素进行计算。",
+  subset_condition: "写一个筛选条件，例如 age >= 18。",
+  direction: "转换方向、排列方向或搜索方向。",
+  sex: "性别变量；会按数据中的类别分别计算。",
+  group: "分组变量；函数会按组别分别处理或比较。",
+  "conf.int": "是否同时给出置信区间。",
+  level: "置信水平，常见为 0.95。",
+  scale: "是否对变量做标准化，或图形采用什么数值尺度。",
+  center: "是否把变量中心化，通常让均值变成 0。",
+  digits: "结果保留几位数字。",
+};
+
+window.RZH_PLAIN_FUNCTION_GUIDES = {
+  str: {
+    gist: "str() 像给对象拍一张“结构照片”：先告诉你它是表格、向量还是模型，每一列又是什么类型。",
+    analogy: "刚收到一份陌生名单时，先看有几栏、每栏写的是什么，比立刻开始筛选更可靠。",
+    remember: "它主要负责“看”，不会替你清洗数据，也不会把原始对象改掉。",
+    steps: [
+      "把陌生的数据对象放进 str()，例如 str(dat)。",
+      "先看 observations 和 variables，确认行数、列数有没有读错。",
+      "再逐列看 num、chr、fct、Date 等类型；类型不对，后面的计算很容易报错。",
+    ],
+  },
+  glimpse: {
+    gist: "glimpse() 也用来查看表，但它把列名和类型横着排，列很多时比 str() 更容易扫一眼。",
+    analogy: "像把一张很宽的表转个方向看，方便快速找到“编号怎么变字符了”这类问题。",
+    remember: "glimpse() 仍然只是检查，不会修改原表。",
+    steps: [
+      "先运行 glimpse(dat)，看 Rows、Columns 和每一列的类型。",
+      "如果某列本来是编号，却显示成 <dbl>，就要考虑前导零是否丢失。",
+      "需要进一步看某一列时，再用 summary() 或 table()。",
+    ],
+  },
+  "read.csv": {
+    gist: "read.csv() 是把 CSV 文件搬进 R 的入口；读进来以后会得到一张数据框。",
+    analogy: "像把一箱资料搬上工作台：先确认文件找得到、表头没搬错、每列类型也合适。",
+    remember: "读取成功不等于数据正确；读完一定用 str() 或 glimpse() 检查列类型。",
+    params: {
+      file: "把文件路径放在这里，推荐从项目文件夹写相对路径。",
+      header: "文件第一行确实是变量名，才写 TRUE。",
+      sep: "CSV 的字段通常用逗号分开，所以默认 sep = \",\"。",
+      "na.strings": "文件中哪些文字代表“没有值”，例如 NA、空白或特殊拒答码。",
+    },
+    steps: [
+      "先确认文件路径：read.csv(\"raw/survey.csv\")。",
+      "读完后马上运行 str(dat)，检查行数和各列类型。",
+      "如果中文乱码，再检查 fileEncoding；不要先手工改一堆数据。",
+    ],
+  },
+  read_excel: {
+    gist: "read_excel() 从 Excel 工作簿里取出一张工作表，变成 R 可以分析的表。",
+    analogy: "一个 Excel 文件像一本多页账本，sheet 决定翻到哪一页，range 决定从哪一块开始抄。",
+    remember: "先确认工作表名和数据起始行，不要默认第一页、第一行就是分析表。",
+    steps: [
+      "先用 excel_sheets(\"survey.xlsx\") 看有哪些工作表。",
+      "再用 sheet 指定工作表；有标题说明行时用 skip 或 range 跳过。",
+      "读取后检查列名和类型，尤其留意编号、日期和空单元格。",
+    ],
+  },
+  clean_names: {
+    gist: "clean_names() 把“Age (years)”“Blood Pressure”这种难写的列名，统一成 age_years、blood_pressure。",
+    analogy: "像给一排带空格和标点的文件夹重新贴标签，之后输入文件名就不容易出错。",
+    remember: "它改的是列名，不是变量里的数值；改完仍要检查是否出现重名。",
+    steps: [
+      "先看 names(dat)，找找空格、括号和大小写混杂的列名。",
+      "运行 dat2 <- clean_names(dat)，把结果保存成新对象。",
+      "再运行 names(dat2)，确认名称统一且没有重名列。",
+    ],
+  },
+  filter: {
+    gist: "filter() 是“留人”或“留行”：只保留满足条件的那几行，其他行暂时不要。",
+    analogy: "像从一叠问卷中只抽出年龄大于等于 18 岁的问卷。",
+    remember: "多个条件写在同一行并用逗号隔开，表示这些条件要同时满足。",
+    params: {
+      ".data": "把要筛选的那张表交给它；放在管道前面即可。",
+      "...": "这里写筛选条件，例如 age >= 18、!is.na(score)。",
+      ".by": "想按组分别筛选时才用，新手可以先不填。",
+    },
+    steps: [
+      "先单独运行 age >= 18，确认它会产生 TRUE 和 FALSE。",
+      "把条件放进 filter(dat, age >= 18)，核对筛完后的行数。",
+      "再加第二个条件时每次只加一个，避免一次写错多个判断。",
+    ],
+  },
+  select: {
+    gist: "select() 是“留列”：变量太多时，只把这次分析要用的几列拿出来。",
+    analogy: "像从一张很宽的登记表里，只复印编号、年龄、性别和结局这几栏。",
+    remember: "列名前面加减号可以删除列；select() 不会自动筛掉不符合条件的行。",
+    steps: [
+      "先列出这次分析真正需要的变量，不要凭感觉全选。",
+      "运行 dat |> select(id, age, sex, outcome)。",
+      "如果有列被排序或改名需求，再使用 relocate()、rename() 或 select(new = old)。",
+    ],
+  },
+  mutate: {
+    gist: "mutate() 是“加一列”或“改一列”：根据已有变量算出新的变量。",
+    analogy: "像在登记表右侧新增一栏 BMI，用同一行里的身高和体重计算，原表其余内容不变。",
+    remember: "新变量名写在等号左边，计算过程写在右边，例如 bmi = weight / height^2。",
+    steps: [
+      "先确认公式单位，例如身高的单位是米还是厘米。",
+      "运行 dat |> mutate(bmi = weight / (height / 100)^2)。",
+      "检查新列的缺失值、极小值和极大值，不急着拿去做模型。",
+    ],
+  },
+  group_by: {
+    gist: "group_by() 是先给数据贴上“组别标签”，让后面的计算按每个组分别进行。",
+    analogy: "像先按性别把问卷分成两摞，再分别计算每摞的平均分。",
+    remember: "group_by() 本身通常不会改变表格内容；真正出结果的是后面的 summarise() 等函数。",
+    steps: [
+      "先确认分组变量每个类别的人数是否够。",
+      "运行 dat |> group_by(sex) |> summarise(n = n())。",
+      "汇总后如果还要对整张表操作，可用 ungroup() 清除分组。",
+    ],
+  },
+  summarise: {
+    gist: "summarise() 是“把很多行汇总成几个结果”，例如组内人数、均数和缺失数。",
+    analogy: "像把一摞问卷整理成一张小纸条，只写“多少人、平均多少分”。",
+    remember: "有 group_by() 时每组一行，没有分组时通常整张表只得到一行。",
+    steps: [
+      "先决定要回答的问题：人数、均数、比例还是缺失数。",
+      "写出 summarise(n = n(), mean_score = mean(score, na.rm = TRUE))。",
+      "拿到结果后核对每一组的 n，避免把空组或极小样本当成稳定结论。",
+    ],
+  },
+  left_join: {
+    gist: "left_join() 是“以左表为主去配资料”：左表每一行都保留，再从右表补上能匹配的列。",
+    analogy: "像拿主名单逐个人去另一张成绩表里查分数；主名单的人不能被成绩表漏掉。",
+    remember: "匹配键必须含义一致、格式一致，并且要检查右表是否有一对多重复。",
+    steps: [
+      "在左表和右表中各找出一个真正代表同一对象的键，例如 id 或 city_code。",
+      "运行 survey |> left_join(city, by = \"id\")。",
+      "比较连接前后的行数，并用 anti_join() 检查哪些记录没有匹配上。",
+    ],
+  },
+  pivot_longer: {
+    gist: "pivot_longer() 把“很多列其实是同一种测量”的宽表，拉成“一列记录测量名称、一列记录数值”的长表。",
+    analogy: "把前测、后测、随访三个并排的抽屉，改成一张时间表：每一行写清是谁、哪一次、得了多少分。",
+    remember: "宽表变长表通常会增加行数，转换后要核对“人数 × 测量次数”。",
+    steps: [
+      "先确定哪些列属于同一种测量，以及它们的名称要放进哪一列。",
+      "运行 pivot_longer(cols = c(pre, post), names_to = \"time\", values_to = \"score\")。",
+      "用 nrow() 和 table(long$time) 核对转换前后的信息有没有丢。",
+    ],
+  },
+  table: {
+    gist: "table() 是“数一数每个类别各有多少”，最常用于分类变量的频数表。",
+    analogy: "像把问卷按性别和结局分别放进格子，再看每个格子有几张。",
+    remember: "连续变量直接放进 table() 可能出现大量单独数值，通常先分组或用 cut()。",
+    steps: [
+      "先确认变量是分类变量，不是带很多小数的连续变量。",
+      "运行 table(dat$sex) 或 table(dat$sex, dat$outcome)。",
+      "再用 prop.table() 查看比例，并核对缺失值是否被排除。",
+    ],
+  },
+  mean: {
+    gist: "mean() 求平均数：把一列有效数值加起来，再除以有效值的个数。",
+    analogy: "像把每个人的分数合成一个“总体水平”的代表值，但它看不到分布是否偏斜。",
+    remember: "只要数据中有 NA，mean() 默认就可能返回 NA；是否忽略要用 na.rm 决定。",
+    params: {
+      x: "放要计算平均数的那一列数值。",
+      trim: "先去掉两端各百分之几的极端值；普通平均就保留 0。",
+      "na.rm": "TRUE 表示忽略缺失值再平均；不会删除原表里的 NA。",
+    },
+    steps: [
+      "先运行 age，确认它是数值列；字符列不能直接求平均。",
+      "mean(age) 遇到 NA 时可能得到 NA，这是提醒，不是小数算错了。",
+      "再运行 mean(age, na.rm = TRUE)，并另外核对缺失数量。",
+    ],
+  },
+  sd: {
+    gist: "sd() 看一组数值通常离平均数有多远，是衡量波动大小的常用指标。",
+    analogy: "两个班平均分都是 80，但一个班都在 78～82，另一个班 50～110，sd() 会把后一个班的波动显示得更大。",
+    remember: "标准差要有实际单位；数值大不一定异常，要结合变量单位和分布解释。",
+    steps: [
+      "先用 range() 和直方图看数据范围。",
+      "运行 sd(x, na.rm = TRUE)，确认缺失值处理方式。",
+      "把均数和标准差一起报告，不要只报其中一个。",
+    ],
+  },
+  quantile: {
+    gist: "quantile() 找“排在某个百分比位置的数”，例如中位数就是第 50 百分位。",
+    analogy: "把全班身高从矮到高排队，站在 25%、50%、75% 位置的人，身高就是对应分位数。",
+    remember: "分位数只描述位置，不会判断某个数值是不是错误数据。",
+    params: {
+      probs: "想算哪些百分比位置，写成 0 到 1 之间的小数。",
+      "na.rm": "是否先忽略缺失值；默认不忽略。",
+    },
+    steps: [
+      "先想清楚要看中位数、四分位数还是自定义百分位。",
+      "运行 quantile(x, probs = c(.25, .5, .75), na.rm = TRUE)。",
+      "再结合箱式图看两端是否很长，分位数单独使用会漏掉异常尾部。",
+    ],
+  },
+  "t.test": {
+    gist: "t.test() 用来比较均数或估计一个均数，并给出差异的不确定范围。",
+    analogy: "像比较两组的平均水平，但同时提醒你：样本不同，均数本身也会晃动。",
+    remember: "p 值小只说明“很难用偶然波动解释”，不代表差异很大或一定有意义。",
+    steps: [
+      "先确认结局近似连续、两组的观测方式满足检验要求。",
+      "运行 t.test(score ~ group, data = dat)。",
+      "同时看均数差、置信区间和 p 值，再回到图形上看分布。",
+    ],
+  },
+  "chisq.test": {
+    gist: "chisq.test() 检查两个分类变量是否相关，例如不同性别组的结局比例是否不同。",
+    analogy: "像把所有人放进“性别 × 结局”的格子，再看每格人数是否与“完全没关系”时的期待差很多。",
+    remember: "期望频数太小的格子不能硬套卡方检验，可考虑精确检验。",
+    steps: [
+      "先用 table(dat$sex, dat$outcome) 看清楚列联表。",
+      "运行 chisq.test(tab)，检查是否有很小的期望频数。",
+      "报告比例、人数和检验结果，不要只写一个 p 值。",
+    ],
+  },
+  glm: {
+    gist: "glm() 用一条预设关系把结局和解释变量连起来；Logistic 回归就是它的一个常见版本。",
+    analogy: "像给数据装一个“翻译器”：把年龄、性别等信息换成结局风险的变化方向。",
+    remember: "family 决定你在拟什么模型；二分类结局常用 family = binomial()。",
+    steps: [
+      "先写清结局、暴露和需要调整的变量。",
+      "用 glm(outcome ~ exposure + age + sex, data = dat, family = binomial()) 拟合模型。",
+      "再检查样本量、事件数、缺失和模型假设，不要看到 p 值就结束。",
+    ],
+  },
+  coxph: {
+    gist: "coxph() 用来分析“到事件发生的时间”，比较不同组的风险，并允许研究在随访结束前失访。",
+    analogy: "像观察一批人从入组开始等一件事件，有些人等到了，有些人只知道随访结束时还没发生。",
+    remember: "coxph() 需要生存时间、事件状态和解释变量；比例风险假设还要另行检查。",
+    steps: [
+      "先构造 Surv(time, event) 作为结局。",
+      "运行 coxph(Surv(time, event) ~ exposure + age, data = dat)。",
+      "查看 HR、置信区间，并用 cox.zph() 检查比例风险假设。",
+    ],
+  },
+  survfit: {
+    gist: "survfit() 按随访时间估计“还没发生事件”的概率，是 Kaplan-Meier 曲线的计算部分。",
+    analogy: "像沿着时间往前走，每到一次事件发生，就把仍处于风险中的人数和曲线更新一次。",
+    remember: "它先算生存曲线；要把曲线画得漂亮，通常再接 ggsurvplot()。",
+    steps: [
+      "先用 Surv() 写清随访时间和事件状态。",
+      "运行 fit <- survfit(Surv(time, event) ~ group, data = dat)。",
+      "用 summary(fit) 看各时间点的风险人数和生存概率。",
+    ],
+  },
+  ggsurvplot: {
+    gist: "ggsurvplot() 把生存分析结果画成曲线，可同时显示风险人数、p 值和置信区间。",
+    analogy: "survfit() 算好路线，ggsurvplot() 负责把路线画到图上并配上说明。",
+    remember: "图上的下降表示事件发生；随访人数变少时，曲线尾部的不确定性通常更大。",
+    steps: [
+      "先有 survfit() 或 Cox 模型的结果，再交给 ggsurvplot()。",
+      "按需要打开 risk.table、pval 和 conf.int。",
+      "查看横轴时间单位、纵轴概率和风险人数，不要忽略曲线尾部的样本量。",
+    ],
+  },
+  ggplot: {
+    gist: "ggplot() 先铺一张画布，并说明数据表以及每一列要对应到横轴、纵轴或颜色。",
+    analogy: "像先摆好画板和数据，再用 + 一层一层放点、线、箱体或文字。",
+    remember: "ggplot() 本身通常还不画点；要加上 geom_*() 图层才出现具体图形。",
+    steps: [
+      "先确定数据表和图形要表达的关系。",
+      "写 ggplot(dat, aes(x = age, y = score)) 作为底图。",
+      "再加 geom_point()、geom_boxplot() 等图层；不要一开始改太多主题。",
+    ],
+  },
+  aes: {
+    gist: "aes() 是“变量和图形外观的对应表”：哪一列放横轴、哪一列放纵轴、哪一列决定颜色。",
+    analogy: "像剧组分配角色：age 演横轴，score 演纵轴，sex 演颜色。",
+    remember: "aes() 里面对应的是变量；只是想统一设置颜色时，颜色可以写在图层函数外面。",
+    steps: [
+      "先决定每个图形位置代表哪个变量。",
+      "在 aes() 中写清 x、y、color、fill 等映射。",
+      "如果图例里出现一个没用的文字值，多半是把固定颜色误写进了 aes()。",
+    ],
+  },
+  scale: {
+    gist: "scale() 把变量按均值和标准差整理，方便不同量纲的变量放在一起比较或建模。",
+    analogy: "像把身高和体重都换算成“相对同类人群高几个标准差”，让单位不再主导计算。",
+    remember: "标准化会改变数值的解释，但不会改变每个人的相对位置。",
+    steps: [
+      "先确认变量是数值型，并检查是否有缺失值。",
+      "运行 z <- scale(dat[, c(\"age\", \"bmi\")])。",
+      "记录均值和标准差；需要回到原单位时不能只靠标准化结果。",
+    ],
+  },
+  alpha: {
+    gist: "alpha() 估计量表内部一致性，常用 Cronbach's α 看多道题是否在测同一个方向。",
+    analogy: "像检查一支球队是否朝同一目标配合；题目各说各话时，总分就不容易解释。",
+    remember: "α 高不证明量表只有一个维度，也不证明题目本身有效。",
+    steps: [
+      "先确认所有题目方向一致，反向题已经重编码。",
+      "运行 psych::alpha(items)，查看原始 α、标准化 α 和逐题删除后的变化。",
+      "结合题目内容、维度结构和样本群体解释，不要只追求一个高数字。",
+    ],
+  },
+  cfa: {
+    gist: "cfa() 检验一个已经写好的量表结构，看题目是否按预期落在各个潜在维度上。",
+    analogy: "像按设计图检查一栋房子的房间是否归到正确区域，而不是让数据自己随便分组。",
+    remember: "CFA 是验证性方法；模型结构应先有理论或量表依据。",
+    steps: [
+      "先写出测量模型，例如 f1 =~ item1 + item2。",
+      "运行 cfa(model, data = dat) 并查看标准化载荷。",
+      "再结合实际意义查看 fitMeasures() 的拟合指标，不能只凭一个阈值。",
+    ],
+  },
+  estimateNetwork: {
+    gist: "estimateNetwork() 根据一组题目或变量之间的条件关联，估计一张心理网络。",
+    analogy: "像画一张“哪些症状在控制其他变量后仍经常一起出现”的关系图。",
+    remember: "边表示条件关联，不等于因果；样本少或题项太相似时网络可能不稳定。",
+    steps: [
+      "先检查题目编码方向、缺失值和样本量。",
+      "运行 estimateNetwork(items, default = \"EBICglasso\")。",
+      "把网络与 bootstrap 稳定性一起解释，不只看哪条线最粗。",
+    ],
+  },
+  corStability: {
+    gist: "corStability() 看网络边的顺序在多次重抽样后是否稳定。",
+    analogy: "像重复拍几张同一场景的照片，看看哪些关系每次都在，哪些只是偶然出现。",
+    remember: "系数低时，网络图可以用于探索，但不宜对具体边权排序下强结论。",
+    steps: [
+      "先用 bootnet() 做合理次数的 bootstrap。",
+      "运行 corStability(boot)，获知相关稳定性系数。",
+      "把稳定性结果、样本量和研究设计一起报告。",
+    ],
+  },
+  qgraph: {
+    gist: "qgraph() 把节点和连线画出来，让人能看见哪些变量关联更强。",
+    analogy: "像把关系表画成社交网络：点是变量，线越粗表示关联越强。",
+    remember: "换一种布局，图看起来可能很不一样；布局和边权规则应记录。",
+    steps: [
+      "准备一个邻接矩阵或网络对象。",
+      "运行 qgraph(weights, layout = \"spring\")。",
+      "再调整标签、颜色和线宽，确保黑白打印仍能看懂。",
+    ],
+  },
+  "is.na": {
+    gist: "is.na() 检查“这个位置是不是缺失值”，会返回 TRUE 或 FALSE，而不是删除数据。",
+    analogy: "像逐格检查表格里有没有空着的位置，先把空位标出来。",
+    remember: "判断缺失不要写 x == NA，必须用 is.na(x)。",
+    steps: [
+      "运行 is.na(score)，看每一行是不是 NA。",
+      "用 sum(is.na(score)) 统计缺失个数。",
+      "再决定删除、插补还是保留，不要只因为看到 TRUE 就删掉整行。",
+    ],
+  },
+  "na.omit": {
+    gist: "na.omit() 会把含有缺失值的行整行删掉，返回一份“完整案例”数据。",
+    analogy: "像只把资料填全的问卷留下，其余暂时放到一边。",
+    remember: "它可能悄悄改变样本构成；删除前后都记录人数和原因。",
+    steps: [
+      "先用 colSums(is.na(dat)) 看缺失都在哪些列。",
+      "运行 complete <- na.omit(dat)，比较剩余样本。",
+      "如果缺失集中在某类人身上，删除可能引入偏倚，应考虑其他处理策略。",
+    ],
+  },
+  "install.packages": {
+    gist: "install.packages() 把包下载并安装到电脑；装好以后还要用 library() 放进当前会话。",
+    analogy: "安装像把工具买回家，library() 像把工具摆到这次工作的桌面上。",
+    remember: "每个新会话通常都要重新 library()，但不需要每次都重装。",
+    steps: [
+      "先写清包名，例如 install.packages(\"dplyr\")。",
+      "等安装成功后再运行 library(dplyr)。",
+      "如果 library() 报错，再检查包名拼写和安装是否完成。",
+    ],
+  },
+  library: {
+    gist: "library() 把已经安装的包载入当前 R 会话，让里面的函数可以直接调用。",
+    analogy: "工具已经装在柜子里，library() 是把它拿到当前工作台上。",
+    remember: "library() 不会替你安装缺失的包；包没装过要先 install.packages()。",
+    steps: [
+      "先运行 library(dplyr)。",
+      "确认没有报错后，再使用 filter() 等该包函数。",
+      "如果不同包有同名函数，用 dplyr::filter() 明确写出包的来源。",
+    ],
+  },
+  help: {
+    gist: "help() 打开函数的官方说明，是最接近“原始说明书”的查词入口。",
+    analogy: "像翻产品手册：Usage 讲怎么用，Arguments 讲按钮，Examples 让你照着试。",
+    remember: "英文帮助不必从第一行读到最后；先看 Usage、Arguments 和 Examples。",
+    steps: [
+      "运行 help(mean) 或 ?mean。",
+      "先找 Usage 中的必填参数，再看 Arguments 的关键项。",
+      "复制 Examples 里的最小例子运行，结合本篇中文说明理解结果。",
+    ],
+  },
+  read_csv: {
+    gist: "read_csv() 把 CSV 文件读成一张 R 数据框，并愿意明确告诉你每一列被识别成了什么类型。",
+    analogy: "像收货时逐项验单：文件是箱子，col_types 是提前写好的物品清单。",
+    remember: "编号列常有前导零，最好提前声明为字符型。",
+  },
+  "write.csv": {
+    gist: "write.csv() 把 R 里的数据框写成 CSV 文件，方便 Excel 或合作者打开。",
+    analogy: "像把工作台上的结果装进标准纸箱，交给别人继续使用。",
+    remember: "导出前先检查列名、缺失值写法和是否覆盖了原始文件。",
+  },
+  drop_na: {
+    gist: "drop_na() 删除含有缺失值的行，也可以只在指定列上检查缺失。",
+    analogy: "像只保留资料完整的问卷；但被拿走的那些问卷也有信息，不能忘记核对。",
+    remember: "删除后要报告少了多少人、这些人是否与完整案例不同。",
+  },
+  replace_na: {
+    gist: "replace_na() 把缺失值替换成指定内容，例如把 NA 补成 0 或“未回答”。",
+    analogy: "像用统一的占位标签填空，但填进去的值必须有现实含义。",
+    remember: "0 不一定是合理的缺失替代；先想清楚为什么缺失。",
+  },
+  distinct: {
+    gist: "distinct() 去掉重复行，只留下每个不同的组合一次。",
+    analogy: "像把完全相同的登记卡叠在一起，只保留一张。",
+    remember: "没有指定列时比较的是整行；只看编号重复要写 distinct(id)。",
+  },
+  arrange: {
+    gist: "arrange() 按一列或多列给行排序，asc() 和 desc() 控制升序、降序。",
+    analogy: "像把名单按年龄从小到大重新排一遍，内容不变，只改变顺序。",
+    remember: "排序不会去重；缺失值通常排在最后。",
+  },
+  rename: {
+    gist: "rename() 只改列名，不动列里的数据。",
+    analogy: "像给文件夹换一个更容易认的标签，里面的文件还是原来那些。",
+    remember: "把新名字写在等号左边，把旧名字写在右边。",
+  },
+  count: {
+    gist: "count() 按一个或多个类别数人数，相当于分组后统计 n。",
+    analogy: "像按性别、年龄组把问卷分组后，分别数每组有几份。",
+    remember: "想检查缺失类别时要留意 exclude = NULL。",
+  },
+  n_distinct: {
+    gist: "n_distinct() 数一列里到底有多少个不同的值，不把重复值重复计算。",
+    analogy: "像名单上有 100 次就诊记录，但只问一共有多少个不同患者。",
+    remember: "多列一起传入时，数字代表“不同组合”的数量。",
+  },
+  pivot_wider: {
+    gist: "pivot_wider() 把长表里的测量名称展开成多列，让表格更宽。",
+    analogy: "像把一行行“谁、哪次、多少分”的记录，重新摆成每个人一行的成绩单。",
+    remember: "展开前确认每个组合只有一个值，否则可能出现列表列或重复。",
+  },
+  separate: {
+    gist: "separate() 按分隔符把一列拆成多列，例如把“省-市”拆开。",
+    analogy: "像把写在一起的地址按逗号切成省、市、区几个格子。",
+    remember: "先在几个样本上测试分隔符，避免多切或少切。",
+  },
+  unite: {
+    gist: "unite() 把几列拼成一列，通常用于生成复合编号或完整地址。",
+    analogy: "像把省、市、区三栏重新贴成一张完整地址标签。",
+    remember: "拼接后的值可能不再唯一，也可能会丢掉原来的缺失信息。",
+  },
+  head: {
+    gist: "head() 只看对象开头几行，用来快速确认数据看起来是否正常。",
+    analogy: "像翻书先看第一页，不需要一次把整本读完。",
+    remember: "它只是一段预览，不能据此判断整张表没有异常。",
+  },
+  tail: {
+    gist: "tail() 看对象最后几行，适合检查数据末尾有没有说明行或空行。",
+    analogy: "像翻到文件最后一页，看看有没有混进来的备注。",
+    remember: "最后几行也可能是重复记录；仍要结合总行数核对。",
+  },
+  summary: {
+    gist: "summary() 给对象做一张快速摘要，连续变量看范围和中位数，分类变量看频数。",
+    analogy: "像先看体检报告的几项总指标，快速知道数据的大致样子。",
+    remember: "摘要不能代替图形和逐变量核查，尤其不能显示异常值的来源。",
+  },
+  class: {
+    gist: "class() 告诉你这个对象被 R 当成什么类型，例如 data.frame、numeric 或 lm。",
+    analogy: "像看包装标签：先知道它是表格、数字还是一台模型，才知道能用哪些工具。",
+    remember: "看起来像数字的列，class() 可能仍然显示 character。",
+  },
+  factor: {
+    gist: "factor() 把文字类别变成 R 能按固定水平处理的分类变量。",
+    analogy: "像给问卷选项建立固定菜单，选项顺序和名称都可以控制。",
+    remember: "分类水平顺序会影响表格和模型参照组，不能只看文字有没有变。",
+  },
+  levels: {
+    gist: "levels() 查看一个分类变量有哪些类别，或者查看因子设定的水平和顺序。",
+    analogy: "像打开分类菜单，看里面列了哪几项、谁排在前面。",
+    remember: "数据里出现过某个文字，不一定意味着它已经成为因子水平。",
+  },
+  relevel: {
+    gist: "relevel() 换掉分类变量的参照组，让模型按另一个类别作为比较起点。",
+    analogy: "像把比较的尺子零点挪到另一组；模型结果会跟着改变。",
+    remember: "参照组改变不等于数据结构改变，系数解释要一起更新。",
+  },
+  ifelse: {
+    gist: "ifelse() 对一列条件逐个判断：成立返回一个值，不成立返回另一个值。",
+    analogy: "像一道二选一分拣题，每一行都独立回答 TRUE 还是 FALSE。",
+    remember: "它适合两个分支；三个以上分支用 case_when() 更容易检查。",
+  },
+  lapply: {
+    gist: "lapply() 对列表或向量中的每一项做同一件事，并把结果收集成列表。",
+    analogy: "像把一排文件依次送进同一台处理机，每份产出都放回对应的盒子。",
+    remember: "返回结果是列表；需要数据框时要再检查结构或改用 map_dfr()。",
+  },
+  sapply: {
+    gist: "sapply() 和 lapply() 类似，但会尝试把结果自动简化成向量或矩阵。",
+    analogy: "像批量处理后顺便帮你把结果装进更紧凑的盒子。",
+    remember: "自动简化偶尔会改变结构；不确定时先用 lapply() 更稳。",
+  },
+  tapply: {
+    gist: "tapply() 按分组变量把一列拆成几组，再分别计算同一个统计量。",
+    analogy: "像先按班级把成绩单分成几摞，再分别算每班的平均分。",
+    remember: "分组变量和计算结果要能一一对应，缺失类别可能不会出现。",
+  },
+  sample: {
+    gist: "sample() 从一组对象里抽取一部分，常用于随机抽样或打乱顺序。",
+    analogy: "像把号码牌洗匀后抽出若干张，抽法会决定结果能否代表总体。",
+    remember: "需要可重复时先 set.seed()，抽样方法还要与研究设计一致。",
+  },
+  "set.seed": {
+    gist: "set.seed() 固定随机数起点，让随机抽样或模拟在同样设置下可以重复。",
+    analogy: "像给洗牌机设一个固定起始顺序；别人按同样设置能洗出同一副牌。",
+    remember: "固定随机种子不提高数据质量，只帮助复现。",
+  },
+  merge: {
+    gist: "merge() 按共同字段把两张表拼在一起，类似根据编号匹配资料。",
+    analogy: "像拿主名单去另一张表里逐个查资料，匹配键写错就会对错人。",
+    remember: "连接前检查 key 的类型、唯一性和缺失；连接后核对行数。",
+  },
+  subset: {
+    gist: "subset() 按条件保留行，也可以顺手选择需要的列。",
+    analogy: "像从整张名单里挑出符合条件的一部分，再只复印相关栏目。",
+    remember: "复杂筛选和缺失值条件较多时，filter() 通常更清楚。",
+  },
+  which: {
+    gist: "which() 告诉你条件为 TRUE 的位置编号，也就是“第几行、第几个”。",
+    analogy: "像查名单时记下“第 3、第 8 个人符合条件”，而不是把名字本身抄一遍。",
+    remember: "它返回位置；条件里有 NA 时要先决定如何处理。",
+  },
+  grepl: {
+    gist: "grepl() 检查文字里有没有匹配内容，返回 TRUE 或 FALSE。",
+    analogy: "像用查找框在一段文字里找关键词，找到了就答“是”。",
+    remember: "它是判断，不会把匹配到的文字取出来；提取要用 regmatches() 或 str_extract()。",
+  },
+  gsub: {
+    gist: "gsub() 找到所有匹配的文字并换成新内容，默认会区分大小写。",
+    analogy: "像全文字处理中的“全部替换”，替换规则要在小样本上先检查。",
+    remember: "正则表达式写错可能改到不该改的内容，先在少量字符串上试。",
+  },
+  str_detect: {
+    gist: "str_detect() 判断每个字符串里有没有目标文字，返回 TRUE 或 FALSE。",
+    analogy: "像逐个标签问：“里面有没有‘住院’这两个字？”",
+    remember: "它只判断有没有匹配，不会把匹配到的部分抽出来。",
+  },
+  str_extract: {
+    gist: "str_extract() 从每个字符串里取出第一段符合模式的内容。",
+    analogy: "像从“ID-001”中只剪下编号 001。",
+    remember: "模式要写得足够具体，否则可能只抓到你想不到的一小段。",
+  },
+  "as.Date": {
+    gist: "as.Date() 把文字日期转换成 R 真正能比较和相减的日期对象。",
+    analogy: "像把“2026-10-29”这张标签，换成日历上的一个真实日期；",
+    remember: "年月日顺序要和 format 对上，否则可能整体读成错误日期。",
+  },
+  "lubridate-ymd": {
+    gist: "ymd() 按“年-月-日”的顺序解析日期，自动兼容斜杠、横线等常见写法。",
+    analogy: "像告诉 R：先读年，再读月，最后读日，不要猜错顺序。",
+    remember: "解析失败时先看问题记录和异常文字，不要直接忽略警告。",
+  },
+  lm: {
+    gist: "lm() 用一条直线关系描述连续结局和一个或多个解释变量的联系。",
+    analogy: "像在散点图里放一把尽量贴近大多数点的直尺。",
+    remember: "系数有方向和单位；还不能据此直接宣称因果。",
+  },
+  aov: {
+    gist: "aov() 比较多个组的平均值，背后用方差分析判断组间差异。",
+    analogy: "像比较几个班的平均成绩，同时看组间差异相对班内波动有多大。",
+    remember: "结果显著只说明至少有两组不同，还要做合适的事后比较。",
+  },
+  "wilcox.test": {
+    gist: "wilcox.test() 比较两组位置或分布，常用于不依赖正态假设的场景。",
+    analogy: "像不只比较均数，而是把两组合在一起排队，看一组是否整体更靠前。",
+    remember: "它回答的问题与 t 检验不完全相同，应结合数据分布选择。",
+  },
+  "kruskal.test": {
+    gist: "kruskal.test() 比较三个或多个组的分布位置，是方差分析的非参数替代。",
+    analogy: "像把几组样本一起排队，看各组的排名是否系统性地混在一起。",
+    remember: "结果显著后还需要说明哪些组不同，不能只看一个总 p 值。",
+  },
+  "confint": {
+    gist: "confint() 给模型参数算置信区间，说明估计值可能波动的范围。",
+    analogy: "像给一个估计值加上“误差尺子”，不要只盯中间那个点。",
+    remember: "置信区间和 p 值来自同一个模型，不能脱离模型假设单独解读。",
+  },
+  roc: {
+    gist: "roc() 把连续指标在不同切点下的灵敏度和特异度串成一条曲线。",
+    analogy: "像调整报警器的敏感程度，看看误报和漏报之间怎样权衡。",
+    remember: "AUC 高不代表切点在临床上有用，还要看目标人群和代价。",
+  },
+  "pwr.t.test": {
+    gist: "pwr.t.test() 估算 t 检验需要多少样本，或给定样本时能发现多大的差异。",
+    analogy: "像出发前估计要用多大网，才能捞到足够明显的一条鱼。",
+    remember: "输入的是预期效应量，不是观察完数据后随便回填的数字。",
+  },
+  vif: {
+    gist: "vif() 检查回归模型里的解释变量是不是彼此太像，导致每个人都很难单独说清自己的作用。",
+    analogy: "像两三个人总提供几乎相同的证词，模型就难以判断到底是谁影响了结局。",
+    remember: "VIF 高说明信息重复，不等于变量没有意义；是否删变量要看研究问题和模型目的。",
+  },
+  lmer: {
+    gist: "lmer() 拟合带有“组”的线性模型，例如同一个人的多次测量、同一学校的学生。",
+    analogy: "像承认不同人有自己的起点，不是把所有人的重复记录都硬当成完全独立。",
+    remember: "公式里的 (1 | id) 表示每个人有随机截距；分组变量必须真的有重复观测。",
+  },
+  emmeans: {
+    gist: "emmeans() 从已经拟合好的模型里算各组调整后的平均估计值，方便比较。",
+    analogy: "像让不同年龄、性别结构的人群先站在同一个基准线上，再比较主暴露的差异。",
+    remember: "边际均值依赖模型结构和协变量取值，不能当成原始数据的简单均数。",
+  },
+  crossbasis: {
+    gist: "crossbasis() 把“暴露强度”和“滞后天数”同时整理成模型可用的两个维度。",
+    analogy: "像一张横轴是温度、纵轴是滞后天数的关系地图，用来观察影响是否延迟出现。",
+    remember: "滞后窗口和自由度应在看结果前确定；窗口选得太宽会增加不稳定。",
+  },
+  gam: {
+    gist: "gam() 允许连续变量的关系弯起来，不必强行塞进一条直线。",
+    analogy: "像给散点画一条能微微弯曲的平滑带，而不是只有一把直尺。",
+    remember: "曲线更灵活，也更容易过拟合；平滑程度和适用范围要核对。",
+  },
+  prcomp: {
+    gist: "prcomp() 把很多互相关联的变量浓缩成少数几个综合方向，减少信息重复。",
+    analogy: "像把身高、臂长、腿长这些相似信息合成一个“体型大小”的综合分数。",
+    remember: "主成分是数据构造的综合方向，不保证一定对应有意义的生物学变量。",
+  },
+  fa: {
+    gist: "fa() 根据题目之间的共同变化，寻找背后可能存在的少数潜在维度。",
+    analogy: "像从很多道问卷题中辨认出“焦虑”和“睡眠问题”两个隐藏主题。",
+    remember: "因子数量和命名都要有理论依据，不能让软件替你决定概念。",
+  },
+  principal: {
+    gist: "principal() 是常用的主成分分析工具，用来压缩变量并观察题目如何聚在一起。",
+    analogy: "像把一叠互相重叠的照片压成几张代表图，尽量保留主要差别。",
+    remember: "主成分分析不等于因子分析；两者的假设和用途要区分。",
+  },
+  kmeans: {
+    gist: "kmeans() 按数值距离把对象分成事先指定数量的几类。",
+    analogy: "像根据多项指标把相似的人分到 K 个小圈子里，圈子并不是天然存在的。",
+    remember: "分类数 K 要事先指定，变量尺度也会强烈影响结果。",
+  },
+  hclust: {
+    gist: "hclust() 按相似程度逐步把对象合并成一组，再画出一棵分组树。",
+    analogy: "像先把最相似的样品配成小组，再让小组继续合并，直到形成整棵树。",
+    remember: "距离和合并方法会改变树形；切割成几类要结合问题和稳定性。",
+  },
+  CreateTableOne: {
+    gist: "CreateTableOne() 把研究对象的年龄、性别、BMI 等基线特征整理成论文常见的“表 1”。",
+    analogy: "像在比较两组人之前，先把两组的基本资料并排放在同一张表上。",
+    remember: "表格只描述样本；组间 p 值不能替代混杂因素和研究设计判断。",
+  },
+  "case_when": {
+    gist: "case_when() 按从上到下的条件给每一行分配一个结果，适合写多段分类规则。",
+    analogy: "像分拣机设定几条规则：先满足哪条就先贴哪个标签，后面的规则不再执行。",
+    remember: "条件顺序很重要；最后常用 TRUE ~ 默认值 兜底，避免漏掉其他情况。",
+    steps: [
+      "把分组规则按互斥且从严格到宽松的顺序写好。",
+      "运行 mutate(group = case_when(age < 18 ~ \"under18\", age < 65 ~ \"adult\", TRUE ~ \"older\"))。",
+      "用 count(group, exclude = NULL) 检查有没有意外落入默认组。",
+    ],
+  },
+  predict: {
+    gist: "predict() 用已经拟合好的模型，给新数据或原数据计算预测值。",
+    analogy: "模型像已经调好的计算器，predict() 是把一份新的对象资料送进去得到结果。",
+    remember: "新数据的变量名和类型要与建模时一致，外推到研究范围外要谨慎。",
+    steps: [
+      "先确认模型对象已经正确拟合。",
+      "把新数据交给 predict(fit, newdata = new_dat)，必要时指定 type。",
+      "检查预测结果是否出现缺失、极端值或超出模型适用范围。",
+    ],
+  },
+};
 
 </script>
   <script>
@@ -55155,6 +56035,9 @@ const learningGuides = [...(window.RZH_GUIDES || []), ...(window.RZH_ADVANCED_GU
 const chartImages = window.RZH_CHART_IMAGES || {};
 const packageGuides = window.RZH_PACKAGE_INFO || [];
 const packageCatalog = buildPackageCatalog();
+const plainFunctionGuides = window.RZH_PLAIN_FUNCTION_GUIDES || {};
+const plainParameterHints = window.RZH_PLAIN_PARAMETER_HINTS || {};
+const plainCategoryAnalogies = window.RZH_PLAIN_CATEGORY_ANALOGIES || {};
 
 const scaleItems = [
   { text: "我最近能专注于日常任务", reverse: false },
@@ -55301,6 +56184,100 @@ function peekFunctionPill(id, label = null) {
 function parameterHint(item, name, providedHint) {
   return providedHint || item.paramTips?.[name] || commonParamHints[name] ||
     "先确认这个参数控制什么，再只修改与当前任务有关的设置；其余参数保持默认通常更安全。";
+}
+
+function buildPlainGuide(item) {
+  const explicit = plainFunctionGuides[item.id] || {};
+  const readableAlias = item.aliases.find((alias) =>
+    alias &&
+    alias !== item.name &&
+    alias !== item.package &&
+    alias !== item.category &&
+    /[\u3400-\u9fff]/.test(alias)
+  );
+  const firstParam = item.params?.find(([name]) => name !== "...")?.[0];
+  return {
+    gist: explicit.gist ||
+      (readableAlias
+        ? `简单说，${item.name} 是你用来“${readableAlias}”的工具。`
+        : `换成直白说法：${item.summary}`),
+    analogy: explicit.analogy ||
+      plainCategoryAnalogies[item.category] ||
+      "把它看成一台小型加工机：先放对原料，再按参数调整，最后检查产出。",
+    remember: explicit.remember ||
+      item.tips?.[0] ||
+      "第一次使用时先保留默认参数，把最小示例跑通，再逐项修改。",
+    params: explicit.params || {},
+    steps: explicit.steps?.length
+      ? explicit.steps
+      : [
+        firstParam
+          ? `先准备输入：把要处理的内容放进 ${firstParam}。`
+          : "先确认这个对象是什么类型，再直接调用函数。",
+        "只运行示例中最小的一行或一小段，先不要同时修改多个参数。",
+        "最后检查结果的值、类型和缺失情况；结果不符合预期时，再回到参数表逐项排查。",
+      ],
+  };
+}
+
+function plainParameterHint(item, name, usage) {
+  const guide = buildPlainGuide(item);
+  if (guide.params[name]) return guide.params[name];
+  if (plainParameterHints[name]) return plainParameterHints[name];
+  if (String(usage).includes("必填")) {
+    return "这是必填内容，不能空着；要放什么取决于函数的用途。";
+  }
+  if (/^(TRUE|FALSE|NULL|NA)$/i.test(String(usage))) {
+    return `这是一个开关或可选项，默认是 ${usage}；第一次使用先不要急着改。`;
+  }
+  if (/通常不填|可选|按需|自动/.test(String(usage))) {
+    return "这是可选设置；当前用法通常不需要手填，先保持默认即可。";
+  }
+  return "这是可选设置；先看默认写法，确实有特殊需要时再修改。";
+}
+
+function plainSearchText(item) {
+  const guide = buildPlainGuide(item);
+  return [
+    guide.gist,
+    guide.analogy,
+    guide.remember,
+    ...guide.steps,
+    ...Object.values(guide.params),
+  ].join(" ");
+}
+
+function plainLanguageMarkup(item) {
+  const guide = buildPlainGuide(item);
+  return `
+    <section class="panel detail-section plain-language-section">
+      <div class="plain-language-head">
+        <span class="plain-language-label">大白话</span>
+        <div>
+          <h2>第一次看 ${escapeHtml(item.name)}，先这样理解</h2>
+          <p>${escapeHtml(guide.gist)}</p>
+        </div>
+      </div>
+      <div class="plain-language-grid">
+        <article>
+          <span>换个说法</span>
+          <p>${escapeHtml(guide.analogy)}</p>
+        </article>
+        <article>
+          <span>先记住这一条</span>
+          <p>${escapeHtml(guide.remember)}</p>
+        </article>
+      </div>
+      <div class="plain-walkthrough">
+        <span>把示例当成一件小事</span>
+        <ol>
+          ${guide.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+        </ol>
+        <p class="plain-example-note">跑完后别急着看“有没有报错”，还要看结果是什么类型、哪一行变了、缺失值有没有被悄悄漏掉。</p>
+      </div>
+      <p class="plain-language-caveat">大白话帮助建立第一层直觉；正式分析时，仍应以专业说明、研究设计和当前 R 包的帮助页为准。</p>
+    </section>
+  `;
 }
 
 const symbolFunctionMap = {
@@ -56083,6 +57060,7 @@ function getFilteredFunctions() {
       item.level,
       ...item.aliases,
       ...item.params.flat(),
+      plainSearchText(item),
     ].join(" ").toLowerCase();
     return categoryMatch && packageMatch && (!query || haystack.includes(query));
   });
@@ -56222,10 +57200,12 @@ function renderFunctionDetail(id) {
             </div>
           </section>
 
+          ${plainLanguageMarkup(item)}
+
           <section class="panel detail-section">
             <h2>参数怎么读</h2>
             ${item.params.length ? `
-              <p>先确认必填项和默认值，再只调整与当前任务有关的参数。下表把“它是什么”和“什么时候要改”放在一起。</p>
+              <p>先看“必须填什么”、再看“默认是什么”。专业解释保留下来便于核对；后面的“大白话”告诉你这个位置实际在管什么。</p>
               <table class="param-table">
                 <thead><tr><th>参数</th><th>默认值 / 是否必填</th><th>中文解释与调整建议</th></tr></thead>
                 <tbody>
@@ -56233,7 +57213,11 @@ function renderFunctionDetail(id) {
                     <tr>
                       <td class="param-name">${escapeHtml(name)}</td>
                       <td>${escapeHtml(usage)}</td>
-                      <td>${escapeHtml(description)}<span class="param-hint">${escapeHtml(parameterHint(item, name, hint))}</span></td>
+                      <td>
+                        ${escapeHtml(description)}
+                        <span class="param-hint">${escapeHtml(parameterHint(item, name, hint))}</span>
+                        <span class="param-plain"><b>大白话</b>${escapeHtml(plainParameterHint(item, name, usage))}</span>
+                      </td>
                     </tr>
                   `).join("")}
                 </tbody>
@@ -57651,6 +58635,7 @@ function renderFunctionPeek(id) {
   if (!item || !functionPeekContent) return;
   state.peekFunctionId = id;
   const favorite = state.favorites.has(item.id);
+  const plainGuide = buildPlainGuide(item);
   functionPeekContent.innerHTML = `
     <div class="peek-sheet">
       <header class="peek-header">
@@ -57662,6 +58647,10 @@ function renderFunctionPeek(id) {
       </header>
       <div class="peek-body">
         <p class="peek-summary">${escapeHtml(item.summary)}</p>
+        <div class="peek-plain">
+          <span>大白话</span>
+          <p>${escapeHtml(plainGuide.gist)}</p>
+        </div>
         <div class="function-tags">${badge(item.package, "brand")}${badge(item.level, "blue")}${item.course ? badge("重点函数", "gold") : ""}</div>
         <section class="peek-section">
           <h3>怎么写</h3>
@@ -57671,7 +58660,7 @@ function renderFunctionPeek(id) {
           <h3>核心参数</h3>
           ${item.params.length ? `<div class="peek-params">
               ${item.params.slice(0, 4).map(([name, description, usage, hint]) => `
-                <div><code>${escapeHtml(name)}</code><span>${escapeHtml(usage)}</span><p>${escapeHtml(description)}${hint ? ` ${escapeHtml(hint)}` : ""}</p></div>
+                <div><code>${escapeHtml(name)}</code><span>${escapeHtml(usage)}</span><p>${escapeHtml(description)}${hint ? ` ${escapeHtml(hint)}` : ""}</p><small>大白话：${escapeHtml(plainParameterHint(item, name, usage))}</small></div>
               `).join("")}
             </div>` : `<p>这个函数通常不需要额外参数。</p>`}
         </section>
@@ -57864,7 +58853,7 @@ function buildSearchItems() {
     title: item.name,
     subtitle: `${item.package} · ${item.category} · ${item.aliases.join("、")}`,
     route: `function/${item.id}`,
-    keywords: [item.name, item.package, item.category, item.summary, item.level, ...item.aliases, ...item.params.flat()].join(" ").toLowerCase(),
+    keywords: [item.name, item.package, item.category, item.summary, item.level, ...item.aliases, ...item.params.flat(), plainSearchText(item)].join(" ").toLowerCase(),
     symbol: "R",
   }));
   const workflowItems = workflows.map((item) => ({
