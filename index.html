@@ -1651,6 +1651,95 @@ html[data-theme="dark"] .theme-icon-sun {
   white-space: pre-wrap;
 }
 
+.code-translation {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--border));
+  border-radius: 11px;
+  background: var(--brand-pale);
+}
+
+.code-translation-head {
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr);
+  gap: 9px;
+  align-items: start;
+}
+
+.code-translation-head > span {
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--brand);
+}
+
+.code-translation-head .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.code-translation-head h3 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.code-translation-head p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.code-translation-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.code-translation-line {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 9px;
+  padding: 10px;
+  border-radius: 9px;
+  background: var(--surface);
+}
+
+.code-translation-line > span {
+  color: var(--brand);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 750;
+}
+
+.code-translation-line code {
+  display: block;
+  overflow-wrap: anywhere;
+  color: var(--brand-strong);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+
+.code-translation-line p {
+  margin: 6px 0 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.code-translation.compact {
+  padding: 11px;
+}
+
+.code-translation.compact .code-translation-head p {
+  display: none;
+}
+
 .param-table {
   width: 100%;
   border-collapse: collapse;
@@ -11210,7 +11299,7 @@ window.RZH_PLAIN_PARAMETER_HINTS = {
   object: "把想检查、打印或处理的对象放在这里。",
   data: "告诉函数去哪张数据框里找变量。",
   ".data": "接收上一步传来的数据框；在管道里通常不需要再重复写表名。",
-  formula: "用“结局 ~ 解释变量”写清要研究谁和谁的关系，例如 y ~ age + sex。",
+  formula: "波浪号 ~ 读作“用右侧解释或分组左侧”：左边放结局，右边放解释变量或分组变量；例如 y ~ age + sex。",
   file: "文件放在哪里。推荐使用项目文件夹内的相对路径。",
   path: "文件放在哪里。写之前先用 list.files() 或文件窗口核对。",
   na: "哪些内容要当成缺失值，例如空字符串或问卷中的特殊拒答码。",
@@ -11470,14 +11559,32 @@ window.RZH_PLAIN_FUNCTION_GUIDES = {
       "查看 HR、置信区间，并用 cox.zph() 检查比例风险假设。",
     ],
   },
+  Surv: {
+    gist: "Surv() 把“随访了多久”和“事件有没有发生”组合成一个生存结局。",
+    analogy: "像记录每个人从入组开始等了多久：有人等到了事件，有人只知道到随访结束还没有发生。",
+    remember: "time 不是普通结局分数，而是随访到事件或删失的时间；event 的 0/1 编码必须核对数据字典。",
+    params: {
+      time: "每个人从起点观察到事件发生或删失的时间。",
+      event: "事件状态：1 通常表示事件发生，0 通常表示删失；必须按你的数据编码解释。",
+    },
+    steps: [
+      "先确认 time 的单位，例如天、月或年。",
+      "确认 event 中哪个数字表示事件发生，哪个表示未发生或删失。",
+      "把 Surv(time, event) 放在模型公式的左侧，作为完整生存结局。",
+    ],
+  },
   survfit: {
     gist: "survfit() 按随访时间估计“还没发生事件”的概率，是 Kaplan-Meier 曲线的计算部分。",
     analogy: "像沿着时间往前走，每到一次事件发生，就把仍处于风险中的人数和曲线更新一次。",
     remember: "它先算生存曲线；要把曲线画得漂亮，通常再接 ggsurvplot()。",
+    params: {
+      formula: "写成 Surv(time, event) ~ treatment。左边是生存结局；time 是随访时间，event 是事件状态；波浪号右边是分组变量。",
+      data: "到这张数据框里寻找公式中写到的 time、event 和 treatment。",
+    },
     steps: [
-      "先用 Surv() 写清随访时间和事件状态。",
-      "运行 fit <- survfit(Surv(time, event) ~ group, data = dat)。",
-      "用 summary(fit) 看各时间点的风险人数和生存概率。",
+      "先确认 time 是随访时间，event 表示事件状态，diagnosis 或 treatment 才是分组变量。",
+      "运行 km <- survfit(Surv(time, event) ~ treatment, data = dat)：计算按治疗组分开的 Kaplan-Meier 曲线，并把结果保存为 km。",
+      "运行 summary(km) 核对各时间点的生存概率与风险人数；运行 plot(km) 画出曲线。",
     ],
   },
   ggsurvplot: {
@@ -11759,6 +11866,21 @@ window.RZH_PLAIN_FUNCTION_GUIDES = {
     gist: "which() 告诉你条件为 TRUE 的位置编号，也就是“第几行、第几个”。",
     analogy: "像查名单时记下“第 3、第 8 个人符合条件”，而不是把名字本身抄一遍。",
     remember: "它返回位置；条件里有 NA 时要先决定如何处理。",
+  },
+  grep: {
+    gist: "grep() 在一组文字中查找目标组合，并返回匹配内容所在的位置编号。",
+    analogy: "像拿着关键词逐行翻目录，只把“第几行找到了”记下来。",
+    remember: "grep() 返回位置，不直接返回匹配到的文字；ignore.case = FALSE 表示区分大小写。",
+    params: {
+      pattern: "要查找的文字或正则表达式。",
+      x: "在哪个文字向量或数据列中查找。",
+      "ignore.case": "FALSE 表示大小写必须完全一致；TRUE 才忽略大小写差异。",
+    },
+    steps: [
+      "先确定要搜索的词，例如 pima。",
+      "确定目标列，例如 mypackages[, \"Item\"]；方括号中逗号前空着表示所有行都搜索。",
+      "运行 grep(\"pima\", mypackages[, \"Item\"], ignore.case = FALSE)，返回的是匹配项的位置编号。",
+    ],
   },
   grepl: {
     gist: "grepl() 检查文字里有没有匹配内容，返回 TRUE 或 FALSE。",
@@ -55553,7 +55675,7 @@ const functions = [
     name: "survfit()",
     package: "survival",
     category: "流行病学",
-    aliases: ["生存曲线", "KM曲线", "Kaplan-Meier"],
+    aliases: ["生存曲线", "KM曲线", "Kaplan-Meier", "survift"],
     summary: "估计 Kaplan-Meier 生存曲线或 Cox 模型的基准生存函数。",
     syntax: "survfit(formula, data, ...)",
     returns: "返回 survfit 对象，可绘图并查看各组生存概率。",
@@ -55561,8 +55683,8 @@ const functions = [
     example: `km <- survfit(Surv(time, event) ~ treatment, data = dat)\nsummary(km)\nplot(km)`,
     output: "按治疗组估计随时间变化的生存概率。",
     params: [
-      ["formula", "Surv(time, event) ~ 分组变量。", "必填"],
-      ["data", "生存数据框。", "推荐填写"],
+      ["formula", "生存结局 ~ 分组变量。Surv(time, event) 中 time 是随访到事件或删失的时间，event 表示是否发生事件；波浪号右侧 treatment 定义要分别估计曲线的组。", "必填"],
+      ["data", "告诉函数到哪张数据框中寻找 time、event 和 treatment。", "推荐填写"],
     ],
     tips: ["建议同时显示风险人数。", "曲线末端样本很少时解释要谨慎。"],
     related: ["coxph", "ggsurvplot"],
@@ -55911,7 +56033,7 @@ const symbols = [
   ["$", "提取列表元素", "从一个列表或模型中按名称提取单个元素。", "fit$coefficients"],
   ["[ ]", "保留结构取子集", "可同时提取多个元素；对列表使用时会继续返回列表。", "dat[1:5, c(\"age\", \"sex\")]"],
   ["[[ ]]", "提取单个元素", "对列表按名称或位置取出内部对象本身。", "fit[[\"coefficients\"]]"],
-  ["~", "公式", "在建模中表示左侧结局、右侧解释变量；在图中用于分面。", "glm(y ~ age + sex)"],
+  ["~", "公式", "读作“用右侧解释或分组左侧”。左边通常放结局，右边放解释变量；Surv(time, event) ~ treatment 表示按 treatment 分组估计生存曲线。", "Surv(time, event) ~ treatment"],
   [":", "连续序列或交互项", "建模公式中表示交互；普通数值对象中生成整数序列。", "1:5 | age:sex"],
   ["::", "显式调用包函数", "即使没有加载整个包，也能调用指定包中的函数。", "survival::coxph()"],
   ["%>% / |>", "管道", "把左侧结果传给右侧函数；原生 |> 不自动补成第一个参数。", "dat |> filter(age >= 18)"],
@@ -56245,6 +56367,571 @@ function plainSearchText(item) {
     ...guide.steps,
     ...Object.values(guide.params),
   ].join(" ");
+}
+
+function stripInlineRComment(line) {
+  let quote = null;
+  let escaped = false;
+  for (let index = 0; index < line.length; index += 1) {
+    const char = line[index];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote) {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (char === "#") return line.slice(0, index).trimEnd();
+  }
+  return line.trimEnd();
+}
+
+function splitRTopLevel(text, separator, preserveEmpty = false) {
+  const parts = [];
+  let quote = null;
+  let escaped = false;
+  let depth = 0;
+  let start = 0;
+  for (let index = 0; index < text.length; index += 1) {
+    const char = text[index];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote) {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (["(", "[", "{"].includes(char)) depth += 1;
+    else if ([")", "]", "}"].includes(char)) depth = Math.max(0, depth - 1);
+    else if (depth === 0 && text.startsWith(separator, index)) {
+      parts.push(text.slice(start, index).trim());
+      index += separator.length - 1;
+      start = index + 1;
+    }
+  }
+  parts.push(text.slice(start).trim());
+  return preserveEmpty ? parts : parts.filter(Boolean);
+}
+
+function splitRStatements(code) {
+  const statements = [];
+  let buffer = "";
+  let quote = null;
+  let escaped = false;
+  let depth = 0;
+  const flush = () => {
+    const value = buffer.trim();
+    if (value && !/^#/.test(value)) statements.push(value);
+    buffer = "";
+  };
+
+  for (let index = 0; index < code.length; index += 1) {
+    const char = code[index];
+    if (escaped) {
+      buffer += char;
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote) {
+      buffer += char;
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      buffer += char;
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      buffer += char;
+      continue;
+    }
+    if (["(", "[", "{"].includes(char)) depth += 1;
+    if ([")", "]", "}"].includes(char)) depth = Math.max(0, depth - 1);
+    if (char === ";" && depth === 0) {
+      flush();
+      continue;
+    }
+    if (char === "\n" && depth === 0) {
+      const current = buffer.trimEnd();
+      const nextLine = code.slice(index + 1).split("\n").find((line) => line.trim());
+      const continues = /(?:\|>|%>%|[+\-*/~=,])$/.test(current) ||
+        /^(?:\|>|%>%|[+\-*/~])/.test(nextLine?.trim() || "");
+      if (continues) {
+        buffer += " ";
+      } else {
+        flush();
+      }
+      continue;
+    }
+    buffer += char;
+  }
+  flush();
+  return statements;
+}
+
+function findTopLevelAssignment(statement) {
+  let quote = null;
+  let depth = 0;
+  for (let index = 0; index < statement.length - 1; index += 1) {
+    const char = statement[index];
+    if (quote) {
+      if (char === quote && statement[index - 1] !== "\\") quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (["(", "[", "{"].includes(char)) depth += 1;
+    else if ([")", "]", "}"].includes(char)) depth = Math.max(0, depth - 1);
+    else if (depth === 0 && statement.slice(index, index + 2) === "<-") {
+      return {
+        left: statement.slice(0, index).trim(),
+        right: statement.slice(index + 2).trim(),
+      };
+    }
+  }
+  return null;
+}
+
+function parseRCall(expression) {
+  const trimmed = expression.trim();
+  const match = trimmed.match(/^((?:[A-Za-z.][\w.]*::)?[A-Za-z.][\w.]*)\s*\(/);
+  if (!match) return null;
+  const openIndex = match[0].lastIndexOf("(");
+  let quote = null;
+  let escaped = false;
+  let depth = 0;
+  for (let index = openIndex; index < trimmed.length; index += 1) {
+    const char = trimmed[index];
+    if (escaped) {
+      escaped = false;
+      continue;
+    }
+    if (char === "\\" && quote) {
+      escaped = true;
+      continue;
+    }
+    if (quote) {
+      if (char === quote) quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (char === "(") depth += 1;
+    if (char === ")") {
+      depth -= 1;
+      if (depth === 0) {
+        if (trimmed.slice(index + 1).trim()) return null;
+        const rawName = match[1];
+        const name = rawName.split("::").pop();
+        return {
+          name,
+          fullName: rawName,
+          args: splitRTopLevel(trimmed.slice(openIndex + 1, index), ","),
+        };
+      }
+    }
+  }
+  return null;
+}
+
+function parseNamedRArg(arg) {
+  let quote = null;
+  let depth = 0;
+  for (let index = 0; index < arg.length; index += 1) {
+    const char = arg[index];
+    if (quote) {
+      if (char === quote && arg[index - 1] !== "\\") quote = null;
+      continue;
+    }
+    if (char === '"' || char === "'" || char === "`") {
+      quote = char;
+      continue;
+    }
+    if (["(", "[", "{"].includes(char)) depth += 1;
+    else if ([")", "]", "}"].includes(char)) depth = Math.max(0, depth - 1);
+    else if (depth === 0 && char === "=" && arg[index - 1] !== "=" && arg[index + 1] !== "=") {
+      return { name: arg.slice(0, index).trim(), value: arg.slice(index + 1).trim() };
+    }
+  }
+  return { name: "", value: arg.trim() };
+}
+
+function describeRSubset(value) {
+  const trimmed = value.trim();
+  const match = trimmed.match(/^(.+?)\[([^\]]*)\]$/);
+  if (!match) return trimmed;
+  const parts = splitRTopLevel(match[2], ",", true);
+  const rows = parts[0]?.trim() || "";
+  const cols = parts[1]?.trim() || "";
+  const rowText = rows ? `${rows} 指定的行` : "所有行";
+  const colText = /^["'`].*["'`]$/.test(cols)
+    ? `“${cols.slice(1, -1)}”列`
+    : cols
+      ? `${cols} 指定的列`
+      : "所有列";
+  return `${match[1].trim()} 数据框的${colText}（${rowText}）`;
+}
+
+function describeSurvivalFormula(formula) {
+  const parts = splitRTopLevel(formula, "~");
+  if (parts.length < 2) return null;
+  const call = parseRCall(parts[0]);
+  if (call?.name !== "Surv") return null;
+  const time = parseNamedRArg(call.args[0] || "").value || "time";
+  const event = parseNamedRArg(call.args[1] || "").value || "event";
+  const group = parts[1].split("+").map((item) => item.trim()).filter(Boolean).join("、");
+  return {
+    outcome: `把 ${time} 作为随访时间、${event} 作为事件状态，组成生存结局`,
+    right: group,
+  };
+}
+
+function describeFormula(formula) {
+  const survival = describeSurvivalFormula(formula);
+  if (survival) {
+    return `${survival.outcome}；右侧 ${survival.right} 用于分组或提供解释变量`;
+  }
+  const parts = splitRTopLevel(formula, "~");
+  if (parts.length < 2) return `公式 ${formula}`;
+  return `左侧 ${parts[0]} 是结局，右侧 ${parts[1]} 是解释变量或分组变量`;
+}
+
+function translateRLogicalCondition(condition) {
+  const value = condition.trim();
+  let match = value.match(/^!is\.na\((.+)\)$/);
+  if (match) return `${match[1].trim()} 不是缺失值`;
+  match = value.match(/^is\.na\((.+)\)$/);
+  if (match) return `${match[1].trim()} 是缺失值`;
+  match = value.match(/^(.+?)\s*%in%\s*(.+)$/);
+  if (match) return `${match[1].trim()} 属于集合 ${match[2].trim()}`;
+  const operators = {
+    ">=": "大于或等于",
+    "<=": "小于或等于",
+    "==": "等于",
+    "!=": "不等于",
+    ">": "大于",
+    "<": "小于",
+  };
+  for (const [operator, words] of Object.entries(operators)) {
+    const index = value.indexOf(operator);
+    if (index > 0) {
+      return `${value.slice(0, index).trim()} ${words} ${value.slice(index + operator.length).trim()}`;
+    }
+  }
+  if (value.startsWith("!")) return `不满足“${translateRLogicalCondition(value.slice(1))}”`;
+  return translateRExpression(value);
+}
+
+function describeCalculation(expression) {
+  const value = expression.trim();
+  const bmi = value.match(/^([A-Za-z.][\w.]*)\s*\/\s*\(\s*([A-Za-z.][\w.]*)\s*\/\s*(\d+(?:\.\d+)?)\s*\)\s*\^\s*2$/);
+  if (bmi) {
+    return `用 ${bmi[1]} 除以 ${bmi[2]} 的平方；其中先把 ${bmi[2]} 除以 ${bmi[3]}，通常是在把厘米换算成米`;
+  }
+  if (/^[A-Za-z.][\w.]*\s*\+\s*[A-Za-z.][\w.]*$/.test(value)) {
+    const [left, right] = value.split("+").map((part) => part.trim());
+    return `把 ${left} 与 ${right} 相加`;
+  }
+  return translateRExpression(value);
+}
+
+function translateGGPlotChain(expression) {
+  const stages = splitRTopLevel(expression, "+");
+  if (stages.length < 2 || !/\bggplot\s*\(/.test(stages[0])) return null;
+  const descriptions = stages.map((stage, index) => {
+    const call = parseRCall(stage);
+    if (!call) return stage;
+    if (index === 0) return translateRFunctionCall(call);
+    if (call.name.startsWith("geom_")) {
+      const geomNames = {
+        geom_point: "散点",
+        geom_line: "连线",
+        geom_boxplot: "箱式图",
+        geom_bar: "条形图",
+        geom_col: "柱形图",
+        geom_histogram: "直方图",
+        geom_density: "密度曲线",
+        geom_violin: "小提琴图",
+        geom_smooth: "平滑趋势线",
+        geom_errorbar: "误差条",
+        geom_text: "文字标注",
+        geom_label: "标签",
+      };
+      return `添加${geomNames[call.name] || call.name.replace("geom_", "")}图层`;
+    }
+    if (call.name === "labs") return "补充标题、坐标轴和图例文字";
+    if (call.name.startsWith("facet_")) return "按分类变量拆成多个分面";
+    if (call.name.startsWith("theme")) return "调整图形主题和外观";
+    return translateRFunctionCall(call);
+  });
+  return descriptions.join("，再");
+}
+
+function describeCallArgument(item, name, value) {
+  const clean = value.trim();
+  if (name === "data") return `使用数据框 ${clean} 中同名的变量`;
+  if (name === "formula") return describeFormula(clean);
+  if (name === "family" && /binomial\s*\(/.test(clean)) return "采用二分类结局常用的 logistic 连接";
+  if (name === "family" && /poisson\s*\(/.test(clean)) return "采用计数结局常用的 Poisson 模型";
+  if (name === "ignore.case") return clean === "FALSE" ? "匹配文字时区分大小写" : "匹配文字时忽略大小写";
+  if (name === "fixed") return clean === "TRUE" ? "把查找内容当作普通文字而不是正则表达式" : "把查找内容当作正则表达式";
+  if (name === "na.rm") return clean === "TRUE" ? "计算前忽略缺失值，但不修改原始数据" : "保留缺失值参与计算";
+  if (name === "risk.table") return clean === "TRUE" ? "在曲线下方显示各时间点仍在风险中的人数" : "不在曲线下方显示风险人数表";
+  if (name === "pval") return clean === "TRUE" ? "在图上显示组间 log-rank 检验 p 值" : "不在图上自动显示 p 值";
+  if (name === "conf.int") return clean === "TRUE" ? "同时显示置信区间" : "不显示置信区间";
+  if (name === "level") return `把置信水平设为 ${clean}`;
+  if (name === "probs") return `计算 ${clean} 指定的分位点`;
+  if (name === "trim") return clean === "0" ? "不作截尾，计算普通平均数" : `两端各截去 ${clean} 比例后再计算`;
+  if (name === "method") return `采用 ${clean} 指定的计算方法`;
+  return `参数 ${name} 设为 ${clean}：${plainParameterHint(item, name, "调用时提供")}`;
+}
+
+function describeCallArguments(item, call, skip = []) {
+  return call.args.map((arg) => parseNamedRArg(arg))
+    .filter((arg) => arg.name && !skip.includes(arg.name))
+    .map((arg) => describeCallArgument(item, arg.name, arg.value));
+}
+
+function translatePipelineExpression(expression) {
+  const stages = splitRTopLevel(expression, "|>");
+  const normalizedStages = stages.length > 1 ? stages : splitRTopLevel(expression, "%>%");
+  if (normalizedStages.length < 2) return null;
+  const first = normalizedStages[0];
+  const actions = normalizedStages.slice(1).map((stage) => {
+    const call = parseRCall(stage);
+    return call ? translateRFunctionCall(call, null, true) : translateRExpression(stage, null);
+  });
+  return `先以 ${first} 为输入，随后${actions.join("，再")}；每一步把上一步结果继续交给下一步`;
+}
+
+function translateRFunctionCall(call, contextItem = null, asAction = false) {
+  const item = findFunction(call.name) || contextItem || {
+    id: call.name,
+    name: `${call.name}()`,
+    package: "",
+    category: "",
+    level: "",
+    aliases: [],
+    summary: `执行 ${call.name}()`,
+    params: [],
+    tips: [],
+  };
+  const named = new Map();
+  const positional = [];
+  call.args.forEach((arg) => {
+    const parsed = parseNamedRArg(arg);
+    if (parsed.name) named.set(parsed.name, parsed.value);
+    else positional.push(parsed.value);
+  });
+  const n = call.name;
+  const get = (...names) => names.map((name) => named.get(name)).find(Boolean);
+  const first = positional[0] || "";
+  const dataArg = get("data", ".data");
+  const dataText = dataArg ? `，数据来自数据框 ${dataArg}` : "";
+  const extras = describeCallArguments(item, call, ["data", ".data", "formula", "x", "fit"]);
+  const extraText = extras.length ? `；${extras.join("；")}` : "";
+
+  if (n === "library" || n === "require") {
+    return `载入程序包 ${first.replaceAll(/["']/g, "")}，让其中已经安装的函数在当前会话中可以直接调用`;
+  }
+  if (n === "Surv") {
+    return `构造生存结局：${positional[0] || "time"} 是随访到事件或删失的时间，${positional[1] || "event"} 是事件状态；具体编码必须与当前数据说明一致`;
+  }
+  if (n === "survfit") {
+    const formula = get("formula") || first;
+    const survival = describeSurvivalFormula(formula);
+    const group = survival?.right || "公式右侧的变量";
+    return `估计 Kaplan-Meier 生存曲线：${survival ? survival.outcome : describeFormula(formula)}，按 ${group} 分组${dataText}${extraText}；结果会保存各组随随访时间变化的生存概率`;
+  }
+  if (n === "coxph") {
+    const formula = get("formula") || first;
+    const survival = describeSurvivalFormula(formula);
+    return `拟合 Cox 比例风险模型：${survival ? survival.outcome : describeFormula(formula)}，右侧 ${survival?.right || "变量"} 作为解释变量${dataText}${extraText}；之后仍需检查比例风险假设`;
+  }
+  if (n === "summary") {
+    const target = first || "对象";
+    if (/km|survfit|fit/i.test(target)) return `查看 ${target} 的摘要，重点核对各时间点的生存概率、事件数；若对象来自 survfit()，还可检查分组结果`;
+    return `查看 ${target} 的摘要结果，包括主要统计量、系数或模型诊断信息`;
+  }
+  if (n === "plot") {
+    const target = first || "对象";
+    if (/km|survfit/i.test(target)) return `绘制 ${target} 的 Kaplan-Meier 生存曲线：横轴是随访时间，纵轴通常是无事件生存概率`;
+    return `绘制 ${target} 的图形；先核对横轴、纵轴和分组含义`;
+  }
+  if (n === "ggsurvplot") {
+    const fit = first || get("fit") || "生存模型结果";
+    return `把 ${fit} 画成适合报告使用的生存曲线${extraText}`;
+  }
+  if (n === "grep" || n === "grepl") {
+    const pattern = first.replace(/^["']|["']$/g, "");
+    const target = positional[1] || rawCallArgument(call, "x") || "文字对象";
+    const action = n === "grep" ? "返回匹配内容的位置编号" : "对每个元素返回是否匹配的 TRUE/FALSE";
+    return `在 ${describeRSubset(target)}中查找文字“${pattern}”，${action}${extraText}`;
+  }
+  if (n === "gsub" || n === "sub") {
+    const pattern = first.replace(/^["']|["']$/g, "");
+    const replacement = (positional[1] || "").replace(/^["']|["']$/g, "");
+    const target = positional[2] || rawCallArgument(call, "x") || "文字对象";
+    return `在 ${target} 中查找“${pattern}”，并${n === "gsub" ? "全部" : "只把第一处"}替换为“${replacement}”${extraText}`;
+  }
+  if (n === "filter") {
+    const positionalArgs = call.args.map(parseNamedRArg).filter((arg) => !arg.name);
+    const conditions = positionalArgs.slice(asAction ? 0 : 1).map((arg) => arg.value);
+    const subject = asAction ? "上一步结果" : `数据框 ${first}`;
+    return `从${subject}中只保留满足以下条件的行：${conditions.map(translateRLogicalCondition).join("，并且 ")}${extraText}`;
+  }
+  if (n === "select") {
+    const positionalArgs = call.args.map(parseNamedRArg).filter((arg) => !arg.name);
+    const columns = positionalArgs.slice(asAction ? 0 : 1).map((arg) => arg.value);
+    const subject = asAction ? "上一步结果" : `数据框 ${first}`;
+    return `从${subject}中选择列 ${columns.join("、")}，生成一张只含这些变量的新表${extraText}`;
+  }
+  if (n === "mutate") {
+    const changes = call.args.map(parseNamedRArg).filter((arg) => arg.name);
+    const descriptions = changes.map((arg) => `新增或修改列 ${arg.name}，${describeCalculation(arg.value)}`);
+    return `整理${asAction ? "上一步结果" : `数据框 ${first}`}：${descriptions.join("；")}`;
+  }
+  if (n === "group_by") {
+    const positionalArgs = call.args.map(parseNamedRArg).filter((arg) => !arg.name);
+    const groups = positionalArgs.slice(asAction ? 0 : 1).map((arg) => arg.value);
+    return `先按 ${groups.join("、")} 给${asAction ? "上一步结果" : `数据框 ${first}`}分组，供后续汇总或分组计算使用`;
+  }
+  if (n === "summarise" || n === "summarize") {
+    const results = call.args.map(parseNamedRArg).filter((arg) => arg.name)
+      .map((arg) => `${arg.name} 由 ${arg.value} 计算`);
+    return `把${asAction ? "上一步结果" : `数据框 ${first}`}汇总为统计结果：${results.join("；")}${extraText}`;
+  }
+  if (n === "left_join") {
+    const right = positional[1] || named.get("y") || "右侧数据";
+    const by = get("by");
+    return `以 ${first} 为主表，按照${by ? ` ${by} ` : "含义相同的连接键"}匹配 ${right}，保留主表全部行并补上右表能匹配的列${extraText}`;
+  }
+  if (n === "glm") {
+    return `拟合广义线性模型：${describeFormula(get("formula") || first)}${dataText}${extraText}；返回的是模型对象，需要再用 summary() 查看结果`;
+  }
+  if (n === "lm") {
+    return `拟合线性回归模型：${describeFormula(get("formula") || first)}${dataText}${extraText}；返回模型对象，不是最终的结论文字`;
+  }
+  if (n === "table") {
+    return `统计 ${positional.join(" 与 ") || "输入变量"} 各类别组合出现的次数，生成频数表`;
+  }
+  if (["mean", "median", "sd", "sum", "quantile", "var"].includes(n)) {
+    const labels = { mean: "平均数", median: "中位数", sd: "标准差", sum: "总和", quantile: "分位数", var: "方差" };
+    return `计算 ${first || "输入数据"} 的${labels[n]}${extraText}`;
+  }
+  if (n === "read.csv" || n === "read_csv" || n === "read.table") {
+    return `从文件 ${first} 读取数据，并生成 R 数据框${extraText}`;
+  }
+  if (n === "read_excel") {
+    return `读取 Excel 文件 ${first} 中的数据，并生成 R 数据框${extraText}`;
+  }
+  if (n === "ggplot") {
+    return `建立一张 ggplot 画布：${first ? `使用 ${first}` : "使用数据"}，后续用 + 添加图形图层`;
+  }
+  if (n.startsWith("geom_")) {
+    return `给当前图形添加 ${n.replace("geom_", "")} 图层`;
+  }
+  if (n === "mean") return `计算平均值${extraText}`;
+
+  const guide = buildPlainGuide(item);
+  const action = guide.gist.replace(/^[^：:]+[：:]\s*/, "");
+  const argumentText = positional.length ? `；输入为 ${positional.join("、")}` : "";
+  const prefix = asAction ? "" : "";
+  return `${prefix}${action}${argumentText}${dataText}${extraText}`;
+}
+
+function rawCallArgument(call, name) {
+  const parsed = call.args.map(parseNamedRArg).find((arg) => arg.name === name);
+  return parsed?.value || "";
+}
+
+function translateRExpression(expression, contextItem = null) {
+  const value = expression.trim().replace(/;$/, "");
+  if (!value) return "";
+  if (/^#/.test(value)) return `注释说明：${value.replace(/^#+\s*/, "")}`;
+  const pipeline = translatePipelineExpression(value);
+  if (pipeline) return pipeline;
+  const ggplotChain = translateGGPlotChain(value);
+  if (ggplotChain) return ggplotChain;
+  const call = parseRCall(value);
+  if (call) return translateRFunctionCall(call, contextItem);
+  if (splitRTopLevel(value, "~").length >= 2) return describeFormula(value);
+  if (/^["'].*["']$/.test(value)) return `文字值 ${value}`;
+  if (/^[-+]?\d+(?:\.\d+)?$/.test(value)) return `数值 ${value}`;
+  if (/^[A-Za-z.][\w.]*\[[^\]]+\]$/.test(value)) return describeRSubset(value);
+  if (/^[A-Za-z.][\w.]*$/.test(value)) return `对象 ${value}`;
+  if (/^!is\.na\([^)]+\)/.test(value)) return `只保留不是缺失值的记录`;
+  if (/^!/.test(value)) return `对条件 ${translateRExpression(value.slice(1), contextItem)} 取反`;
+  if (/[<>=]|%in%/.test(value)) return translateRLogicalCondition(value);
+  return `计算表达式 ${value}`;
+}
+
+function translateRStatement(statement, contextItem = null) {
+  const assignment = findTopLevelAssignment(statement);
+  if (assignment) {
+    const target = assignment.left;
+    const right = assignment.right;
+    if (right === "function" || /^function\s*\(/.test(right)) {
+      return `定义自定义函数 ${target}：函数体会接收输入，并按其中写好的步骤返回结果`;
+    }
+    return `创建或更新对象 ${target}：${translateRExpression(right, contextItem)}。之后可以通过 ${target} 继续查看或使用这份结果`;
+  }
+  return `${translateRExpression(statement, contextItem)}。`;
+}
+
+function translateRCode(code, contextItem = null) {
+  const statements = splitRStatements(
+    code.split("\n").map(stripInlineRComment).filter((line) => line.trim()).join("\n"),
+  );
+  return statements.map((statement, index) => ({
+    index: index + 1,
+    code: statement,
+    translation: translateRStatement(statement, contextItem),
+  }));
+}
+
+function codeTranslationMarkup(lines, title = "逐句代码翻译", compact = false) {
+  if (!lines.length) return "";
+  return `
+    <section class="code-translation ${compact ? "compact" : ""}">
+      <div class="code-translation-head">
+        <span>${icon("book")}</span>
+        <div><h3>${escapeHtml(title)}</h3><p>按代码实际顺序解释；变量含义仍要结合你的数据字典核对。</p></div>
+      </div>
+      <div class="code-translation-list">
+        ${lines.map((line) => `
+          <article class="code-translation-line">
+            <span>${String(line.index).padStart(2, "0")}</span>
+            <div><code>${escapeHtml(line.code)}</code><p>${escapeHtml(line.translation)}</p></div>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
 }
 
 function plainLanguageMarkup(item) {
@@ -57169,6 +57856,7 @@ function renderFunctionDetail(id) {
   const favorite = state.favorites.has(item.id);
   const note = state.notes[item.id]?.text || "";
   const related = item.related.map(findFunction).filter(Boolean);
+  const exampleTranslation = translateRCode(item.example, item);
   app.innerHTML = `
     <div class="page">
       <a class="detail-back" href="#functions">${icon("arrow-left")} 返回函数词典</a>
@@ -57232,6 +57920,7 @@ function renderFunctionDetail(id) {
               ${escapeHtml(item.example)}
             </div>
             <div class="output-box">${escapeHtml(item.output)}</div>
+            ${codeTranslationMarkup(exampleTranslation, "把这段示例逐句翻译成人话")}
           </section>
 
           <section class="panel detail-section">
@@ -58427,7 +59116,7 @@ function renderAI() {
       <header class="page-header">
         <span class="eyebrow">代码辅助</span>
         <h1 class="page-title">解读一段 R 代码</h1>
-        <p class="page-subtitle">粘贴代码后，可以查看调用的包、函数和关键参数，并跳转到对应的中文说明。代码不会被执行，也不会上传患者原始数据。</p>
+        <p class="page-subtitle">粘贴代码后，可以按行查看“这行在做什么”，同时核对调用函数、公式、分组变量和关键参数。代码只做静态解释，不会执行，也不会帮助修正你尚未说明的数据含义。</p>
       </header>
       <div class="ai-layout">
         <section class="panel ai-editor">
@@ -58458,7 +59147,7 @@ summary(model)</textarea>
             ${badge("等待分析")}
           </div>
           <div class="ai-placeholder">
-            <div>${icon("sparkles")}<p>点击“解析这段代码”后，这里会按执行目的拆分步骤，并列出识别到的函数。</p></div>
+            <div>${icon("sparkles")}<p>点击“解析这段代码”后，这里会先概括分析脉络，再逐句翻译代码，并列出识别到的函数。</p></div>
           </div>
         </section>
       </div>
@@ -58804,6 +59493,7 @@ function analyzeCode() {
   });
   const packages = [...new Set(recognized.map((item) => item.package))];
   const lines = code.split("\n").filter((line) => line.trim());
+  const translations = translateRCode(code);
   const steps = [];
   if (/\|>|%>%/.test(code)) steps.push(["连接处理步骤", "代码使用管道把前一步结果传给下一步；先按管道分段阅读，每段只回答一个问题。"]);
   if (/\bfilter\s*\(/.test(code)) steps.push(["筛选研究样本", "filter() 在不改变原数据对象的情况下保留满足条件的行；注意缺失值条件。"]);
@@ -58811,9 +59501,11 @@ function analyzeCode() {
   if (/\bglm\s*\(/.test(code)) steps.push(["拟合广义线性模型", "glm() 只返回模型对象；family = binomial() 通常表示二分类结局的 logistic 回归。"]);
   if (/\blmer\s*\(/.test(code)) steps.push(["拟合线性混合模型", "lmer() 中的 (1 | id) 表示随机截距，(time | id) 表示随机斜率；先确认重复测量结构。"]);
   if (/\bcrossbasis\s*\(/.test(code)) steps.push(["构造暴露-滞后基", "crossbasis() 为 DLNM 准备暴露与滞后矩阵；滞后窗口和自由度应在建模前确定。"]);
+  if (/\bsurvfit\s*\(/.test(code)) steps.push(["估计生存曲线", "survfit() 把 Surv(随访时间, 事件状态) 作为生存结局；公式右侧写分组变量，用 data 指定变量所在的数据框。"]);
   if (/\bcoxph\s*\(/.test(code)) steps.push(["拟合 Cox 生存模型", "coxph() 使用 Surv(time, event) 估计风险比，并应继续检查比例风险假设。"]);
+  if (/\bgr(?:ep|epl)\s*\(/.test(code)) steps.push(["查找文字位置", "grep() 返回匹配项的位置编号，grepl() 返回 TRUE/FALSE；ignore.case = FALSE 表示区分大小写。"]);
   if (/\broc\s*\(/.test(code)) steps.push(["评价二分类区分能力", "roc() 比较连续预测值与真实结局；AUC 不能替代校准和临床阈值判断。"]);
-  if (/\bsummary\s*\(/.test(code)) steps.push(["读取结果摘要", "summary() 展示系数、标准误和检验信息，但不能单独证明因果或预测性能。"]);
+  if (/\bsummary\s*\(/.test(code)) steps.push(["读取结果摘要", "summary() 显示已有对象的摘要；如果对象来自 survfit()，应重点核对各时间点的生存概率与风险人数。"]);
   if (!steps.length) steps.push(["从函数调用开始阅读", "按“函数名（输入对象，命名参数）”逐层拆解括号，先确认输入对象，再看命名参数。"]);
 
   output.innerHTML = `
@@ -58829,6 +59521,7 @@ function analyzeCode() {
         </div>
       `).join("")}
     </div>
+    ${codeTranslationMarkup(translations, "逐句翻译代码")}
     <div class="detected-packages">
       ${recognized.length ? recognized.map((item) => `<a class="function-pill" href="#function/${item.id}">${escapeHtml(item.name)}</a>`).join("") : badge("未识别到词典内的已知函数")}
     </div>
