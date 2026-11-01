@@ -105597,7 +105597,10 @@ function buildSearchItems() {
       item.overview,
       ...item.aliases,
       ...item.whenUse,
-      ...item.steps.flatMap((step) => [step.title, step.text, step.code]),
+      ...(item.concepts || []).flatMap((concept) => [concept.term, concept.explain]),
+      ...(item.comparison ? [item.comparison.title, item.comparison.note, ...item.comparison.headers, ...item.comparison.rows.flat()] : []),
+      ...(item.readingNotes || []),
+      ...item.steps.flatMap((step) => [step.title, step.text, step.code, step.explain || ""]),
     ].join(" ").toLowerCase(),
     symbol: item.type === "method" ? "研" : item.type === "model" ? "模" : "图",
   }));
