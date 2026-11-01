@@ -5529,6 +5529,74 @@ html[data-theme="dark"] .theme-icon-sun {
   color: var(--brand);
 }
 
+.guide-concept-panel {
+  margin-bottom: 18px;
+  padding: clamp(20px, 3vw, 28px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background:
+    radial-gradient(circle at 100% 0, var(--accent-soft), transparent 280px),
+    var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.guide-concept-panel > header {
+  max-width: 760px;
+}
+
+.guide-concept-panel > header > span {
+  color: var(--accent);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+}
+
+.guide-concept-panel h2 {
+  margin: 7px 0 5px;
+  font-size: 20px;
+}
+
+.guide-concept-panel > header > p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11.5px;
+  line-height: 1.7;
+}
+
+.guide-concept-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 17px;
+}
+
+.guide-concept-grid article {
+  min-width: 0;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--surface) 86%, transparent);
+}
+
+.guide-concept-grid article > span {
+  color: var(--brand);
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.guide-concept-grid h3 {
+  margin: 5px 0 6px;
+  font-size: 13px;
+}
+
+.guide-concept-grid p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
 .guide-chart-example {
   overflow: hidden;
   margin: 0 0 18px;
@@ -5731,6 +5799,55 @@ html[data-theme="dark"] .theme-icon-sun {
   overflow-x: auto;
 }
 
+.guide-step-explain {
+  margin-top: 9px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  background: var(--surface);
+  color: var(--text-soft);
+  font-size: 10.5px;
+  line-height: 1.7;
+}
+
+.guide-comparison-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+}
+
+.guide-comparison-table {
+  width: 100%;
+  min-width: 620px;
+  border-collapse: collapse;
+  font-size: 10.5px;
+}
+
+.guide-comparison-table th,
+.guide-comparison-table td {
+  padding: 10px 11px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: top;
+  line-height: 1.6;
+}
+
+.guide-comparison-table th {
+  background: var(--brand-pale);
+  color: var(--brand-strong);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+}
+
+.guide-comparison-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.guide-comparison-table td:first-child {
+  color: var(--brand);
+  font-weight: 650;
+}
+
 .guide-function-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -5833,6 +5950,16 @@ html[data-theme="dark"] .theme-icon-sun {
   color: var(--text-soft);
   font-size: 11px;
   line-height: 1.75;
+}
+
+.guide-reading-notes {
+  display: grid;
+  gap: 7px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.65;
 }
 
 .guide-pitfalls {
@@ -6598,6 +6725,10 @@ html[data-theme="dark"] .theme-icon-sun {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .guide-concept-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .package-list {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -6770,6 +6901,10 @@ html[data-theme="dark"] .theme-icon-sun {
   }
 
   .guide-primer {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guide-concept-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -60996,6 +61131,494 @@ window.RZH_ADVANCED_GUIDE_FUNCTIONS = [
 
 </script>
   <script>
+(() => {
+  const methodGuides = window.RZH_GUIDES || [];
+  const advancedGuides = window.RZH_ADVANCED_GUIDES || [];
+  const allGuides = [...methodGuides, ...advancedGuides];
+  const findGuide = (id) => allGuides.find((guide) => guide.id === id);
+  const annotateStep = (guideId, title, explain) => {
+    const step = findGuide(guideId)?.steps?.find((item) => item.title === title);
+    if (step) step.explain = explain;
+  };
+
+  const cohort = findGuide("cohort");
+  if (cohort) {
+    Object.assign(cohort, {
+      overview: "队列研究从一个尚未发生目标结局的研究人群出发，按暴露有无或暴露水平分组，再随访各组的结局。它最重要的优势是暴露通常先于结局被记录，因此时间顺序较清楚，可以直接计算累积发病率、发病密度、相对危险度和归因危险度。但“先因后果”不等于自动具有因果结论，失访、暴露测量误差和混杂仍会改变结果。",
+      concepts: [
+        { term: "暴露", explain: "研究中希望考察的因素，可以是吸烟、空气污染、治疗方式，也可以是年龄或遗传特征。暴露必须是研究问题明确指定的因素，不能因为数据里有某一列就自动算作暴露。" },
+        { term: "结局", explain: "随访中等待发生的事件，例如发病、死亡、复发或住院。事件定义、诊断标准和随访终点必须在研究开始前统一。" },
+        { term: "人时", explain: "每个人被观察的时间相加后的总量，常用“人年”。随访时间不同、有人提前退出时，用人时作分母比只数人数更合理。" },
+        { term: "累积发病率", explain: "在一段明确时间内，新发病例数除以研究开始时的风险人群数。它回答“这段时间内有多少人发病”，必须同时写出观察了几年或几个月。" },
+        { term: "发病密度", explain: "新发病例数除以总人时，反映单位人时内事件发生的速度。观察时间不齐或失访较多时，它通常比累积发病率更合适。" },
+        { term: "失访", explain: "研究对象在观察到目标事件以前退出随访。不能把失访当成“没有发病”，而要报告人数、原因，并比较失访者与继续随访者的特征。" },
+      ],
+      comparison: {
+        title: "RR、AR 和 HR 分别在说什么",
+        note: "三者都描述暴露与结局的关系，但尺度和用途不同。论文里不能互相替换。",
+        headers: ["指标", "比较方式", "通俗解释", "常见误区"],
+        rows: [
+          ["RR（相对危险度）", "暴露组风险 ÷ 非暴露组风险", "暴露组的发病风险是非暴露组的多少倍", "把 RR 当作绝对增加的风险"],
+          ["AR（归因危险度）", "暴露组风险 − 非暴露组风险", "暴露组比非暴露组多出来的发病数量", "忽略原风险大小，只比较 RR"],
+          ["HR（风险比）", "某一时刻的事件风险之比", "在整个随访过程中，暴露组的瞬时事件风险约为参照组的多少倍", "解释成每个人最终都会增加相同比例的发病概率"],
+        ],
+      },
+      readingNotes: [
+        "累积发病率强调一段时间内“发生了多少”；发病密度强调每个单位人时“发生得多快”。",
+        "RR 回答相对倍数，AR 回答绝对多出多少。一个暴露的 RR 可以很大，但若基础风险很低，绝对影响仍可能很小。",
+        "HR 是比较瞬时风险，不能直接等同于累积发病率之比，也不能说暴露组“多发生 HR−1 倍的人”。",
+      ],
+    });
+    annotateStep("cohort", "先锁定分母和时间起点", "这里先根据原始状态列生成 0/1 事件变量，再把随访天数统一换算成年。真正开始分析前，还要逐项确认：入组日期、结局日期、失访日期和死亡日期是否来自同一定义。");
+    annotateStep("cohort", "描述两组基线与事件数", "CreateTableOne() 只负责把两组基线资料并排展示。先看每组人数、事件数和缺失，再决定模型能否稳定；基线表本身不能证明两组可比。");
+    annotateStep("cohort", "绘制生存曲线", "Surv(随访时间, 事件状态) 先组成生存结局；波浪号右侧的 exposure 表示按暴露组分别估计曲线。曲线比较是未调整的描述，不能代替多因素模型。");
+    annotateStep("cohort", "拟合 Cox 或 Poisson 模型", "Cox 使用个体的事件时间；Poisson 可把事件数和 log(人时) 放入模型。若研究重点是率而非个体生存时间，二者回答的问题并不相同。");
+    annotateStep("cohort", "检查假设并解释不确定性", "exp(coef(fit)) 把 Cox 的对数风险比转换回 HR，confint(fit) 给出系数的区间。最终报告必须同时写 HR、95% CI、事件数、随访时间和调整变量。");
+  }
+
+  const crossSectional = findGuide("cross-sectional");
+  if (crossSectional) {
+    Object.assign(crossSectional, {
+      overview: "现况研究又称横断面研究：在某个明确时间点或较短时期内，同时测量研究对象的暴露和当前疾病状态。它最适合估计患病率、描述人群分布和发现线索，却通常无法知道谁先暴露、谁先发病。抽样是否随机、应答率是否足够、病例是否只包括存活者，会直接决定结果能否代表目标人群。",
+      concepts: [
+        { term: "患病率", explain: "某一时点或时期内，人群中所有现患病例所占的比例。分子包括新病例和旧病例，分母是相应人口数。" },
+        { term: "发病率", explain: "一段观察时间内新发生病例的比例或速度。横断面调查通常只看到“现在有没有病”，不能单次调查就得到发病率。" },
+        { term: "现况调查", explain: "在特定人群中同时记录暴露和健康状况，用来描述现状、发现高危人群或提出后续研究假设。" },
+        { term: "同期分组", explain: "研究开始时通常不按暴露或结局预先选人，而是在资料收集后按是否暴露、是否患病进行分组比较。" },
+        { term: "抽样代表性", explain: "样本在关键特征上应接近目标人群。随机抽样、足够样本量和较低无应答率，是把样本结果推回总体的前提。" },
+        { term: "患病率与病程", explain: "在发病率、病程稳定的情况下，患病率近似等于发病率乘以平均病程。治疗延长生命但没有治愈，也可能使患病率升高。" },
+      ],
+      comparison: {
+        title: "患病率还是发病率",
+        note: "这是横断面学习中最常混淆的一对指标。",
+        headers: ["问题", "患病率", "发病率"],
+        rows: [
+          ["问的是什么", "现在有多少人患病", "一段时间内有多少新发病例"],
+          ["分子", "新病例 + 旧病例", "观察期内首次发生的新病例"],
+          ["常见来源", "现况调查、筛检、登记资料", "队列随访、疾病监测新发病例"],
+          ["受病程影响", "很强：治疗、康复或死亡会改变患病率", "主要反映新发过程"],
+        ],
+      },
+      readingNotes: [
+        "横断面 OR 描述调查时点的关联，不能直接改写成“暴露使以后发病风险增加多少”。",
+        "抽样权重、分层、整群等复杂调查设计不能忽略；权重不是可有可无的附加列。",
+        "横断面研究中的“对照”多是资料收集后形成的比较组，并不等于先选结局、再回看暴露的病例对照设计。",
+      ],
+    });
+    annotateStep("cross-sectional", "明确研究时间与样本", "table(dat$year) 用来看调查年份是否混杂，str() 则检查年龄、性别和结局是不是错误地读成字符。横断面研究必须能说清“哪一年、哪一人群、哪些人符合纳入标准”。");
+    annotateStep("cross-sectional", "计算患病率和基线特征", "prop.table(table(...)) 给出当前结局的比例，summary() 描述年龄分布。这里算的是患病比例，不是随访期间的新发风险。");
+    annotateStep("cross-sectional", "先做单因素分析", "二维 table() 先把暴露和结局组成列联表，chisq.test() 检验关联。若期望频数太小，应改用 Fisher 精确检验；显著也不等于时间顺序成立。");
+    annotateStep("cross-sectional", "用 Logistic 回归描述调整后关联", "family = binomial() 表示二分类结局。exp(coef(fit)) 是调整其他变量后的 OR，confint(fit) 给出区间；因为暴露和结局同时测量，解释时应使用“当前结局与暴露的关联”。");
+  }
+
+  const ecological = findGuide("ecological");
+  if (ecological) {
+    Object.assign(ecological, {
+      overview: "生态学研究以国家、城市、社区或时间点等群体作为分析单位，比较群体平均暴露与疾病频率。它适合利用现成资料、发现环境与健康线索，也常用于时间序列和干预前后比较。主要风险是生态学谬误：群体层面相关，并不代表每个人身上也存在同样关系。",
+      concepts: [
+        { term: "群体水平", explain: "一张表的一行可能代表一个城市、一年或一个监测点，而不是一个人。样本量描述的是群体数量，不是个体人数。" },
+        { term: "聚合分母", explain: "城市死亡数必须配合人口数或人时，才能变成本地死亡率。只分析事件数会把“人口多”误当成“风险高”。" },
+        { term: "生态学比较", explain: "比较不同地区或人群的平均暴露和疾病频率，用来提出病因假设。" },
+        { term: "生态趋势", explain: "连续观察同一人群暴露水平与疾病频率怎样一起变化，例如空气污染政策实施前后的变化。" },
+        { term: "生态学谬误", explain: "把群体层面的关联直接当成个体层面的关系。例如某城市平均收入较高且某病死亡较低，不代表低收入个体就风险更高。" },
+        { term: "区域与时间固定差异", explain: "不同城市、不同季节本身可能有稳定差异。模型中需要处理地区、长期趋势和季节性，否则会把混杂误当成暴露效应。" },
+      ],
+      comparison: {
+        title: "生态学研究与个体研究有什么区别",
+        note: "同样研究污染与健康，分析单位不同，能回答的问题也不同。",
+        headers: ["方面", "生态学研究", "队列/病例对照等个体研究"],
+        rows: [
+          ["一行代表", "一个地区、时间点或群体", "一个人或一次个体观测"],
+          ["暴露与结局", "只知道群体平均或总数", "可连接同一个人的暴露和结局"],
+          ["主要优势", "快速、省成本、适合宏观政策与环境趋势", "时间顺序和个体混杂控制通常更清楚"],
+          ["主要风险", "生态学谬误、群体混杂、时间趋势", "失访、回忆偏倚、测量误差等"],
+        ],
+      },
+      readingNotes: [
+        "地区或时间序列模型中的系数是群体平均尺度上的关系，不能直接翻译成个人风险。",
+        "事件数、人口分母和 offset 必须成对解释；poisson 模型里的 offset 通常就是 log(人口或人时)。",
+        "长期趋势和季节性不是“调得越复杂越好”，应在看结果前说明选择依据，并检查模型是否过度拟合。",
+      ],
+    });
+    annotateStep("ecological", "先画时间与空间分布", "日期转换为 Date 对象后，plot() 用连续时间作横轴，检查是否存在突然断点、季节波动或人口分母变化。图形应在建模前完成。");
+    annotateStep("ecological", "建立计数结局和分母", "glm() 把每日或每地区事件数作为结局，offset = log(population) 把人口规模变成率的分母，family = poisson() 表示计数模型。固定地区或年份用于处理稳定的群体差异。");
+    annotateStep("ecological", "检查过度离散与时间相关", "Pearson 残差平方和除以残差自由度，若远大于 1，说明普通 Poisson 可能把不确定性估得过小。还应检查自相关和季节结构。");
+    annotateStep("ecological", "解释群体水平结果", "exp(coef(fit)) 将系数转换为率比。解释时需写明暴露单位、人口分母和调整变量，并说明结果是群体平均关联。");
+  }
+
+  const caseControl = findGuide("case-control");
+  if (caseControl) {
+    Object.assign(caseControl, {
+      overview: "病例对照研究先从结局出发：按统一标准选择病例，再从产生这些病例的源人群中选取对照，回顾两组既往暴露。它特别适合罕见结局，但病例与对照的来源、回忆方式和匹配结构会强烈影响结果。病例对照研究通常不能直接计算发病率，核心效应量是优势比 OR。",
+      concepts: [
+        { term: "源人群", explain: "真正产生这些病例的人群。对照必须能代表同一源人群的暴露分布，而不是随便找一群“没病的人”。" },
+        { term: "优势（odds）", explain: "事件发生概率与不发生概率之比。它不是患病率，也不是风险。" },
+        { term: "比值比 OR", explain: "病例组的暴露优势除以对照组的暴露优势。OR=1 表示无关联；OR>1 与 OR<1 分别提示正、负关联。" },
+        { term: "匹配", explain: "让病例和对照在年龄、性别等已知混杂因素上相同或相近。匹配变量通常不能再用普通方式分析其本身效应。" },
+        { term: "匹配过度", explain: "匹配了不该匹配的变量，例如暴露与结局之间的中间变量，可能把真正的关联一起匹配掉，并降低研究效率。" },
+        { term: "回忆偏倚", explain: "病例与对照回忆既往暴露的准确程度不同。使用客观记录、新发病例和统一访谈方法可减少这种问题。" },
+        { term: "入院率偏倚", explain: "医院病例和医院对照并不一定代表源人群，因为不同疾病入院概率不同。多医院、多病种选择对照可降低风险。" },
+      ],
+      comparison: {
+        title: "病例对照研究与队列研究怎么选",
+        note: "选择设计时先看结局有多罕见、随访是否可行，以及资料从何时开始。",
+        headers: ["方面", "病例对照研究", "队列研究"],
+        rows: [
+          ["选择起点", "按结局选病例和对照", "按暴露选暴露组和非暴露组"],
+          ["时间方向", "多从现在回看过去暴露", "从暴露随访到未来结局"],
+          ["常见效应", "OR", "累积发病率、发病密度、RR、AR、HR"],
+          ["优势", "罕见病效率高，成本较低", "时间顺序较清楚，可直接计算风险"],
+          ["主要风险", "选择偏倚、回忆偏倚、对照不当", "失访、随访成本、暴露变化"],
+        ],
+      },
+      readingNotes: [
+        "OR=2 表示病例组暴露优势是对照组的 2 倍，不等同于发病风险翻倍。",
+        "只有当结局很罕见时，OR 才可以粗略近似 RR；是否罕见要有外部资料支持。",
+        "匹配研究必须保留匹配组结构。普通 glm() 可能忽略匹配信息，1:1 或多匹配资料常使用 clogit() 与 strata()。",
+      ],
+    });
+    annotateStep("case-control", "写清病例与对照的定义", "table() 先核对病例数和暴露分布。病例必须符合统一诊断标准，对照必须来自产生病例的源人群；仅看到两张表还不够，研究设计信息必须一起记录。");
+    annotateStep("case-control", "检查暴露和匹配结构", "matched_set 是匹配组编号，同一组内的病例和对照互相配对。配对资料不能把每个对子拆散当独立观测。");
+    annotateStep("case-control", "拟合普通或条件 Logistic", "非匹配设计可用 glm(... family = binomial())；匹配设计用 clogit()，strata(matched_set) 告诉模型哪些人处于同一匹配组。两种设计不能混用同一种解释。");
+    annotateStep("case-control", "解释 OR 和选择偏倚", "exp(coef(fit)) 得到 OR，confint(fit) 得到区间。结果报告还应包含病例来源、对照来源、匹配比例、回忆方式和选择偏倚控制。");
+  }
+
+  const survivalCurve = findGuide("survival-curve");
+  if (survivalCurve) {
+    Object.assign(survivalCurve, {
+      definition: "生存曲线描述在随访时间 t 之后仍未发生目标事件的概率 S(t)。对每个人，研究者需要知道观察了多久，以及在这段时间内是发生了事件，还是只知道到最后一刻仍未发生。",
+      overview: "Kaplan-Meier 曲线是阶梯线：每发生一次事件，曲线向下走一级；两次事件之间，估计生存概率保持不变。删失者不再进入之后的风险人数，但并不等于已经发生事件。读图时要同时看横轴时间单位、纵轴生存概率、风险人数和曲线尾部样本量。",
+      concepts: [
+        { term: "起点", explain: "每个人开始被观察的时间，例如手术日、确诊日或入组日。所有研究对象必须使用同一类起点。" },
+        { term: "终点事件", explain: "研究中真正关心的事件，例如死亡、复发或住院。必须与“失访”和“其他原因死亡”区分。" },
+        { term: "右删失", explain: "只知道事件发生在观察结束之后，尚不知道确切时间。例如研究结束时仍存活、失访或死于非目标事件。" },
+        { term: "风险集", explain: "在某个时间点仍处于观察中、并且尚未发生事件的人。生存曲线每下降一级，对应的是当前风险集中的事件数。" },
+        { term: "中位生存时间", explain: "生存曲线第一次降到 0.5 的时间，表示约一半研究对象仍存活到该时间。" },
+        { term: "log-rank 检验", explain: "比较两条或多条生存曲线整体是否相同的非参数检验。它不直接给出效应量，也不能替代 Cox 模型。" },
+      ],
+      comparison: {
+        title: "生存分析的三层任务",
+        note: "先用曲线看，再用检验比，最后用 Cox 调整。",
+        headers: ["任务", "常用函数", "回答的问题", "不能回答什么"],
+        rows: [
+          ["估计曲线", "survfit()", "随时间推移，无事件概率怎样变化", "调整多个混杂后的独立效应"],
+          ["比较曲线", "survdiff()", "几组整体生存曲线是否不同", "效应大小和多个协变量调整"],
+          ["多因素建模", "coxph()", "调整变量后，暴露与瞬时风险的关系", "未经比例风险检查的绝对因果结论"],
+        ],
+      },
+      readingNotes: [
+        "曲线下降表示事件发生，不表示“每个人的生存概率连续下降”。",
+        "删失时间点只会减少风险人数，通常不会让曲线下降。",
+        "曲线尾部风险人数很少时，任何小波动都会造成明显台阶，解释要谨慎。",
+      ],
+    });
+    annotateStep("survival-curve", "构建生存对象", "Surv() 把两列信息合在一起：follow_up 是随访时长，event 是事件状态。先检查 event 中 1 是否真的代表目标事件，并确认 follow_up 的单位。");
+    annotateStep("survival-curve", "估计并绘制 KM 曲线", "survfit() 计算每组随时间变化的生存概率；ggsurvplot() 再把结果画成曲线。risk.table = TRUE 增加风险人数，conf.int = TRUE 增加置信带。");
+  }
+
+  const logistic = findGuide("logistic");
+  if (logistic) {
+    Object.assign(logistic, {
+      overview: "Logistic 回归用于 0/1 结局，但模型真正建模的是事件发生概率经过 logit 变换后的对数优势。这样预测概率始终保持在 0 到 1 之间。系数本身不是 OR；exp(系数) 才是调整其他变量后，解释变量每增加一个单位所对应的优势比。",
+      concepts: [
+        { term: "概率", explain: "发生事件的人数或风险在 0 到 1 之间。概率为 0.2 表示 20% 的机会或比例。" },
+        { term: "优势", explain: "事件概率除以未事件概率。概率 0.2 时，优势是 0.2/0.8=0.25。" },
+        { term: "Logit", explain: "对数优势。它把 0 到 1 的概率转换成可正可负、没有上下限的数值，便于放进线性模型。" },
+        { term: "OR", explain: "两个优势之比。OR 不是概率比，也不是风险比；OR=1 表示两组优势相同。" },
+        { term: "完全分离", explain: "某个变量或组合能完美区分事件与非事件，导致系数趋于无穷、标准误异常。常见于小样本或稀疏分类。" },
+        { term: "校准", explain: "模型预测“30% 风险”的人，实际发生率是否接近 30%。区分能力好不等于概率预测准确。" },
+      ],
+      comparison: {
+        title: "OR、RR 与 HR 不要混用",
+        note: "看到“倍数”时，先问它是什么尺度上的倍数。",
+        headers: ["指标", "来自什么模型/设计", "回答的问题", "典型误区"],
+        rows: [
+          ["OR", "Logistic 回归、病例对照研究", "结局优势与暴露的关系", "直接写成发病风险增加多少"],
+          ["RR", "队列研究或试验的风险比较", "暴露组发病风险是参照组的多少倍", "忽略基线风险，误认为绝对影响同样大"],
+          ["HR", "Cox 生存模型", "某一时刻事件风险是参照组的多少倍", "当成最终累积发病风险之比"],
+        ],
+      },
+      readingNotes: [
+        "exp(系数) 才是 OR；summary() 里的 Estimate 是 log-odds。",
+        "OR 不能直接读成“风险增加 OR−1 倍”。结局常见时，OR 会明显偏离 RR。",
+        "评价模型既要看系数和置信区间，也要看事件数、分离、共线性和校准。",
+      ],
+    });
+    annotateStep("logistic", "确认结局编码", "table(dat$outcome) 先确认结局只有 0 和 1，没有 2、9、NA 或文字标签。若原数据是因子，应明确哪一个水平代表事件，不能机械地 as.integer()。");
+    annotateStep("logistic", "拟合 glm 模型", "glm() 的公式左侧是二分类结局，右侧依次写主要暴露和调整变量；family = binomial() 指定 logistic 模型。summary(fit) 中的系数仍是 log-odds。");
+    annotateStep("logistic", "转换为 OR 和置信区间", "cbind() 把 OR 与 confint(fit) 的上下限排成一张表。exp() 只改变尺度，不改变模型；置信区间包含 1 时，提示数据与“无关联”并不冲突。");
+    annotateStep("logistic", "检查拟合、分离和影响点", "fitted(fit) 是每个人被预测的事件概率，residuals(fit, type = \"deviance\") 帮助检查异常拟合。还要检查完全分离、事件数和模型校准。");
+  }
+
+  const cox = findGuide("cox");
+  if (cox) {
+    Object.assign(cox, {
+      overview: "Cox 模型比较研究对象在某一时刻发生事件的瞬时风险。它由未知的基准风险和一组协变量效应组成，因此通常不要求假设生存时间服从正态分布，也不要求指定基准风险的具体形状。模型允许右删失，但必须检查比例风险：协变量带来的风险比应随时间大致保持稳定。",
+      concepts: [
+        { term: "瞬时风险", explain: "在活到某一时刻的前提下，极短时间内发生事件的相对可能性。它不是最终患病概率，也不是累积死亡率。" },
+        { term: "基准风险", explain: "所有解释变量都取参照值或 0 时的风险函数。它的具体形状由数据决定，Cox 模型不必先写出某个分布。" },
+        { term: "HR", explain: "两个个体的风险函数之比。HR=1.5 表示在协变量相同的条件下，暴露组的瞬时风险约为参照组的 1.5 倍。" },
+        { term: "比例风险", explain: "两组风险函数之比不随随访时间改变。若曲线明显交叉或风险比随时间变化，单一 HR 不能概括全过程。" },
+        { term: "右删失", explain: "只知道研究对象到随访结束仍未发生事件，真实事件时间在这之后。Cox 模型利用“至少活到这里”的信息。" },
+        { term: "风险集", explain: "在每个事件时间仍处于随访且未发生事件的人。Cox 的部分似然比较的是当时的人在暴露和协变量上的差异。" },
+      ],
+      comparison: {
+        title: "Kaplan-Meier、log-rank 和 Cox 各做什么",
+        note: "三者常连用，但角色不同。",
+        headers: ["分析", "主要输出", "是否调整混杂", "适合回答"],
+        rows: [
+          ["Kaplan-Meier", "随时间变化的生存曲线、中位生存时间", "不调整", "各组生存过程怎样变化"],
+          ["log-rank", "整体曲线比较的 p 值", "不调整", "几条曲线整体是否不同"],
+          ["Cox 模型", "调整后的 HR 与置信区间", "可以调整", "多个因素同时存在时暴露与瞬时风险的关系"],
+        ],
+      },
+      readingNotes: [
+        "HR 是相对风险，不是绝对风险差，也不能说“HR=1.5 就多 50% 的人死亡”。",
+        "cox.zph() 不显著只代表没有发现明显违背，不等于比例风险被证明。",
+        "若比例风险不成立，可考虑按变量分层、加入时间交互或时间依赖效应；不能继续只报一个总 HR。",
+      ],
+    });
+    annotateStep("cox", "构建 Surv 对象", "Surv(time, event) 是 Cox 模型的结局部分：time 是到事件或删失的随访时长，event 表示是否发生目标事件。先打印前几行，核对时间单位和事件编码。");
+    annotateStep("cox", "画出 Kaplan-Meier 曲线", "这行按 exposure 分组估计生存曲线并显示置信带。若两条曲线随时间交叉，之后只解释一个不变的 HR 要格外谨慎。");
+    annotateStep("cox", "拟合 Cox 模型", "coxph() 公式左侧是 Surv 生存结局，右侧是 exposure 以及需要调整的年龄和性别。summary(fit) 给出 log HR、标准误和检验结果。");
+    annotateStep("cox", "检验比例风险", "cox.zph(fit) 检查风险比是否随时间改变；exp(cbind(HR=coef(fit), confint(fit))) 将系数换成 HR 和 95% CI。先通过假设检查，再解释系数。");
+  }
+
+  const dlnm = findGuide("dlnm");
+  if (dlnm) {
+    Object.assign(dlnm, {
+      overview: "DLNM 不是一种单独的结局分布，而是一种把“暴露强度”和“滞后时间”同时纳入回归的建模方法。它先分别用基函数描述非线性和滞后形态，再组成 cross-basis 矩阵放入 Poisson、Logistic 或 Cox 等模型。它最适合回答：今天与过去若干天的暴露，是否共同影响当前结局，以及影响怎样随时间延迟。DLMN 是常见拼写错误，规范缩写应写作 DLNM。",
+      concepts: [
+        { term: "滞后", explain: "今天的结局可能受到昨天、前天或更早暴露的影响。lag=0 常表示当天，lag=1 表示前一天。" },
+        { term: "分布滞后", explain: "把多个滞后天的效应同时估计，而不是只选“最显著的一天”。每个滞后系数描述该天暴露与结局的关系。" },
+        { term: "非线性", explain: "暴露增加一个单位时，结局不一定按固定比例改变。温度通常呈 U 形或 J 形，极高和极低都可能增加风险。" },
+        { term: "cross-basis", explain: "暴露维度的基函数与滞后维度的基函数组合成的矩阵，让模型能同时容纳非线性与延迟。" },
+        { term: "参照暴露", explain: "比较其他暴露水平时使用的基准值。曲线和 RR 都依赖参照值，参照点必须写清。" },
+        { term: "累积效应", explain: "在设定滞后窗口内，把各天效应按模型组合后的总体效应。它不是简单把每一天的 RR 相加。" },
+        { term: "时间趋势与季节", explain: "长期人口变化、医疗水平、季节本身都会影响结局。时间序列模型必须处理它们，但不能让调整项吞掉暴露信息。" },
+      ],
+      comparison: {
+        title: "三个常见图形分别在说什么",
+        note: "DLNM 结果不应只放一张三维图。二维切片通常更容易核对。",
+        headers: ["图形", "横纵轴", "回答的问题", "阅读重点"],
+        rows: [
+          ["暴露-反应曲线", "横轴暴露，纵轴 RR", "某个固定滞后或累积窗口内，暴露怎样影响结局", "参照值、非线性、置信带"],
+          ["滞后-反应曲线", "横轴滞后天数，纵轴 RR", "某次暴露的影响在第几天最强、持续多久", "瞬时效应与延迟峰"],
+          ["暴露-滞后-反应图", "暴露 × 滞后 × 效应", "不同暴露和不同滞后组合的综合关系", "颜色尺度、参照值和是否过度解读"],
+        ],
+      },
+      readingNotes: [
+        "lag=0:14 表示当天到第 14 天，不是“第 14 天以后”。",
+        "累积 RR 依赖参照暴露和完整滞后窗口；换参照值或换窗口，数值会改变。",
+        "滞后窗口、基函数自由度、时间趋势自由度都应在看主要结果前确定，不能挑选最显著的组合。",
+      ],
+    });
+    annotateStep("dlnm", "定义滞后窗口", "crossbasis() 把 pm25 的当天到第 14 天暴露一起整理成矩阵。argvar 描述暴露如何弯曲，arglag 描述效应怎样随滞后时间变化；两个自由度都要事先说明。");
+    annotateStep("dlnm", "把 crossbasis 放进回归", "cb 作为一组变量进入 glm()，family = quasipoisson() 适合可能过度离散的每日死亡计数；ns(date, df=...) 用于控制长期趋势和季节，不能随意省略。");
+    annotateStep("dlnm", "计算特定暴露、滞后和累积效应", "crosspred() 以 cen=10 为参照，计算 pm25=25 或 35 时的预测效应；cumul=TRUE 同时给出整个滞后窗口的累积效应。");
+    annotateStep("dlnm", "画暴露-滞后-反应图", "第一幅图展示整体三维关系，第二幅图按暴露值切出不同滞后天的二维曲线。图题必须写明暴露单位、滞后单位和参照值。");
+  }
+
+  const lmm = findGuide("lmm");
+  if (lmm) {
+    Object.assign(lmm, {
+      overview: "线性混合模型用于结局近似连续、但观测之间并非完全独立的数据。例如同一个人的多次测量、同一家庭或同一学校内的个体共享环境。固定效应用来描述总体平均关系，随机效应用来描述个体或群组之间无法完全由协变量解释的差异。",
+      concepts: [
+        { term: "固定效应", explain: "研究者希望估计并推广的总体平均关系，例如治疗组与对照组随时间的平均差异。" },
+        { term: "随机效应", explain: "用来表示个体、家庭、学校等单位的差异。随机截距允许每个人起点不同，随机斜率允许每个人变化速度不同。" },
+        { term: "聚集/嵌套", explain: "同一单位内的观测更相似，例如同一学生的多次成绩。忽略这种相关会低估标准误。" },
+        { term: "长格式", explain: "一人多行：每一行代表一个人在一个时间点的一次观测，并保留 id、time、group 和 outcome。" },
+        { term: "奇异拟合", explain: "随机效应方差接近 0 或结构过于复杂时，模型可能给出警告。它提示数据不足以支持当前随机效应。" },
+      ],
+      comparison: {
+        title: "普通线性回归与线性混合模型",
+        note: "差别不只在函数名，而在你是否承认“同一组观测彼此相关”。",
+        headers: ["方面", "普通 lm()", "线性混合模型 lmer()"],
+        rows: [
+          ["观测假设", "通常视为相互独立", "允许同一人或同一群组内相关"],
+          ["个体差异", "只通过固定协变量解释", "可用随机截距/斜率表示"],
+          ["典型数据", "一人一条记录", "一人多行或嵌套结构"],
+          ["额外检查", "线性、方差、异常点", "还要看随机效应结构、收敛和奇异拟合"],
+        ],
+      },
+      readingNotes: [
+        "固定效应回答总体平均关系，随机效应不是每个个体的最终预测。",
+        "REML 适合比较随机效应或估计方差，比较固定效应结构时常需 REML=FALSE。",
+        "模型收敛不等于模型合理，仍要检查残差、随机效应和数据编码。",
+      ],
+    });
+    annotateStep("lmm", "先画每个人的轨迹", "group=id 让同一人的点连成一条线，stat_summary() 再叠加总体平均趋势。先看个体轨迹是否真的存在不同起点或不同斜率。");
+    annotateStep("lmm", "从随机截距模型开始", "lmer() 中 group * time 同时包含组间差异、时间效应和交互；(1 | id) 表示每个人有不同起始水平。REML=FALSE 便于后续比较固定效应模型。");
+    annotateStep("lmm", "评估是否需要随机斜率", "(time | id) 表示每个人既有不同起点，也有不同变化速度。随机效应越复杂，越需要足够重复测量和稳定收敛。");
+    annotateStep("lmm", "解释固定效应并检查假设", "summary() 读取固定效应；交互项显著表示两组的时间变化不同。confint() 给出区间，但不能修复错误的随机效应结构。");
+  }
+
+  const linear = findGuide("linear");
+  if (linear) {
+    Object.assign(linear, {
+      concepts: [
+        { term: "偏回归系数", explain: "在其他解释变量保持不变时，某个变量增加一个单位，连续结局平均改变多少。" },
+        { term: "调整", explain: "把多个变量同时放进模型，以估计某一暴露在其他变量取值相同时的平均关系。调整只能处理已测量且模型化正确的混杂。" },
+        { term: "交互作用", explain: "一个变量的效应随另一个变量水平而变化。例如干预效果在男性和女性中不同，模型需要交互项。" },
+        { term: "多重共线性", explain: "解释变量彼此高度相关，使各自的系数不稳定、标准误增大，甚至方向改变。" },
+        { term: "决定系数 R²", explain: "模型解释的结局变异比例。R² 高不代表因果成立，也不代表预测一定准确。" },
+      ],
+      readingNotes: [
+        "回归系数有单位。不同量纲变量的系数大小不能直接比较，必要时使用标准化系数。",
+        "线性回归要求的是条件关系和残差结构近似合理，不是要求结局本身必须完美正态。",
+        "看到调整后关联改变，不等于已经排除所有混杂；未测量混杂仍可能存在。",
+      ],
+    });
+    annotateStep("linear", "拟合 lm 并查看系数", "lm() 的公式左侧是连续结局，右侧是暴露和调整变量；summary() 给出偏回归系数、标准误和 p 值，confint() 给出系数的置信区间。");
+  }
+
+  const poisson = findGuide("poisson");
+  if (poisson) {
+    poisson.overview = "Poisson 回归用于非负计数结局，例如某地区一年内的病例数或某日死亡数。加入 offset(log(人时或人口数)) 后，模型比较的是单位人时的发生率，而不是单纯事件数。实际数据常有过度离散、时间相关或零值过多，需要检查而不是机械套用。";
+    poisson.whenUse = [
+      "结局是非负整数计数。",
+      "每个人、地区或时间点的观察量不同，需要比较单位人时的发生率。",
+      "研究问题关注率比 IRR，而不是二分类结局的优势比。",
+    ];
+    poisson.concepts = [
+      { term: "计数", explain: "0、1、2、3 这样的非负整数事件数。计数本身没有上限，但通常不能是负数。" },
+      { term: "率", explain: "事件数除以人时或人口规模，描述单位观察量中的发生频率。" },
+      { term: "offset", explain: "模型中已知、系数固定为 1 的分母项。Poisson 回归常用 offset=log(person_time)，把事件数转成率。" },
+      { term: "IRR", explain: "发生率比。IRR=1.2 表示暴露组的单位人时发生率约为参照组的 1.2 倍。" },
+      { term: "过度离散", explain: "实际方差大于 Poisson 假设的均值方差。标准误可能被低估，可考虑 quasi-Poisson 或负二项模型。" },
+      { term: "零膨胀", explain: "零事件比普通 Poisson 预期更多。是否使用零膨胀模型，要看研究问题、数据结构与模型诊断。" },
+    ];
+    poisson.comparison = {
+      title: "事件数、发生率与 IRR",
+      note: "Poisson 模型的三个层次很容易混淆。",
+      headers: ["对象", "含义", "举例"],
+      rows: [
+        ["事件数", "实际观察到的病例或死亡人数", "某市某日死亡 18 人"],
+        ["发生率", "事件数 ÷ 人时/人口", "18 ÷ 100 万人日"],
+        ["IRR", "两个发生率之比", "高污染日相对低污染日的率比"],
+      ],
+    };
+    poisson.readingNotes = [
+      "不设 offset 时，模型比较的是事件数；设置 offset 后才主要比较率。",
+      "分母是人口数还是人年，要根据数据和研究问题确定，并在结果中写清。",
+      "发现过度离散后，不能继续无条件使用普通 Poisson 的标准误。",
+    ];
+    annotateStep("poisson", "确认计数与分母", "events / person_time 先做一张粗略率表，帮助发现分母为零或极端小的记录。正式模型仍应把原始事件数和人时分别输入。");
+    annotateStep("poisson", "拟合 Poisson 模型", "glm() 的结局是 events；offset=log(person_time) 把不同人时放到同一个率尺度；family=poisson() 指定计数模型。");
+    annotateStep("poisson", "诊断过度离散", "Pearson 卡方除以残差自由度。接近 1 表示离散程度与 Poisson 假设不冲突，远大于 1 时常提示过度离散。");
+    annotateStep("poisson", "报告 IR / IRR 与置信区间", "coef(fit) 仍在 log 尺度，exp() 后得到发生率比；confint(fit) 后同样取 exp()。解释要写出暴露单位与率的分母。");
+  }
+
+  const methodsCategory = (window.RZH_TEACHING_CATEGORIES || []).find((category) => category.id === "methods");
+  if (methodsCategory) {
+    methodsCategory.detail = "先学习现况研究和生态学研究能回答什么，再理解队列研究、病例对照研究、随机对照试验与诊断试验。参考《流行病学（第8版）》和《卫生统计学（第8版）》，每类专题补充研究对象、时间顺序、效应指标和偏倚边界。";
+    const methodOrder = ["cross-sectional", "ecological", "cohort", "case-control", "rct", "diagnostic"];
+    methodsCategory.items.sort((a, b) => {
+      const idOf = (item) => item.href.split("/").pop();
+      return methodOrder.indexOf(idOf(a)) - methodOrder.indexOf(idOf(b));
+    });
+  }
+
+  const modelsCategory = (window.RZH_TEACHING_CATEGORIES || []).find((category) => category.id === "models");
+  if (modelsCategory) {
+    modelsCategory.detail = "参考《流行病学（第8版）》《卫生统计学（第8版）》和相关 R 教材，从连续结局、二分类结局、计数率、生存时间到重复测量与暴露滞后逐步学习。每个专题先解释概率、优势、风险、人时、删失等基础概念，再说明函数、参数、使用条件和结果边界。";
+  }
+
+  Object.assign(window.RZH_PLAIN_FUNCTION_GUIDES ||= {}, {
+    survdiff: {
+      gist: "survdiff() 比较两组或多组 Kaplan-Meier 生存曲线是否不同，是 log-rank 家族检验的常用入口。",
+      analogy: "像比较几条随随访时间下降的阶梯路线，判断它们整体上是否偏离得太多。",
+      remember: "它回答“曲线是否不同”，不直接给出调整混杂后的效应量；需要 HR 时还要拟合 Cox 模型。",
+      steps: [
+        "先构造 Surv(time, event)，再按分组变量写出公式。",
+        "运行 survdiff(Surv(time, event) ~ group, data = dat)。",
+        "结果中的 p 值要与曲线、风险人数和临床意义一起解释。",
+      ],
+    },
+    "cox.zph": {
+      gist: "cox.zph() 检查 Cox 模型中的风险比是否在随访期间保持相对稳定。",
+      analogy: "像检查两条风险曲线是否始终按固定倍数一起变化；若关系不断变向，单一 HR 就说不清全过程。",
+      remember: "p 值不显著不代表比例风险被证明，只是没有发现足够强的违背证据。",
+      steps: [
+        "先完成 coxph() 模型，再把模型对象交给 cox.zph()。",
+        "查看每个变量和总体检验的结果。",
+        "若明显违背，可考虑分层、时间交互或时间依赖模型，并重新解释研究问题。",
+      ],
+    },
+    clogit: {
+      gist: "clogit() 是条件 Logistic 回归，适合病例与对照按匹配组配对的病例对照研究。",
+      analogy: "像一个病例只和自己匹配组里的对照比较，而不是把所有人混在一起。",
+      remember: "普通 glm() 会忽略匹配结构；条件 Logistic 用 strata() 指定匹配组。",
+      steps: [
+        "确认数据里有一个匹配组编号，同组内包含病例和对照。",
+        "运行 clogit(case ~ exposure + age + strata(matched_set), data = dat)。",
+        "exp(系数) 得到条件 OR，并报告匹配方式、病例来源和对照来源。",
+      ],
+    },
+    strata: {
+      gist: "strata() 在公式中声明分层或匹配组，让不同层拥有各自的基准。",
+      analogy: "像先按医院、家庭或配对编号分桌，再在每桌内部比较。",
+      remember: "它不会替你决定该匹配什么；分层变量应由设计和混杂知识决定。",
+      steps: [
+        "先检查分层变量是否真的代表匹配组或不同基准风险层。",
+        "把 strata(分层变量) 放在模型公式右侧。",
+        "结果通常不报告分层变量本身的普通系数，因为它被用于控制结构。",
+      ],
+    },
+    crosspred: {
+      gist: "crosspred() 从 DLNM 中计算指定暴露、滞后和累积窗口的预测效应。",
+      analogy: "像在暴露-滞后关系地图上选择几个坐标，读出相对于参照点的风险。",
+      remember: "参照暴露 cen 会决定所有 RR 的数值，滞后窗口和 at 必须与 crossbasis() 及研究方案一致。",
+      steps: [
+        "先保存 crossbasis() 生成的对象和包含它的回归模型。",
+        "运行 crosspred(cb, model, at = 目标暴露值, cen = 参照暴露, cumul = TRUE)。",
+        "画图前核对暴露单位、滞后单位、参照值和累积效应窗口。",
+      ],
+    },
+    crossreduce: {
+      gist: "crossreduce() 把 DLNM 的暴露-滞后结构缩减成更容易报告的总效应或滞后段效应。",
+      analogy: "像把一张三维地图投影成一条更容易解释的曲线，但投影会改变你看到的信息。",
+      remember: "降维不能掩盖原始模型的结构，也不能根据最显著结果反复改窗口。",
+      steps: [
+        "先明确要保留暴露维度、滞后维度还是总累积效应。",
+        "把 crossbasis 和模型交给 crossreduce()。",
+        "在结果中写清缩减前后的假设和滞后窗口。",
+      ],
+    },
+  });
+
+  const glossary = window.RZH_GLOSSARY || [];
+  glossary.push(
+    ["exposure", "暴露", "流行病学", "研究中希望考察的危险因素、保护因素、行为、环境或个体特征。", "像研究中被怀疑会改变结局的那件事。", "暴露必须与研究问题对应，不能因为数据库里有一列就自动算暴露。"],
+    ["outcome", "结局", "流行病学", "研究中追踪的健康事件或状态，例如发病、死亡、复发或住院。", "像随访过程中等待发生的结果。", "结局定义、诊断标准和观察终点必须在分析前统一。"],
+    ["incidence", "发病率", "流行病学", "一定观察期内新发生病例的频率或速度。", "像一段时间里新出现多少个病例。", "累积发病率以人数为分母；发病密度以人时为分母。"],
+    ["prevalence", "患病率", "流行病学", "某时点或时期内全部现患病例在人群中的比例。", "像今天人口中有多少人正患病。", "患病率受发病率和病程共同影响，不等于发病率。"],
+    ["cumulative-incidence", "累积发病率", "流行病学", "在明确观察期内新发病例数除以开始时风险人群数。", "像随访 10 年后，原队列中多少人新发病。", "报告时必须说明累积时间；范围通常在 0 到 1。"],
+    ["incidence-density", "发病密度", "流行病学", "新发病例数除以总人时，反映单位人时中的发生速度。", "像每个人每被观察一年贡献多少发病风险时间。", "随访时间不齐、存在退出时通常比累积发病率更合适。"],
+    ["person-time", "人时", "流行病学", "每个人被观察的时间相加得到的总随访时间，常用人年。", "像把许多段长短不同的随访时间接成一条总时间。", "事件数除以人时得到发病密度；Poisson 模型常用 offset=log(人时)。"],
+    ["relative-risk", "相对危险度", "流行病学", "暴露组风险或发生率与非暴露组的比值。", "像暴露组发病是参照组的几倍。", "RR 是相对倍数，不直接等于绝对风险增加量。"],
+    ["attributable-risk", "归因危险度", "流行病学", "暴露组风险减去非暴露组风险得到的绝对差值，也称危险度差。", "像暴露组比非暴露组多出来的发病数量。", "AR 依赖基线风险；RR 很大时 AR 仍可能很小。"],
+    ["odds", "优势", "统计建模", "事件发生概率除以不发生概率。", "像“中”与“不中”的机会之比。", "概率 0.2 对应优势 0.25；优势不是概率。"],
+    ["odds-ratio", "比值比 OR", "统计建模", "两个优势之比，常用于 Logistic 回归和病例对照研究。", "像病例组暴露优势相对对照组暴露优势的倍数。", "OR=1 表示无关联；OR 通常不能直接解释成风险比。"],
+    ["hazard", "风险率/瞬时风险", "生存分析", "在已经活到某一时刻的前提下，极短时间内发生事件的相对可能性。", "像某一瞬间仍处于风险中的人发生事件的强度。", "瞬时风险不是最终累积发病概率。"],
+    ["hazard-ratio", "风险比 HR", "生存分析", "两个风险函数或瞬时风险之比，常由 Cox 模型估计。", "像同一时刻暴露组风险是参照组的几倍。", "HR 不是累积风险比，也不等于绝对风险差。"],
+    ["censoring", "删失", "生存分析", "未观察到确切终点事件时间，只知道真实事件时间在观察结束之后。", "像随访结束时仍存活，只知道至少活到了这一天。", "删失不等于没有事件，也不能简单删除这些记录。"],
+    ["survival-function", "生存函数", "生存分析", "生存时间大于某一时刻的概率 S(t)。", "像到时间 t 时仍未发生目标事件的比例。", "Kaplan-Meier 曲线是生存函数的阶梯估计。"],
+    ["proportional-hazards", "比例风险假设", "生存分析", "Cox 模型中不同个体的风险函数之比不随时间改变。", "像两条风险曲线按固定倍数一起变化。", "曲线明显交叉或风险比随时间变化时，单一 HR 不能概括全过程。"],
+    ["log-rank", "对数秩检验", "生存分析", "比较两组或多组生存曲线整体是否相同的非参数检验。", "像比较几条阶梯曲线在整个随访过程中是否偏离预期。", "log-rank 给 p 值，不直接给调整后的效应量。"],
+    ["ecological-fallacy", "生态学谬误", "流行病学", "把地区或群体层面的关联错误地当成个体层面的关系。", "像看到富裕城市死亡率低，就断定富人个体一定更健康。", "群体平均暴露不能代表每个人的暴露和结局。"],
+    ["confounding", "混杂", "流行病学", "第三变量同时与暴露和结局有关，使观察到的暴露-结局关系发生扭曲。", "像年龄既影响暴露机会，又影响疾病风险。", "混杂是系统误差，不能靠扩大样本量自动消失。"],
+    ["selection-bias", "选择偏倚", "流行病学", "研究对象进入或留在研究中的方式与暴露、结局相关，导致样本不能代表目标人群。", "像只调查到医院就诊的人，会漏掉未就医者。", "队列中的失访偏倚、病例对照中的入院率偏倚都属于此类。"],
+    ["information-bias", "信息偏倚", "流行病学", "测量暴露或结局时产生系统误差，如回忆、诊断或仪器误差。", "像病例比对照更认真回忆过去的暴露。", "各组测量方法一致，是减少信息偏倚的基础。"],
+    ["matching", "匹配", "流行病学", "按年龄、性别等变量为病例选择特征相近的对照，或在分析中保持匹配组结构。", "像先给每个病例找一个年龄相近的对照。", "匹配变量通常是已知混杂，不能把感兴趣暴露作为匹配变量。"],
+    ["overmatching", "匹配过度", "流行病学", "匹配了不该匹配的变量，可能把真正的暴露信息一起匹配掉或降低研究效率。", "像把研究因素本身也配平了，最后当然看不出差别。", "中间变量和与疾病无关的变量不应随意匹配。"],
+    ["lag", "滞后", "统计建模", "暴露发生后到结局可能出现之间的时间延迟。", "像今天的污染可能影响随后几天的健康。", "DLNM 中的 lag=0:14 表示当天到第 14 天。"],
+    ["cross-basis", "交叉基", "统计建模", "同时描述暴露非线性和滞后形态的矩阵，是 DLNM 的核心输入。", "像一张暴露 × 滞后的关系网格。", "crossbasis() 生成矩阵，之后要放入具体回归模型。"],
+  );
+})();
+
+</script>
+  <script>
 window.RZH_CHART_IMAGES = {
   "plot/bar": "data:image/webp;base64,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",
   "plot/boxplot": "data:image/webp;base64,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",
@@ -102768,6 +103391,9 @@ function renderGuide(type, id) {
   const typeLabel = guideTypeLabel(type);
   const definition = guide.definition || guide.overview;
   const features = guide.features || guide.whenUse;
+  const concepts = guide.concepts || [];
+  const comparison = guide.comparison;
+  const readingNotes = guide.readingNotes || [];
   const exampleImage = type === "plot" ? chartImages[`plot/${guide.id}`] : "";
   const relatedGuides = (guide.related || []).map((relatedId) => learningGuides.find((item) => item.id === relatedId)).filter(Boolean);
   app.innerHTML = `
@@ -102801,6 +103427,25 @@ function renderGuide(type, id) {
         </div>
       </section>
 
+      ${concepts.length ? `
+        <section class="guide-concept-panel" aria-labelledby="guide-concepts-title">
+          <header>
+            <span>基础概念拆解</span>
+            <h2 id="guide-concepts-title">先弄懂这几个词，再看代码</h2>
+            <p>这些概念决定数据怎样组织、结果怎样解释。遇到陌生术语时，可以先回到这里。</p>
+          </header>
+          <div class="guide-concept-grid">
+            ${concepts.map((concept, index) => `
+              <article>
+                <span>${String(index + 1).padStart(2, "0")}</span>
+                <h3>${escapeHtml(concept.term)}</h3>
+                <p>${escapeHtml(concept.explain)}</p>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      ` : ""}
+
       ${exampleImage ? `
         <figure class="guide-chart-example">
           <img src="${exampleImage}" alt="${escapeHtml(guide.title)}示例图">
@@ -102813,6 +103458,20 @@ function renderGuide(type, id) {
 
       <div class="guide-layout">
         <article class="guide-main">
+          ${comparison ? `
+            <section class="panel guide-section">
+              <div class="guide-section-title"><span>对</span><div><h2>${escapeHtml(comparison.title)}</h2><p>${escapeHtml(comparison.note || "把相近概念放在一起比较，重点看研究对象、时间顺序和效应指标。")}</p></div></div>
+              <div class="guide-comparison-wrap">
+                <table class="guide-comparison-table">
+                  <thead><tr>${comparison.headers.map((header) => `<th>${escapeHtml(header)}</th>`).join("")}</tr></thead>
+                  <tbody>
+                    ${comparison.rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          ` : ""}
+
           <section class="panel guide-section">
             <div class="guide-section-title"><span>01</span><div><h2>检查数据结构</h2><p>先确认每一行代表什么，以及变量类型、时间和单位是否适合当前分析。</p></div></div>
             <ul class="guide-check-list">
@@ -102829,10 +103488,13 @@ function renderGuide(type, id) {
                   <div class="guide-step-content">
                     <h3>${escapeHtml(step.title)}</h3>
                     <p>${escapeHtml(step.text)}</p>
-                    <div class="code-block">
-                      <button class="copy-button" type="button" data-action="copy" data-copy="${escapeHtml(step.code)}" aria-label="复制示例代码">${icon("copy")}</button>
-                      ${escapeHtml(step.code)}
-                    </div>
+                    ${step.code ? `
+                      <div class="code-block">
+                        <button class="copy-button" type="button" data-action="copy" data-copy="${escapeHtml(step.code)}" aria-label="复制示例代码">${icon("copy")}</button>
+                        ${escapeHtml(step.code)}
+                      </div>
+                    ` : ""}
+                    ${step.explain ? `<div class="guide-step-explain">${escapeHtml(step.explain)}</div>` : ""}
                   </div>
                 </article>
               `).join("")}
@@ -102856,6 +103518,7 @@ function renderGuide(type, id) {
             <div>
               <h2>如何理解结果</h2>
               <p class="guide-interpretation">${escapeHtml(guide.interpret)}</p>
+              ${readingNotes.length ? `<ul class="guide-reading-notes">${readingNotes.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>` : ""}
             </div>
           </section>
 
@@ -103600,7 +104263,7 @@ function renderGlossaryResults() {
         ${(glossaryFunctionMap[id] || []).length ? `<div class="glossary-functions">${glossaryFunctionMap[id].map((functionId) => peekFunctionPill(functionId)).join("")}</div>` : ""}
       </article>
     `).join("")
-    : `<div class="empty-state">${icon("search")}<h3>没有找到术语</h3><p>试试“管道”“对象”“数据框”或“缺失值”。</p></div>`;
+    : `<div class="empty-state">${icon("search")}<h3>没有找到术语</h3><p>试试“删失”“人时”“混杂”“管道”或“数据框”。</p></div>`;
   const count = document.getElementById("glossary-count");
   if (count) count.textContent = `找到 ${terms.length} 个术语`;
 }
@@ -103611,14 +104274,14 @@ function renderGlossary() {
     <div class="page">
       <header class="page-header">
         <span class="eyebrow">专业术语</span>
-        <h1 class="page-title">R 专业术语词典</h1>
-        <p class="page-subtitle">环境、程序包、管道、对象、因子、模型和随机种子等词，先给出日常类比，再说明它在 R 里到底指什么。</p>
+        <h1 class="page-title">R、统计与流行病学术语词典</h1>
+        <p class="page-subtitle">从程序包、管道和模型对象，到发病率、删失、风险比、混杂与偏倚。每个词先说明它回答什么问题，再给出日常类比和使用边界。</p>
       </header>
       <div class="toolbar glossary-toolbar">
         <label class="toolbar-search">
           <span class="sr-only">搜索专业术语</span>
           ${icon("search")}
-          <input id="glossary-search" type="search" value="${escapeHtml(state.glossaryQuery)}" placeholder="搜索：环境、管道、对象、缺失值…">
+          <input id="glossary-search" type="search" value="${escapeHtml(state.glossaryQuery)}" placeholder="搜索：删失、人时、混杂、管道、缺失值…">
         </label>
       </div>
       <div class="filter-row" aria-label="按术语类别筛选">
