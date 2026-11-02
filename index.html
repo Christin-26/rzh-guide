@@ -65305,6 +65305,24 @@ window.RZH_GLOSSARY.push(
       pattern.default = "";
     }
   });
+  if (parameterKb["as.numeric"]) {
+    parameterKb["as.numeric"].parameters = [
+      {
+        name: "x",
+        default: "",
+        required: true,
+        defaultKnown: false,
+        kind: "input",
+      },
+      {
+        name: "...",
+        default: "",
+        required: false,
+        defaultKnown: false,
+        kind: "dots",
+      },
+    ];
+  }
   const parameterOverrides = window.RZH_PARAMETER_OVERRIDES ||= { functions: {}, names: {} };
   parameterOverrides.functions ||= {};
   parameterOverrides.functions.str_extract = {
@@ -107279,9 +107297,9 @@ function guideFunctionMarkup(functionId) {
       </div>
       <p>${escapeHtml(item.summary)}</p>
       <dl>
-        ${resolvedFunctionParameters(item).slice(0, 6).map((parameter) => `
-          <div><dt>${escapeHtml(parameter[0])}</dt><dd><span>${escapeHtml(parameter[2])}</span>${parameterCellMarkup(item, parameter)}</dd></div>
-        `).join("")}
+        ${resolvedFunctionParameters(item).slice(0, 6).map(([name, description, usage]) => {
+          return `<div><dt>${escapeHtml(name)}</dt><dd><span>${escapeHtml(usage)}</span>${escapeHtml(description)}</dd></div>`;
+        }).join("")}
       </dl>
       <a class="text-link" href="#function/${item.id}">查看完整参数与示例 ${icon("arrow-right")}</a>
     </article>
