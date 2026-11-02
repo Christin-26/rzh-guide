@@ -8150,6 +8150,10 @@ body {
   animation: route-enter 280ms cubic-bezier(.2, .8, .2, 1) both;
 }
 
+.page:not(.page-enter) {
+  animation: route-enter 240ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
 @keyframes route-enter {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -8163,6 +8167,10 @@ body {
   box-shadow: var(--glass-inner);
   -webkit-backdrop-filter: blur(28px) saturate(150%);
   backdrop-filter: blur(28px) saturate(150%);
+}
+
+.nav-item.active {
+  box-shadow: var(--glass-inner), 0 6px 18px color-mix(in srgb, var(--brand) 12%, transparent);
 }
 
 .sidebar {
