@@ -6011,6 +6011,35 @@ html[data-theme="dark"] .theme-icon-sun {
   line-height: 1.85;
 }
 
+.guide-references ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-references li {
+  display: grid;
+  gap: 3px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  background: var(--surface-subtle);
+}
+
+.guide-references a {
+  color: var(--brand);
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+.guide-references li span {
+  color: var(--muted);
+  font-size: 10.5px;
+  line-height: 1.65;
+}
+
 .guide-aside {
   position: sticky;
   top: calc(var(--topbar) + 18px);
@@ -65396,6 +65425,2650 @@ window.RZH_GLOSSARY.push(
 
 </script>
   <script>
+(() => {
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const categoryMap = new Map(categories.map((item) => [item.id, item]));
+
+  if (categoryMap.has("entry")) {
+    Object.assign(categoryMap.get("entry"), {
+      title: "数据导入与导出",
+      subtitle: "CSV、Excel、SPSS、Stata 与 RDS",
+      detail: "从文件路径、编码和列类型开始，完成单文件读取、工作簿读取、批量导入、类型核对和安全导出。目标不是“把文件读进来”，而是得到一份可以继续分析、也能追溯来源的数据表。",
+      items: [
+        { title: "从原始文件到分析表", note: "格式选择、读取、类型核对和导出", href: "#guide/data/data-import-export", level: "入门" },
+        { title: "readr 与 readxl 速查", note: "CSV、Excel、工作表、区域和列类型", href: "#function/read_csv", level: "入门" },
+        { title: "haven 导入问卷数据", note: "SPSS、Stata 标签与缺失值", href: "#function/read_sav", level: "进阶" },
+        { title: "批量导入多个文件", note: "文件名、来源列和 purrr 批量读取", href: "#guide/text/purrr-iteration", level: "进阶" },
+      ],
+    });
+  }
+
+  if (categoryMap.has("cleaning")) {
+    Object.assign(categoryMap.get("cleaning"), {
+      title: "数据清洗",
+      subtitle: "结构、缺失、重复、异常与一致性",
+      detail: "把清洗拆成可以复核的步骤：先检查结构和主键，再处理列名、空行空列、缺失、重复、异常与逻辑矛盾。每一步记录规则、行数变化和保留原因。",
+      items: [
+        { title: "系统数据清洗流程", note: "结构、主键、缺失、重复和异常", href: "#guide/data/data-cleaning", level: "入门" },
+        { title: "缺失值处理流程", note: "先理解机制，再选择方法", href: "#workflows", workflow: "missing-values", level: "进阶" },
+        { title: "异常值检查流程", note: "统计异常与研究上不合理", href: "#workflows", workflow: "outliers", level: "进阶" },
+        { title: "多重插补入门", note: "MAR、插补、诊断与 Rubin 合并", href: "#guide/advanced/multiple-imputation", level: "高阶" },
+      ],
+    });
+  }
+
+  if (!categoryMap.has("transform")) {
+    const transformCategory = {
+      id: "transform",
+      title: "数据转换",
+      subtitle: "筛选、派生、连接、长宽与类型",
+      audience: "数据已经比较干净，但需要从原始字段构造分析变量、合并多张表或改成模型要求的结构。",
+      detail: "围绕一行代表什么、每次操作改变多少行和列来学习 dplyr、tidyr 和 forcats。重点是操作后仍能解释变量含义、参照组和连接覆盖情况。",
+      icon: "workflow",
+      items: [
+        { title: "从原始变量到分析数据", note: "筛选、派生、汇总、连接与长宽转换", href: "#guide/data/data-transformation", level: "入门" },
+        { title: "因子与参照组", note: "水平、标签、排序和模型参照", href: "#function/factor", level: "进阶" },
+        { title: "长宽转换", note: "重复测量与问卷条目的结构重塑", href: "#function/pivot_longer", level: "进阶" },
+        { title: "文本与日期清洗", note: "字符串、日期和正则表达式", href: "#guide/text/string-basics", level: "进阶" },
+      ],
+    };
+    categories.push(transformCategory);
+  }
+
+  const desiredOrder = ["quick", "system", "entry", "cleaning", "transform", "control", "regex", "datetime", "visualization", "parameters", "methods", "models", "advanced", "bayesian", "reviews", "ml", "reporting"];
+  categories.sort((a, b) => {
+    const ai = desiredOrder.indexOf(a.id);
+    const bi = desiredOrder.indexOf(b.id);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
+
+  const importReferences = [
+    { title: "readr：读取与写出文本数据", url: "https://readr.tidyverse.org/", note: "CSV、TSV、分隔文本、列类型与写出。" },
+    { title: "readxl：读取 Excel 工作簿", url: "https://readxl.tidyverse.org/", note: "工作表、区域、列类型和日期。" },
+    { title: "haven：SPSS、Stata 与 SAS 文件", url: "https://haven.tidyverse.org/", note: "带标签数据和统计软件格式。" },
+  ];
+  const cleaningReferences = [
+    { title: "janitor：表格清洗与列联表", url: "https://sfirke.github.io/janitor/", note: "列名、空行空列、重复和制表工具。" },
+    { title: "tidyr：整洁数据与缺失值", url: "https://tidyr.tidyverse.org/", note: "长宽转换、嵌套、缺失值和完整化。" },
+    { title: "dplyr：数据操作语法", url: "https://dplyr.tidyverse.org/", note: "筛选、派生、分组、连接和行级操作。" },
+  ];
+  const transformReferences = [
+    { title: "dplyr：按行、列和组操作", url: "https://dplyr.tidyverse.org/", note: "连接、分组汇总、across 和 rowwise。" },
+    { title: "tidyr：长宽转换", url: "https://tidyr.tidyverse.org/", note: "pivot_longer、pivot_wider、嵌套与展开。" },
+    { title: "forcats：因子处理", url: "https://forcats.tidyverse.org/", note: "水平排序、合并、重命名与参照组。" },
+  ];
+
+  window.RZH_GUIDES.push(
+    {
+      type: "data",
+      id: "data-import-export",
+      typeLabel: "数据流程",
+      minutes: 30,
+      title: "从原始文件到分析表",
+      aliases: ["数据导入", "数据导出", "readr", "readxl"],
+      hero: "先确认文件是什么，再把类型、编码和缺失值一起核对",
+      audience: "手里有 CSV、Excel、SPSS 或 Stata 文件，希望安全读入 R 并导出可分析副本。",
+      overview: "导入不是选一个函数就结束。文件格式决定读取工具，列类型决定后续计算，编码决定中文能否正确显示，缺失编码决定分析样本。可靠流程会保留原始文件，先读取少量数据查看结构，再明确列类型、缺失规则和导出目的。",
+      features: ["分辨 CSV、Excel、SPSS、Stata 与 RDS 的用途。", "在读取阶段指定关键列类型。", "处理中文编码、前导零、工作表与区域。", "导出便于交换的 CSV 或可完整恢复对象的 RDS。"],
+      concepts: [
+        { term: "原始区与输出区", explain: "raw/ 保存收到的原始文件且不覆盖；output/ 保存清洗数据和结果。所有脚本从原始文件重新运行。" },
+        { term: "列类型", explain: "年龄、日期、编号和分类变量在 R 中应分别使用适合的类型。类型猜错会让排序、计算和连接出现隐蔽错误。" },
+        { term: "编码", explain: "UTF-8 是较通用的文本编码。中文乱码不是“显示小问题”，应回到文件编码和读取设置。" },
+        { term: "缺失编码", explain: "空白、NA、99、-1、“拒答”是否表示缺失，必须由数据字典决定，不能靠函数自动猜测。" },
+        { term: "工作表与区域", explain: "Excel 文件可包含多个 sheet 和说明行。读取前必须明确哪一行是表头、哪些单元格属于数据。" },
+        { term: "RDS", explain: "RDS 能较完整保存 R 对象和类型，适合 R 内部存档；CSV 更适合跨软件交换，但会丢失部分类型信息。" },
+      ],
+      comparison: {
+        title: "常见数据格式怎么选",
+        note: "读取函数和保存函数要成对考虑。导出后再读回一次，才能确认类型与内容没有丢失。",
+        headers: ["格式", "常用读取", "常用写出", "适合用途", "主要风险"],
+        rows: [
+          ["CSV", "read_csv()", "write_csv()", "跨软件交换和长期查看", "编码、分隔符、类型和精度"],
+          ["Excel", "read_excel()", "writexl::write_xlsx()", "带工作表或人工查看的数据", "合并单元格、说明行、日期和列类型"],
+          ["SPSS", "read_sav()", "write_sav()", "带变量标签的问卷数据", "标签、缺失码和用户缺失值"],
+          ["Stata", "read_dta()", "write_dta()", "流行病学数据交换", "标签、日期和编码版本"],
+          ["RDS", "readRDS()", "saveRDS()", "R 内部保存对象", "其他软件不能直接读取"],
+        ],
+      },
+      whenUse: ["第一次把数据读进 R。", "多个文件字段相似，需要批量读取。", "Excel 有多个工作表或说明行。", "准备把清洗后的数据交给合作者或进入论文分析。"],
+      dataShape: ["确认一行代表一个人、一次随访还是一份处方。", "先看前几十行、总行数、列名和列类型。", "核对唯一编号、日期范围、分类取值和缺失编码。", "原始文件只读，分析副本另存输出目录。"],
+      steps: [
+        {
+          title: "先建立输入与输出目录",
+          text: "把原始文件夹和分析输出分开。使用项目相对路径，避免换电脑后路径失效。",
+          code: `library(readr)\nraw_path <- "raw/survey.csv"\nout_path <- "output/analysis_data.csv"\nfile.exists(raw_path)`,
+          explain: "第一行给路径命名，第二行指定输出位置；file.exists() 在真正读取前检查文件是否存在。",
+        },
+        {
+          title: "读取少量数据并声明关键列类型",
+          text: "不要只看文件能否打开。先读少量记录，再对 ID、日期和分类变量指定 col_types。",
+          code: `preview <- read_csv(raw_path, n_max = 20, show_col_types = FALSE)\nstr(preview)\ndat <- read_csv(\n  raw_path,\n  col_types = cols(\n    id = col_character(),\n    enroll_date = col_date(format = "%Y-%m-%d"),\n    age = col_double()\n  ),\n  na = c("", "NA", "未知")\n)`,
+          explain: "n_max 先读 20 行检查；col_types 防止 ID 丢前导零或日期被当字符；na 明确哪些文字表示缺失。",
+        },
+        {
+          title: "Excel 先看工作表与区域",
+          text: "读 Excel 前先列出 sheet；有说明行时用 range 或 skip 明确数据起点。",
+          code: `library(readxl)\nexcel_sheets("raw/survey.xlsx")\ndat <- read_excel(\n  "raw/survey.xlsx",\n  sheet = "raw",\n  range = "A3:H120",\n  na = c("", "NA")\n)`,
+          explain: "excel_sheets() 返回全部工作表名称；range 指定读取区域，防止把标题和备注当成数据。",
+        },
+        {
+          title: "导入后做第一轮完整性检查",
+          text: "检查行数、列名、列类型、ID 重复和关键变量范围，再进入清洗。",
+          code: `library(dplyr)\ndat |>\n  summarise(rows = n(), duplicate_id = sum(duplicated(id))) |>\n  print()\nrange(dat$age, na.rm = TRUE)\nsummary(dat$enroll_date)`,
+          explain: "n() 返回行数；duplicated(id) 标记重复 ID；range() 和 summary() 帮助发现单位或编码异常。",
+        },
+        {
+          title: "批量导入多个文件并保留来源",
+          text: "文件名列表、读取函数和结果合并应拆开写。保留 source_file，出现异常时才能回查。",
+          code: `library(purrr)\nfiles <- list.files("raw/cohorts", pattern = "\\\\.csv$", full.names = TRUE)\ncohort <- map(files, \\(path) {\n  read_csv(path, show_col_types = FALSE) |>\n    mutate(source_file = basename(path))\n}) |>\n  list_rbind()`,
+          explain: "map() 逐个读取文件，mutate() 记录来源，list_rbind() 合并为一张表。应检查每个文件列类型是否一致。",
+        },
+        {
+          title: "导出并向回读取验证",
+          text: "CSV 用于交换，RDS 用于保留 R 对象。导出后重新读取并核对行数、关键 ID 和变量类型。",
+          code: `write_csv(dat, out_path, na = "NA")\nsaveRDS(dat, "output/analysis_data.rds")\ncheck <- read_csv(out_path, show_col_types = FALSE)\nsetequal(check$id, dat$id)`,
+          explain: "write_csv() 不写行名；setequal() 检查两边 ID 集合是否一致。正式交付还应检查行数和列类型。",
+        },
+      ],
+      functions: ["read_csv", "read_tsv", "read_delim", "read_excel", "read_sav", "read_dta", "write_csv", "write_sav", "write_dta", "saveRDS", "readRDS", "map", "list_rbind"],
+      conditions: ["先确认文件格式、编码、表头和数据范围。", "原始文件只读，分析数据写入独立输出目录。", "关键 ID、日期、分类变量和缺失码必须显式核对。", "导出后重新读取验证，不能只确认写出时没有报错。"],
+      interpret: "“读取成功”只表示 R 找到了文件并生成了一个对象。真正合格的数据导入还要通过类型、主键、范围、缺失和来源一致性检查。",
+      readingNotes: ["tibble 仍可转换为 data.frame；大多数分析函数都可直接处理。", "read_csv() 不把字符自动转为因子，这通常更安全。", "RDS 适合保存模型或复杂列表，CSV 不适合完整保存这些对象。"],
+      pitfalls: ["直接覆盖原始文件。", "让 ID、邮编或床号自动变成数值而丢失前导零。", "把 Excel 的说明行当成表头。", "把空白、99 和“未知”混成未记录的 NA。"],
+      practice: "准备一个含说明行、中文编码、重复 ID 和特殊缺失码的模拟数据文件，完成读取、类型声明、完整性检查和 CSV/RDS 双格式导出。",
+      references: importReferences,
+    },
+    {
+      type: "data",
+      id: "data-cleaning",
+      typeLabel: "数据清洗",
+      minutes: 36,
+      title: "系统数据清洗流程",
+      aliases: ["数据清洗", "janitor", "缺失值与重复"],
+      hero: "先找问题和记录规则，再决定删、改还是保留",
+      audience: "数据能读进 R，但列名混乱、有空行空列、重复记录、缺失码和明显不合理值。",
+      overview: "数据清洗是对原始数据做可解释、可追踪的修改。先检查结构和主键，再清理列名与空行空列，逐列检查缺失和合法范围，最后根据研究定义处理重复和异常。任何删除或修改都应留下规则、数量与原因。",
+      features: ["规范列名、删除全空行列和常数变量。", "识别缺失码、缺失模式与关键字段缺失。", "依据主键判断重复记录。", "区分数据错误、统计异常和真实极端值。"],
+      concepts: [
+        { term: "主键", explain: "能唯一定位一条记录的变量或变量组合，例如 patient_id 或 patient_id + visit_date。" },
+        { term: "缺失与非法值", explain: "NA 表示缺失；超出允许范围的值可能是录入错误；两者不能混为一谈。" },
+        { term: "重复记录", explain: "重复行可能是同一记录被录入两次，也可能是同一人多次随访。必须先定义主键再判断。" },
+        { term: "审计列", explain: "新增变量记录是否缺失、是否异常、由哪条规则修改，便于复核。" },
+        { term: "异常值", explain: "统计上远离主体的值不一定是错误。医学中的极端值可能正是研究对象，必须结合单位和业务范围。" },
+      ],
+      comparison: {
+        title: "数据问题与第一反应",
+        note: "“删除”通常不是第一步。先确认含义，再选择保留、修正、标记或纳入敏感性分析。",
+        headers: ["发现问题", "先检查", "常见处理", "不能直接做什么"],
+        rows: [
+          ["列名含空格与括号", "是否重复或有隐藏空格", "clean_names() 统一", "未记录就覆盖原表"],
+          ["全空行或全空列", "是否来自导出格式", "remove_empty()", "不检查就删除非空边缘列"],
+          ["重复 ID", "主键是一列还是组合键", "get_dupes() 后人工核对", "把所有重复行机械去重"],
+          ["关键字段缺失", "缺失机制和有效样本", "标记、完整案例分析或插补", "只加 na.rm=TRUE 当已处理"],
+          ["数值超出范围", "单位、录入、特殊编码", "标记并回查原文", "按 3 倍 IQR 机械删除"],
+        ],
+      },
+      whenUse: ["数据刚导入，尚未开始分析。", "多来源数据合并前需要统一变量。", "准备多重插补、建模或制表。", "需要向老师说明样本如何从原始数据得到。"],
+      dataShape: ["记录原始行数和列数。", "明确主键与允许重复规则。", "列出每个关键变量的单位、合法范围与缺失码。", "每一步清洗后重新统计行数和关键分布。"],
+      steps: [
+        {
+          title: "建立清洗起点和主键",
+          text: "保存原始行数，并确认按什么变量定义同一条记录。",
+          code: `library(dplyr)\nraw <- readr::read_csv("raw/survey.csv", show_col_types = FALSE)\nlineage <- tibble(step = "raw", rows = nrow(raw), columns = ncol(raw))\nraw |> count(patient_id) |> filter(n > 1)`,
+          explain: "lineage 记录每一步行数和列数；count() 找出出现多次的 patient_id。",
+        },
+        {
+          title: "统一列名并移除结构性空行空列",
+          text: "先处理明显由导出造成的空列和空行，再进行变量级检查。",
+          code: `library(janitor)\nclean <- raw |>\n  clean_names() |>\n  remove_empty(which = c("rows", "cols")) |> \n  remove_constant(na.rm = TRUE)\nlineage <- add_row(lineage, step = "structure", rows = nrow(clean), columns = ncol(clean))`,
+          explain: "clean_names() 统一命名；remove_empty() 删除完全空的行或列；remove_constant() 删除只有一个常数值的列。",
+        },
+        {
+          title: "逐列检查缺失而不是直接删行",
+          text: "先统计每个关键变量的缺失数、比例和组合模式，再依据研究目的处理。",
+          code: `missing_check <- clean |>\n  summarise(across(c(age, sex, bmi, outcome), ~sum(is.na(.x)))) |>\n  tidyr::pivot_longer(everything(), names_to = "variable", values_to = "n_missing") |>\n  mutate(percent = round(100 * n_missing / nrow(clean), 1))\nmissing_check`,
+          explain: "across() 对多个列应用同一统计；长表更容易查看各变量缺失比例。",
+        },
+        {
+          title: "检查合法范围与逻辑矛盾",
+          text: "按数据字典定义范围。异常值先标记并回查，不立即删除。",
+          code: `checked <- clean |>\n  mutate(\n    age_invalid = !is.na(age) & (age < 18 | age > 110),\n    bmi_invalid = !is.na(bmi) & (bmi < 10 | bmi > 80),\n    date_invalid = !is.na(event_date) & !is.na(enroll_date) & event_date < enroll_date\n  )\nchecked |> summarise(across(ends_with("_invalid"), sum))`,
+          explain: "ends_with(\"_invalid\") 汇总各检查列；范围只是需要复核的阈值，不等同于诊断或自动删除规则。",
+        },
+        {
+          title: "按组合主键检查重复",
+          text: "一个人多次随访不是重复；同一患者同一随访日出现多次才可能重复。",
+          code: `checked |>\n  get_dupes(patient_id, visit_date) |>\n  arrange(patient_id, visit_date)`,
+          explain: "get_dupes() 一次显示全部重复组合和重复次数。保留哪条应由核对结果和研究规则决定。",
+        },
+        {
+          title: "输出清洗数据与清洗日志",
+          text: "保留原变量、检查标记和规则版本；分析时再决定哪些记录进入主分析。",
+          code: `write_csv(checked, "output/clean_checked.csv", na = "NA")\nwrite_csv(lineage, "output/cleaning_lineage.csv")\nchecked |>\n  summarise(rows = n(), any_invalid = sum(if_any(ends_with("_invalid"))))`,
+          explain: "checked 数据保留异常标记，便于比较“标记后分析”和“排除异常后”的敏感性分析。",
+        },
+      ],
+      functions: ["clean_names", "remove_empty", "remove_constant", "get_dupes", "tabyl", "is.na", "drop_na", "replace_na", "complete", "count", "across", "if_any", "write_csv"],
+      conditions: ["主键和合法范围来自数据字典，而不是看过结果后决定。", "原始数据保持不变。", "删除、替换和插补规则必须记录。", "清洗后的行数变化要能逐项解释。"],
+      interpret: "清洗后的数据更整齐，不代表更真实。任何自动处理都可能改变研究样本和关联方向，因此必须保留原值、审计列与敏感性分析能力。",
+      readingNotes: ["drop_na() 删除含缺失的行，可能显著改变样本。", "replace_na() 只适合“缺失确实代表某个已知值”的场景。", "tabyl() 可快速查看分类变量及缺失。"],
+      pitfalls: ["先看结果再决定异常值标准。", "把 patient_id 当普通数值并做均值。", "未定义主键就全面去重。", "清洗数据覆盖 raw 文件。"],
+      practice: "使用一份含重复 ID、空列、非法范围和三成缺失的模拟数据，完成主键检查、缺失统计、异常标记、清洗日志和敏感性分析数据集。",
+      references: cleaningReferences,
+    },
+    {
+      type: "data",
+      id: "data-transformation",
+      typeLabel: "数据转换",
+      minutes: 35,
+      title: "从原始变量到分析数据",
+      aliases: ["数据整理", "dplyr", "tidyr", "数据转换"],
+      hero: "让每一行、每一列和参照组都符合分析问题",
+      audience: "会简单筛选和新增列，但遇到分组汇总、连接多表、长宽转换、因子参照组和重复测量时容易混乱。",
+      overview: "数据转换是把原始字段改造成模型和图形能够使用的结构。dplyr 负责行、列、分组与连接，tidyr 负责长宽结构和嵌套，forcats 负责分类变量水平。每次转换都要回答：一行代表什么、哪些变量被改、行数为何变化、参照组是谁。",
+      features: ["筛选研究人群并派生分析变量。", "分组计算比例、均数和汇总表。", "按共同主键连接多张表并检查覆盖。", "在宽表和长表之间转换重复测量或问卷条目。"],
+      concepts: [
+        { term: "一行一观测", explain: "不同分析可能需要不同粒度：一人一行、一人一次随访一行或一人一份处方一行。转换前先确定粒度。" },
+        { term: "派生变量", explain: "用已有列计算新列，例如 BMI、年龄组、随访天数和综合分数。公式与单位必须写清。" },
+        { term: "连接键", explain: "left_join() 等函数用共同列匹配两张表。键必须唯一或明确多对多关系，否则行数会膨胀。" },
+        { term: "长表", explain: "每个测量值单独一行，适合 ggplot2、混合模型和重复测量。通常包含 id、time、variable、value。" },
+        { term: "宽表", explain: "每个变量或时间点单独一列，适合人工查看、制表和部分模型格式。" },
+        { term: "因子水平", explain: "分类变量的水平和顺序决定排序、分组与模型参照组。参照组不是自动无偏的选择。" },
+      ],
+      comparison: {
+        title: "常用数据转换任务",
+        note: "先确定目标结构，再组合少量“动词”函数。不要把所有操作塞进一条无法检查的长管道。",
+        headers: ["目标", "常用函数", "结果", "必须检查"],
+        rows: [
+          ["选择分析人群", "filter()", "保留符合条件的人/次", "纳排规则与剩余人数"],
+          ["选择或重命名变量", "select() / rename()", "只保留分析字段", "是否漏掉主键和分层变量"],
+          ["派生变量", "mutate()", "新增或修改列", "单位、公式、缺失传播"],
+          ["分组汇总", "group_by() / summarise()", "每组一行", "每组样本量和缺失数"],
+          ["连接表", "left_join() / full_join()", "合并两张表", "键重复、匹配率和行数变化"],
+          ["宽转长", "pivot_longer()", "测量值进入多行", "列名模式、值类型和缺失"],
+          ["长转宽", "pivot_wider()", "类别成为多列", "唯一键和列顺序"],
+        ],
+      },
+      whenUse: ["需要计算衍生变量或研究分组。", "需要把多个数据文件按 ID 或日期连接。", "问卷条目或重复测量需要从宽表变为长表。", "需要明确模型参照组和分类变量排序。"],
+      dataShape: ["明确目标数据的一行代表什么。", "保留 patient_id 等稳定主键。", "连接前检查连接键是否唯一。", "转换后比较行数、列数和关键分组人数。"],
+      steps: [
+        {
+          title: "定义目标粒度和分析人群",
+          text: "先用一段文字写清一行代表谁，再筛选、选择列。",
+          code: `library(dplyr)\nanalysis <- clean |>\n  filter(age >= 18, !is.na(outcome)) |>\n  select(patient_id, age, sex, bmi, exposure, outcome) |>\n  mutate(age_group = case_when(\n    age < 45 ~ "18-44",\n    age < 65 ~ "45-64",\n    TRUE ~ "65+"\n  ))`,
+          explain: "filter() 确定研究人群，select() 保留变量，case_when() 从上到下判断并创建有序分组。",
+        },
+        {
+          title: "分组汇总前先保留分母",
+          text: "比例和均值必须连同每组人数一起计算。",
+          code: `analysis |>\n  summarise(\n    n = n(),\n    events = sum(outcome == 1, na.rm = TRUE),\n    mean_bmi = mean(bmi, na.rm = TRUE),\n    .by = exposure\n  ) |>\n  mutate(event_pct = 100 * events / n)`,
+          explain: "summarise(.by=) 按暴露组输出一行；先保留 n 和 events，再计算百分比，避免只有比例而不知道分母。",
+        },
+        {
+          title: "连接表并核对行数变化",
+          text: "连接前检查两表主键。左连接不保证行数不变，右表键重复会复制行。",
+          code: `visits <- readRDS("data/visits.rds")\njoined <- analysis |>\n  left_join(visits, by = join_by(patient_id, visit_date))\nstopifnot(nrow(joined) == nrow(analysis))`,
+          explain: "join_by() 明确连接键；stopifnot() 在行数意外增加时立即停止，迫使检查重复键。",
+        },
+        {
+          title: "宽表转长表用于重复测量",
+          text: "把多个随访列合并成长表，保留每行的时间和测量值。",
+          code: `long <- wide |>\n  pivot_longer(\n    cols = starts_with("score_"),\n    names_to = "time",\n    names_prefix = "score_",\n    values_to = "score"\n  )`,
+          explain: "starts_with() 选择重复测量列；names_prefix 删除统一前缀；time 和 score 分别保存时间标签和数值。",
+        },
+        {
+          title: "固定分类变量参照组",
+          text: "模型参照组和图中顺序应来自研究设计，而不是字母排序。",
+          code: `library(forcats)\nanalysis <- analysis |>\n  mutate(exposure = fct_relevel(exposure, "Control"))`,
+          explain: "fct_relevel() 把 Control 放到第一个水平，通常成为模型参照组。更改顺序会改变回归系数表达，并不改变原始观察。",
+        },
+        {
+          title: "保存分析数据字典",
+          text: "把变量名、定义、单位、缺失规则、因子水平和派生公式与数据一起保存。",
+          code: `write_csv(analysis, "output/analysis_data.csv", na = "NA")\nwriteLines(c(\n  "bmi = weight_kg / (height_m^2)",\n  "exposure reference = Control",\n  "analysis population = age >= 18 and outcome not missing"\n), "output/data_dictionary_notes.txt")`,
+          explain: "数据文件本身不会记录公式和设计决定；配套的说明文件是可重复分析的一部分。",
+        },
+      ],
+      functions: ["filter", "select", "rename", "mutate", "case_when", "if_else", "group_by", "summarise", "left_join", "full_join", "anti_join", "join_by", "pivot_longer", "pivot_wider", "unnest_wider", "unnest_longer", "rowwise", "factor", "fct_relevel", "fct_reorder", "fct_recode", "fct_lump"],
+      conditions: ["转换前明确目标数据粒度和研究人群。", "连接键必须检查唯一性和匹配率。", "派生公式、单位、分类水平和参照组写入数据字典。", "每次关键转换后核对行数、人数和关键分布。"],
+      interpret: "数据转换不改变观察事实，但会改变观察的组织方式和模型看到的参照组。相同数据换一个参照组或长宽结构，参数表示可能改变。",
+      readingNotes: ["left_join() 可能因右表重复键而增加行数。", "pivot_longer() 不是缺失值删除，原缺失仍会保留。", "group_by() 与 summarise(.by=) 都能分组，但作用域不同。"],
+      pitfalls: ["没有研究人群定义就连续 filter()。", "连接后不检查行数和匹配率。", "长宽转换后重复计数。", "让 factor 按字母顺序自动选参照组。"],
+      practice: "把一张患者基线宽表与随访表按 patient_id 连接，检查重复键；再把三次随访分数转为长表，并写出每一步的行数变化。",
+      references: transformReferences,
+    },
+  );
+
+  const modules = window.RZH_COURSE_MODULES || [];
+  const existingIds = new Set(modules.map((item) => item.id));
+  const dataModule = {
+    id: "r-data-pipeline",
+    title: "从文件到分析表",
+    subtitle: "导入、类型检查、清洗、转换与导出",
+    minutes: 28,
+    unit: "data",
+    outcome: "能从原始数据文件生成一份有数据字典、可追溯清洗过程和完整类型的分析数据。",
+    sections: [
+      {
+        heading: "先定义输入和输出",
+        text: "原始文件只读，清洗数据和结果写入 output。先写清一行代表什么、主键是什么、目标变量和纳排规则。",
+      },
+      {
+        heading: "读取后先检查",
+        text: "核对行数、列名、列类型、唯一编号、日期范围和缺失编码。ID 与前导零应读取为字符。",
+      },
+      {
+        heading: "清洗与转换分开记录",
+        text: "先处理结构和明显错误，再创建派生变量、连接表格和转换长宽。每一步记录行数与人数变化。",
+      },
+      {
+        heading: "导出并回读验证",
+        text: "CSV 用于交换，RDS 用于保留对象。导出后读回检查行数、主键和关键变量。",
+      },
+    ],
+    code: `library(readr)\nlibrary(dplyr)\nlibrary(janitor)\n\nraw <- read_csv("raw/survey.csv", show_col_types = FALSE)\nclean <- raw |>\n  clean_names() |>\n  remove_empty(c("rows", "cols"))\n\nanalysis <- clean |>\n  filter(age >= 18) |>\n  mutate(bmi = weight / (height / 100)^2)\n\nwrite_csv(analysis, "output/analysis_data.csv", na = "NA")\nsaveRDS(analysis, "output/analysis_data.rds")`,
+    functions: ["read_csv", "clean_names", "remove_empty", "filter", "mutate", "write_csv", "saveRDS"],
+    practice: "选择自己的一份脱敏数据，从读取开始完成结构检查、清洗日志、派生变量和导出回读。",
+  };
+  if (!existingIds.has(dataModule.id)) {
+    const index = modules.findIndex((item) => item.id === "r-reshape");
+    modules.splice(index >= 0 ? index + 1 : modules.length, 0, dataModule);
+  }
+  modules.forEach((module, index) => {
+    module.number = index + 1;
+  });
+
+  if (categoryMap.has("system")) {
+    categoryMap.get("system").detail = `从 R 与 RStudio 入门开始，依次学习语法、数据结构、数据导入与清洗、数据转换、控制流、文本处理、探索性分析、可视化、统计建模、贝叶斯和机器学习，共 ${modules.length} 节系统课。`;
+  }
+})();
+
+</script>
+  <script>
+(() => {
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const categoryMap = new Map(categories.map((item) => [item.id, item]));
+
+  if (!categoryMap.has("advanced")) {
+    categories.push({
+      id: "advanced",
+      title: "高级建模",
+      typeLabel: "高级建模",
+      subtitle: "非线性、层级、潜变量与缺失数据",
+      audience: "基础回归已经掌握，研究问题需要处理非线性、重复测量、潜变量、分类亚组或大量缺失。",
+      detail: "高级模型不是更复杂的公式竞赛。每节先说明模型回答什么、数据要满足什么，再完成拟合、诊断、可视化和结果解释。",
+      icon: "scale",
+      items: [
+        { title: "广义可加模型 GAM", note: "用平滑函数描述非线性关系", href: "#guide/advanced/gam", level: "高阶" },
+        { title: "结构方程模型 SEM", note: "测量模型、结构路径与拟合指标", href: "#guide/advanced/sem", level: "高阶" },
+        { title: "潜类别分析 LCA", note: "从分类指标识别未观测亚组", href: "#guide/advanced/latent-class", level: "高阶" },
+        { title: "多重插补", note: "缺失机制、插补模型与 Rubin 合并", href: "#guide/advanced/multiple-imputation", level: "高阶" },
+        { title: "纵向与聚类结局", note: "LMM、GEE 与总体平均效应", href: "#guide/advanced/longitudinal-models", level: "高阶" },
+        { title: "因果推断设计", note: "目标试验、混杂、权重与敏感性", href: "#guide/advanced/causal-inference", level: "应用" },
+        { title: "线性混合模型 LMM", note: "重复测量与个体随机效应", href: "#guide/model/lmm", level: "进阶" },
+        { title: "主成分分析 PCA", note: "压缩相关变量并检查结构", href: "#guide/model/pca", level: "进阶" },
+        { title: "因子分析", note: "量表的潜在维度", href: "#guide/model/factor-analysis", level: "进阶" },
+        { title: "聚类分析", note: "探索相似对象并检查稳定性", href: "#guide/model/clustering", level: "进阶" },
+      ],
+    });
+  }
+
+  if (!categoryMap.has("bayesian")) {
+    categories.push({
+      id: "bayesian",
+      title: "贝叶斯统计",
+      typeLabel: "Bayesian",
+      subtitle: "先验、后验与不确定性",
+      audience: "希望理解贝叶斯推断，或在小样本、复杂层级模型中使用先验和概率化不确定性。",
+      detail: "从贝叶斯定理和可信区间开始，再进入 brms/rstanarm 回归。重点掌握先验检查、MCMC 诊断、后验预测检查和先验敏感性。",
+      icon: "sparkles",
+      items: [
+        { title: "贝叶斯思维与工作流", note: "先验、似然、后验和诊断", href: "#guide/bayesian/foundations", level: "入门" },
+        { title: "贝叶斯回归", note: "brms、rstanarm、先验与后验检查", href: "#guide/bayesian/regression", level: "高阶" },
+        { title: "常用模型", note: "与频率学派模型和高级层级模型衔接", href: "#guide/model/logistic", level: "应用" },
+      ],
+    });
+  }
+
+  if (!categoryMap.has("reviews")) {
+    categories.push({
+      id: "reviews",
+      title: "综述与证据综合",
+      typeLabel: "证据综合",
+      subtitle: "系统综述、Meta 与证据分级",
+      audience: "准备做 Meta 分析、网状 Meta、范围综述或伞状综述，需要知道方案、检索、偏倚和报告规范。",
+      detail: "先写方案和检索，再提取效应量、评估偏倚、合成证据并解释不确定性。软件能算模型，但不能代替综述设计和研究质量判断。",
+      icon: "database",
+      items: [
+        { title: "证据综合总路线", note: "系统综述、范围综述和伞状综述", href: "#guide/review/evidence-synthesis", level: "入门" },
+        { title: "Meta 分析", note: "效应量、随机效应、异质性与偏倚", href: "#guide/review/meta-analysis", level: "高阶" },
+        { title: "网状 Meta 分析", note: "连通性、传递性、一致性与排序", href: "#guide/review/network-meta", level: "高阶" },
+        { title: "范围综述与伞状综述", note: "PRISMA-ScR、AMSTAR 2 与证据分级", href: "#guide/review/scoping-umbrella", level: "高阶" },
+      ],
+    });
+  }
+
+  const desiredOrder = ["quick", "system", "entry", "cleaning", "transform", "control", "regex", "datetime", "visualization", "parameters", "methods", "models", "advanced", "bayesian", "reviews", "ml", "reporting"];
+  categories.sort((a, b) => {
+    const ai = desiredOrder.indexOf(a.id);
+    const bi = desiredOrder.indexOf(b.id);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
+
+  const ref = (title, url, note) => ({ title, url, note });
+
+  window.RZH_GUIDES.push(
+    {
+      type: "advanced",
+      id: "gam",
+      typeLabel: "高级建模",
+      minutes: 36,
+      title: "广义可加模型 GAM",
+      aliases: ["GAM", "mgcv", "广义可加模型"],
+      hero: "让数据决定曲线弯多少，但由研究者控制允许有多弯",
+      audience: "连续暴露与结局的关系不像直线，需要使用样条或平滑曲线，同时继续调整其他变量。",
+      overview: "GAM 在广义线性模型的基础上，用平滑函数代替部分线性项。它适合年龄、温度、污染暴露或生物标志物等可能非线性的变量。平滑度由基函数维度和惩罚共同控制；曲线越灵活，越需要防止过拟合和外推。",
+      features: ["保留 Logistic、Poisson 等结局分布。", "用平滑项描述非线性暴露效应。", "同时纳入分类变量和其他线性协变量。", "通过偏效应图和预测值表达形状与不确定性。"],
+      concepts: [
+        { term: "平滑项 s()", explain: "表示一个连续变量的平滑函数，例如 s(age)。括号内是变量，不是普通回归斜率。" },
+        { term: "基函数维度 k", explain: "k 限制平滑函数可达到的复杂度。k 太小会欠拟合，k 足够后由惩罚控制有效自由度。" },
+        { term: "有效自由度 EDF", explain: "不是参数个数本身，而是曲线实际弯曲程度的近似。EDF 接近 1 时接近直线。" },
+        { term: "惩罚", explain: "在拟合优度和曲线弯曲程度之间折中，减少锯齿状过拟合。" },
+        { term: "张量积平滑", explain: "te() 或 ti() 用来描述两个连续变量的平滑交互，例如时间和暴露。" },
+        { term: "外推", explain: "数据范围外没有观测支持，再平滑的曲线也可能不可靠。" },
+      ],
+      comparison: {
+        title: "线性项、样条与 GAM 平滑",
+        note: "三者都可能回答暴露与结局的关系，但非线性假设和报告方式不同。",
+        headers: ["方法", "关系假设", "R 表达", "适合问题"],
+        rows: [
+          ["线性项", "每增加一单位效应恒定", "y ~ x", "理论支持近似线性"],
+          ["参数样条", "分段多项式、节点需设定", "y ~ ns(x, df=3)", "节点规则和自由度可预先定义"],
+          ["GAM 平滑", "平滑曲线，惩罚控制复杂度", "y ~ s(x, k=6)", "探索非线性形状并量化不确定性"],
+          ["GAM 交互", "两个连续变量的平滑交互", "y ~ ti(x1, x2)", "暴露效应随另一连续变量变化"],
+        ],
+      },
+      whenUse: ["连续暴露与结局可能非线性。", "需要用图展示调整后的曲线。", "样本量足以支持多个平滑项。", "研究问题关注形状，而不仅是单一系数。"],
+      dataShape: ["连续变量单位和范围清晰。", "结局分布决定 family。", "记录每个平滑项的 k、节点或样条类型。", "检查数据稀疏区域的曲线与置信带。"],
+      steps: [
+        {
+          title: "先画原始关系并检查分布",
+          text: "在建模前查看暴露分布和粗关系，确认极端值、稀疏区间和可能的非线性。",
+          code: `library(mgcv)\nlibrary(ggplot2)\n\nggplot(dat, aes(age, outcome)) +\n  geom_point(alpha = 0.25) +\n  geom_smooth(method = "loess", se = FALSE)`,
+          explain: "散点与平滑线只用于探索。它们没有调整混杂，不能直接当作最终效应。",
+        },
+        {
+          title: "拟合基础 GAM",
+          text: "用 s() 表示非线性项，其余变量仍按普通线性项进入模型。",
+          code: `fit <- gam(\n  outcome ~ s(age, k = 6) + sex + treatment,\n  data = dat,\n  family = gaussian(),\n  method = "REML"\n)\nsummary(fit)`,
+          explain: "s(age,k=6) 允许年龄呈平滑曲线；sex 和 treatment 仍是普通项；method='REML' 用于平滑参数选择。",
+        },
+        {
+          title: "检查基函数维度是否足够",
+          text: "gam.check() 检查残差和 k。若提示 k 不足，应先考虑增加 k，而不是忽略警告。",
+          code: `gam.check(fit)\nconcurvity(fit, full = FALSE)`,
+          explain: "gam.check() 提供残差诊断和基函数检查；concurvity() 检查平滑项之间是否高度重叠，类似非线性共线性。",
+        },
+        {
+          title: "绘制调整后的偏效应",
+          text: "偏效应图表达其他变量保持不变时，平滑项对结局预测的贡献。",
+          code: `plot(fit, pages = 1, shade = TRUE, seWithMean = TRUE)\nnewdat <- data.frame(age = seq(18, 80, 1), sex = "F", treatment = "Control")\npred <- predict(fit, newdat, type = "response", se.fit = TRUE)`,
+          explain: "plot() 快速查看平滑形状；predict() 在明确协变量值时生成可用于报告或绘图的预测。",
+        },
+        {
+          title: "报告形状、范围和不确定性",
+          text: "不要只写“非线性显著”。应说明曲线在哪里上升、平台或下降，稀疏区间是否可信，以及参照点。",
+          code: `# 比较多个暴露水平与参照值的预测差异\nref_age <- 40\nnewdat$contrast <- predict(fit, newdat) - predict(fit, transform(newdat, age = ref_age))\nrange(newdat$contrast)`,
+          explain: "参照值决定曲线如何解释。改变参照年龄会改变差值，但通常不改变整体拟合。",
+        },
+      ],
+      functions: ["gam", "s", "te", "ti", "predict", "summary"],
+      conditions: ["非线性关系有研究问题或探索依据。", "样本量能支持平滑项和协变量。", "k、样条类型和匹配方法记录在分析方案。", "数据范围外不随意外推。"],
+      interpret: "GAM 的 EDF 和曲线形状是证据，不是自动因果结论。需要同时报告模型分布、调整变量、参照值、不确定性区间和稀疏区域。",
+      readingNotes: ["EDF 约等于 1 表示关系接近线性。", "k 是复杂度上限，不直接等于有效自由度。", "偏效应图不一定适合直接比较不同人群的绝对风险。"],
+      pitfalls: ["把 k 调得很高来换更好看的曲线。", "不检查 concurvity 和残差。", "将曲线外推到没有数据的年龄区间。", "只报告 p 值不展示形状。"],
+      practice: "用模拟数据比较线性项、ns() 和 s()，记录三者对同一暴露范围的预测差异，并说明选择依据。",
+      references: [
+        ref("mgcv 官方手册", "https://cran.r-project.org/web/packages/mgcv/mgcv.pdf", "平滑、基函数、k、GAM 诊断与预测。"),
+        ref("Wood：Generalized Additive Models", "https://www.routledge.com/Generalized-Additive-Models-An-Introduction-with-R/Wood/p/book/9781498728331", "GAM 方法和解释的系统教材。"),
+        ref("R 语言实战（第3版）", "https://www.ituring.com.cn/book/2861", "非线性回归与模型解释的入门参考。"),
+      ],
+    },
+    {
+      type: "advanced",
+      id: "sem",
+      typeLabel: "高级建模",
+      minutes: 38,
+      title: "结构方程模型 SEM",
+      aliases: ["SEM", "lavaan", "测量模型", "结构模型"],
+      hero: "先证明潜变量测得像，再讨论潜变量之间的路径",
+      audience: "处理量表、多个相关结局或理论路径模型，希望同时检验测量结构和结构关系。",
+      overview: "SEM 由测量模型和结构模型组成。测量模型说明题目如何反映潜变量，结构模型说明潜变量或观测变量之间的关系。模型必须有理论和识别条件，拟合指数只是支持或质疑模型的证据，不能证明因果。",
+      features: ["同时处理测量误差与潜变量。", "检验因子结构、路径和间接效应。", "比较多组测量或路径是否可比。", "把量表理论与数据分析放进同一个框架。"],
+      concepts: [
+        { term: "潜变量", explain: "不能直接观测、由多个题目标记的心理或健康构念，例如焦虑或社会支持。" },
+        { term: "测量模型", explain: "用 =~ 描述潜变量如何由观测指标测量，例如 anxiety =~ item1 + item2 + item3。" },
+        { term: "结构模型", explain: "用 ~ 描述潜变量或观测变量之间的预测关系。" },
+        { term: "模型识别", explain: "数据中的信息必须足够估计所有自由参数。载荷、方差和路径不能无限自由。" },
+        { term: "拟合指数", explain: "CFI、TLI、RMSEA、SRMR 从不同角度评价模型与数据差异，不存在适用所有场景的单一阈值。" },
+        { term: "修正指数", explain: "提示若增加某个参数可能改善拟合，但只能基于理论修改，不能按数值机械加路径。" },
+      ],
+      comparison: {
+        title: "SEM 中两类模型",
+        note: "量表研究至少要先检查测量模型，再解释结构路径。",
+        headers: ["部分", "回答什么", "lavaan 运算符", "主要检查"],
+        rows: [
+          ["测量模型", "题目是否测量同一个潜变量", "=~", "载荷、残差、维度与拟合"],
+          ["结构模型", "潜变量/观测变量之间关系", "~", "路径方向、效应大小和不确定性"],
+          ["协方差", "未设定方向的关系", "~~", "残差和潜变量相关是否合理"],
+          ["间接效应", "通过中介变量的路径", ":=", "定义、置信区间和理论顺序"],
+        ],
+      },
+      whenUse: ["有明确理论测量结构或多个潜变量。", "需要处理测量误差。", "研究问题涉及路径或中介机制。", "样本量和指标数足以支持模型识别。"],
+      dataShape: ["题目方向、计分和缺失规则已整理。", "分类或有序题目要考虑估计方法。", "模型方向和自由参数必须有理论依据。", "样本量、题目数和模型复杂度一起评估。"],
+      steps: [
+        {
+          title: "先做测量模型",
+          text: "在加入复杂路径前，先确认各题目是否按预期加载到潜变量。",
+          code: `library(lavaan)\nmeasurement <- '\n  anxiety =~ item1 + item2 + item3\n  depression =~ item4 + item5 + item6\n'\nfit_measure <- cfa(measurement, data = dat, estimator = "MLR")\nsummary(fit_measure, fit.measures = TRUE, standardized = TRUE)`,
+          explain: "cfa() 只拟合测量模型；standardized=TRUE 同时查看标准化载荷，fit.measures=TRUE 输出常见拟合指标。",
+        },
+        {
+          title: "根据理论设定结构路径",
+          text: "结构模型的方向来自研究假设，不是从相关矩阵自动生成。",
+          code: `model <- '\n  anxiety =~ item1 + item2 + item3\n  depression =~ item4 + item5 + item6\n  depression ~ anxiety + age + sex\n'\nfit <- sem(model, data = dat, estimator = "MLR", missing = "fiml")\nsummary(fit, fit.measures = TRUE, standardized = TRUE, ci = TRUE)`,
+          explain: "depression ~ anxiety 表示焦虑预测抑郁；age 和 sex 是观测协变量；missing='fiml' 在满足假设时利用可用信息。",
+        },
+        {
+          title: "分开报告拟合与参数",
+          text: "拟合指数说明整体模型，路径系数说明具体关系。二者不能互相替代。",
+          code: `fitMeasures(fit, c("chisq", "df", "cfi", "tli", "rmsea", "srmr"))\nparameterEstimates(fit, standardized = TRUE, ci = TRUE)`,
+          explain: "χ² 对样本量敏感；CFI/TLI 与 RMSEA/SRMR 各有局限。应结合模型目的、样本量和理论一起判断。",
+        },
+        {
+          title: "检查残差与修正指数",
+          text: "修改模型前先核对题目含义、方法效应和缺失处理。高修正指数不是自动修改指令。",
+          code: `resid(fit, type = "cor.bentler")\nmodificationIndices(fit, sort. = TRUE, minimum.value = 10)`,
+          explain: "残差相关提示观测协方差中未解释的部分；修正指数只表示潜在改善空间，仍需要理论支持。",
+        },
+        {
+          title: "多组比较要有层级",
+          text: "先检验形态，再逐渐约束载荷、截距等。不要直接跳到最严格的不变性模型。",
+          code: `measurementInvariance(model, data = dat, group = "sex")\n# 也可以逐层拟合 configural / metric / scalar 模型进行比较`,
+          explain: "多组不变性检验用于判断同一量表在不同组是否以相同方式测量，而不是只比较路径系数。",
+        },
+      ],
+      functions: ["cfa", "sem", "fitMeasures", "modificationIndices", "measurementInvariance", "parameterEstimates"],
+      conditions: ["模型结构来自理论，不是事后搜索。", "确认模型识别与样本量。", "量表方向、计分和缺失策略先处理。", "拟合指数、标准化路径和残差一起报告。"],
+      interpret: "SEM 路径箭头表达模型假设，不自动证明时间顺序或因果。纵向前瞻数据、理论和支持因果设计的证据仍然必要。",
+      readingNotes: ["CFI/TLI 越接近 1 通常越好，但没有绝对万能阈值。", "RMSEA 与 SRMR 反映残差不同方面。", "修改指数必须极小化事后模型搜索。"],
+      pitfalls: ["用 SEM 代替研究设计。", "模型不拟合就不断加相关。", "只报告 CFI 而忽略载荷和残差。", "多组比较不先检验测量不变性。"],
+      practice: "为一个两因子量表写出测量模型和结构模型，说明每个参数、自由度、参照指标和预期方向。",
+      references: [
+        ref("lavaan 官方教程", "https://lavaan.ugent.be/tutorial/", "模型语法、CFA、SEM、多组分析与拟合指标。"),
+        ref("lavaan 参考手册", "https://cran.r-project.org/web/packages/lavaan/lavaan.pdf", "函数参数、估计方法和输出说明。"),
+        ref("R 语言实战（第3版）", "https://www.ituring.com.cn/book/2861", "结构方程与潜变量模型的入门介绍。"),
+      ],
+    },
+    {
+      type: "advanced",
+      id: "latent-class",
+      typeLabel: "高级建模",
+      minutes: 32,
+      title: "潜类别分析 LCA",
+      aliases: ["LCA", "poLCA", "潜类别", "人群亚型"],
+      hero: "用响应模式寻找未观测亚组，而不是把聚类换个名字",
+      audience: "有一组分类或有序题目、症状或健康行为，希望识别不同响应模式的人群亚型。",
+      overview: "LCA 假设总体由若干未观测类别组成，同一类别内题目在给定类别后近似独立。它基于概率模型，可以为每个人估计属于各类别的概率。类别数由信息准则、分类质量、可解释性和稳定性共同决定，不能只看 BIC 最小。",
+      features: ["适合二分类、有序或分类指标。", "给出类别比例和题目条件概率。", "允许按后验概率分配类别。", "可用于症状亚型、健康行为或问卷响应模式。"],
+      concepts: [
+        { term: "潜类别", explain: "不能直接观测的人群分组，分类依据是多个分类指标的共同响应模式。" },
+        { term: "局部独立", explain: "在给定潜类别后，各指标在一个类别内被假设为条件独立。强相关题目可能违反该假设。" },
+        { term: "条件概率", explain: "某一类别的人在某题上作出某个响应的概率，用于解释和命名类别。" },
+        { term: "类别比例", explain: "估计总体中各潜类别所占比例。小类别需要谨慎解释和检查稳定性。" },
+        { term: "熵", explain: "衡量个体被分到某一类别的清晰程度；高熵不等于类别数正确。" },
+        { term: "分类不确定性", explain: "个体属于各类别的概率而非唯一事实。后续回归若使用最可能类别，会引入分类误差。" },
+      ],
+      comparison: {
+        title: "LCA、聚类与因子分析",
+        note: "三者都处理多指标结构，但目标和模型假设不同。",
+        headers: ["方法", "指标类型", "目标", "输出", "关键限制"],
+        rows: [
+          ["LCA", "主要是分类/有序", "寻找潜人群类别", "类别比例、条件概率、后验概率", "局部独立与类别解释"],
+          ["K-means", "连续变量", "按距离分组", "中心和硬分类", "距离尺度与稳定性"],
+          ["因子分析", "连续指标", "寻找连续潜维度", "载荷与因子", "维度不是人群类别"],
+        ],
+      },
+      whenUse: ["指标是症状、行为或分类问卷响应。", "研究问题关注人群响应模式而非单一总分。", "样本量和指标数足以支持多类别模型。", "分类结果有理论和实践解释价值。"],
+      dataShape: ["指标尽量统一编码方式。", "缺失处理规则明确。", "连续变量若用于 LCA，需要合理离散化或考虑混合模型。", "先定义类别数搜索范围和模型选择标准。"],
+      steps: [
+        {
+          title: "准备分类指标",
+          text: "把题目整理为因子并检查各类别频数，避免极小或空类别。",
+          code: `items <- c("item1", "item2", "item3", "item4")\nformula <- as.formula(paste("cbind(", paste(items, collapse = ","), ") ~ 1"))\ntable(dat$item1)`,
+          explain: "cbind(...) ~ 1 表示对多个分类指标拟合无协变量的 LCA；table() 检查每题的响应分布。",
+        },
+        {
+          title: "拟合多个类别数并固定随机起点",
+          text: "LCA 可能有局部最优，需多次随机起始并比较结果。",
+          code: `library(poLCA)\nset.seed(2026)\nfits <- lapply(2:5, \\(k) {\n  poLCA(formula, data = dat, nclass = k, nrep = 20, maxiter = 5000, verbose = FALSE)\n})\nnames(fits) <- paste0("k", 2:5)`,
+          explain: "nclass 是类别数；nrep 是随机起点；固定 seed 和记录起始次数便于复现。",
+        },
+        {
+          title: "比较信息准则、分类质量与稳定性",
+          text: "BIC、样本校正 BIC、aBIC、熵、最小类别比例和重复拟合是否同一解都要一起看。",
+          code: `quality <- do.call(rbind, lapply(fits, \\(fit) {\n  probs <- fit$posterior\n  entropy <- 1 - sum(-probs * log(probs + 1e-12)) / (nrow(probs) * log(ncol(probs)))\n  data.frame(k = fit$nclass, BIC = fit$bic, entropy = entropy)\n}))\nquality`,
+          explain: "熵只是模型选择的一项。一个 BIC 更小的模型可能包含难以解释或极小的类别。",
+        },
+        {
+          title: "解释条件概率而不是凭标签猜",
+          text: "用每个类别在各题上的概率命名类别，并报告比例和概率模式。",
+          code: `best <- fits[["k3"]]\nbest$probs\nbest$P`,
+          explain: "probs 是各类别下各题的条件响应概率，P 是类别比例。类别名称应来自这些概率而不是自动算法输出。",
+        },
+        {
+          title: "保存后验概率并做敏感性分析",
+          text: "保留每人属于各类别的概率，不立即用硬分类替代真实不确定性。",
+          code: `post <- as.data.frame(best$posterior)\noptimal_class <- max.col(post, ties.method = "first")\ncbind(dat[items], post)[1:5, ]`,
+          explain: "max.col() 只给出最可能类别。报告后应说明分类不确定性、最大概率较低的人群以及不同类别数下结论是否稳定。",
+        },
+      ],
+      functions: ["poLCA", "poLCA.entropy", "factor", "table"],
+      conditions: ["指标类型适合 LCA，编码规则先定义。", "类别数范围和信息准则事先说明。", "使用多个随机起点并检查局部最优。", "类别必须有理论或实践解释，且不能太小或极不稳定。"],
+      interpret: "潜类别是按模型估计出的概率分组，不是天然、固定或诊断性的亚型。后验概率低的人分类不确定，外推到新样本前需要验证。",
+      readingNotes: ["BIC 倾向较少类别，aBIC 有时更宽松。", "高熵只表示分类较清楚。", "将最可能类别当结局进入回归，会产生分类误差。"],
+      pitfalls: ["只凭 BIC 选模型。", "把类别解释为确定诊断。", "不固定 seed 或只运行一次。", "对极小类别赋予夸张临床意义。"],
+      practice: "对模拟的 4 个二分类症状指标拟合 2–5 类模型，整理 BIC、熵、最小类别比例和条件概率，并为每个候选类别写一句客观描述。",
+      references: [
+        ref("poLCA 官方手册", "https://cran.r-project.org/web/packages/poLCA/poLCA.pdf", "latent class model、nclass、nrep、条件概率和输出。"),
+        ref("Nylund 等：LCA 类别数与模型选择", "https://doi.org/10.1080/10705510701575396", "比较 BIC、aBIC、熵和 bootstrap likelihood ratio 的模拟研究。"),
+      ],
+    },
+    {
+      type: "advanced",
+      id: "multiple-imputation",
+      typeLabel: "缺失数据",
+      minutes: 40,
+      title: "多重插补",
+      aliases: ["MI", "mice", "缺失值", "Rubin rules"],
+      hero: "保留缺失带来的不确定性，而不是把它伪装成一个确定值",
+      audience: "关键变量存在较多缺失，完整案例分析可能损失样本或产生偏倚。",
+      overview: "多重插补为每个缺失值生成多套合理值，再分别分析并用 Rubin 规则合并。方法适合满足“随机缺失”等条件的数据，但是否可信取决于插补模型、辅助变量、缺失机制和敏感性分析，而不是调一个函数。",
+      features: ["保留部分缺失信息并估计额外不确定性。", "利用变量之间关系进行条件插补。", "合并回归、均数等多种分析结果。", "可比较不同缺失假设下的结论。"],
+      concepts: [
+        { term: "MCAR", explain: "缺失与任何变量都无关。完整案例分析通常无偏，但可能损失效率。" },
+        { term: "MAR", explain: "给定已观测变量后，缺失机制不再依赖未观测值。多重插补通常在此假设下应用。" },
+        { term: "MNAR", explain: "缺失仍依赖未观测的真实值，MAR 不成立，需要敏感性分析或专门的机制模型。" },
+        { term: "链式方程", explain: "mice 按变量逐个建立条件插补模型，适合混合类型数据。" },
+        { term: "m 次插补", explain: "插补数据套数。缺失较多或不确定较大时通常需要更多套，不能固定只看一套。" },
+        { term: "Rubin 规则", explain: "合并多套结果的效应估计、组内与组间方差，得到总标准误和区间。" },
+      ],
+      comparison: {
+        title: "常见缺失处理策略",
+        note: "没有一种策略“总能使用”。先理解缺失产生方式，再结合分析和敏感性。",
+        headers: ["策略", "保留样本", "主要假设", "适用情况", "风险"],
+        rows: [
+          ["完整案例分析", "否", "缺失机制不引入偏倚", "缺失极少或已完成敏感性分析", "样本损失与选择偏倚"],
+          ["单次均值插补", "是", "不应作为默认方法", "几乎不建议正式推断", "低估不确定性"],
+          ["多重插补", "是", "插补模型合理，通常接近 MAR", "多变量缺失", "模型设定和机制假设"],
+          ["最大似然", "是", "模型缺失假设合理", "SEM、LMM 等模型框架", "依赖模型与分布假设"],
+        ],
+      },
+      whenUse: ["关键变量缺失较多。", "完整案例会显著降低样本或改变分布。", "有合理的辅助变量可解释缺失。", "愿意报告插补模型和敏感性分析。"],
+      dataShape: ["统计每个变量缺失数和缺失模式。", "不要把结局、主键或不应插补的派生变量随意纳入插补。", "分类变量保持合适类型，避免无意义小数类别。", "记录插补变量、预测变量、m、迭代数和随机种子。"],
+      steps: [
+        {
+          title: "先检查缺失模式和机制线索",
+          text: "比较缺失与未缺失组的变量分布，并统计变量组合的缺失模式。",
+          code: `library(mice)\nmd.pattern(dat, rotate.names = TRUE)\ndat |> dplyr::mutate(age_missing = is.na(age)) |> \n  dplyr::group_by(age_missing) |> \n  dplyr::summarise(mean_outcome = mean(outcome, na.rm = TRUE))`,
+          explain: "缺失模式表帮助识别是否为少量变量造成大部分缺失；分组比较只是机制线索，不能证明 MCAR/MAR。",
+        },
+        {
+          title: "限定插补变量和方法",
+          text: "保留主键和结局，但结局可参与插补过程；给二分类变量明确方法。只插补真正需要的变量。",
+          code: `ini <- mice(dat, maxit = 0)\nmethod <- ini$method\nmethod[] <- ""\nmethod[c("age", "bmi", "smoking")] <- c("pmm", "pmm", "logreg")\npred <- ini$predictorMatrix\npred[, "patient_id"] <- 0\npred["patient_id", ] <- 0`,
+          explain: "maxit=0 先建立变量和方法骨架；pmm 用于连续变量，logreg 用于二分类；主键不参与插补。",
+        },
+        {
+          title: "运行多套插补并检查收敛",
+          text: "设置随机种子，检查不同变量均值/参数在迭代链中是否稳定。",
+          code: `set.seed(2026)\nimp <- mice(dat, m = 20, maxit = 20, method = method, predictorMatrix = pred, printFlag = FALSE)\nplot(imp)`,
+          explain: "m 是插补套数，maxit 是每套迭代数。轨迹应混合而非持续漂移，但仍需结合数据和模型判断。",
+        },
+        {
+          title: "在每套数据上分别分析",
+          text: "插补后每个模型都在所有 m 套数据上拟合，再合并结果。",
+          code: `fit <- with(imp, glm(outcome ~ exposure + age + bmi + smoking, family = binomial()))\npooled <- pool(fit)\nsummary(pooled, conf.int = TRUE, exponentiate = TRUE)`,
+          explain: "with() 在每套插补数据上拟合同一模型；pool() 按 Rubin 规则合并；exponentiate=TRUE 输出 OR。",
+        },
+        {
+          title: "做缺失机制敏感性分析",
+          text: "改变插补模型、辅助变量或对 MNAR 的假设，比较结论是否稳定。",
+          code: `# 示例：比较排除结局缺失、完整案例和多重插补结果\n# 正式分析可进一步使用 delta adjustment 或 pattern-mixture 方法`,
+          explain: "如果不同合理缺失假设导致结论方向改变，应明确报告不确定性，而不是只展示最有利的一套插补。",
+        },
+      ],
+      functions: ["mice", "with.mids", "pool", "complete", "md.pattern"],
+      conditions: ["缺失机制和插补目标清楚。", "插补模型包含与缺失相关的辅助变量。", "结局和主键的使用符合方法要求。", "报告 m、迭代、方法、种子、收敛和敏感性分析。"],
+      interpret: "多重插补得到的是在插补模型与缺失假设下的一组结果。它保留不确定性，但不会自动消除选择偏倚或 MNAR 问题。",
+      readingNotes: ["FMI 高通常意味着需要更多插补套数。", "插补值不应被当作真实观测值单独描述。", "插补模型与最终分析模型需要区分。"],
+      pitfalls: ["用均值一次插补后照常计算标准误。", "只生成一套插补。", "把主键、ID 或高度派生变量插补。", "不做收敛和敏感性检查。"],
+      practice: "在一份模拟数据中人为制造 MAR 缺失，比较完整案例、单次均值插补和 20 套多重插补的效应估计、标准误与置信区间。",
+      references: [
+        ref("mice：Multivariate Imputation by Chained Equations", "https://www.jstatsoft.org/article/view/v045i03", "FCS、mice 实现、收敛和合并方法。"),
+        ref("Flexible Imputation of Missing Data", "https://stefvanbuuren.name/fimd/", "缺失机制、插补模型和诊断的开放教材。"),
+        ref("mice 官方文档", "https://cran.r-project.org/web/packages/mice/mice.pdf", "mice、with、pool 和诊断函数。"),
+      ],
+    },
+    {
+      type: "advanced",
+      id: "longitudinal-models",
+      typeLabel: "高级建模",
+      minutes: 34,
+      title: "纵向与聚类结局",
+      aliases: ["LMM", "GEE", "重复测量", "聚类数据"],
+      hero: "先分清你想估计个体条件效应还是总体平均效应",
+      audience: "同一人多次测量，或患者嵌套于医院、家庭、班级等聚类单位。",
+      overview: "纵向数据中，同一人的观测通常相关。LMM 用随机效应描述个体差异，估计条件效应；GEE 用工作相关结构处理聚类，估计总体平均效应。两者回答的问题不同，不能只按 p 值选择。",
+      features: ["利用所有重复测量而不是把每次随访当独立。", "处理个体或中心之间的异质性。", "区分条件效应与边际效应。", "检查随机效应、相关结构和模型诊断。"],
+      concepts: [
+        { term: "固定效应", explain: "研究者关心的总体平均参数，例如治疗组随时间变化的平均差异。" },
+        { term: "随机效应", explain: "个体、医院或学校偏离总体平均的效应，可表现为随机截距或随机斜率。" },
+        { term: "条件效应", explain: "在同一个体或同一随机效应条件下解释的效应。" },
+        { term: "总体平均效应", explain: "把人群平均后的边际效应，Logistic 等非线性模型中通常与条件 OR 不完全相同。" },
+        { term: "工作相关结构", explain: "GEE 对同一聚类内相关形式的假设，如 independence、exchangeable、AR(1)，影响效率但不直接决定均值模型。" },
+        { term: "聚类稳健标准误", explain: "允许组内相关存在并校正参数标准误，聚类数太少时需谨慎。" },
+      ],
+      comparison: {
+        title: "LMM 与 GEE",
+        note: "连续结局、随机效应本身是研究问题时更常考虑 LMM；关注总体平均效应和稳健推断时常考虑 GEE。",
+        headers: ["方面", "LMM", "GEE", "选择提示"],
+        rows: [
+          ["目标", "条件效应", "总体平均效应", "研究问题先于软件"],
+          ["随机效应", "显式估计", "通常不估计", "个体差异是否重要"],
+          ["连续结局", "常用", "可用", "正态假设与稳健性权衡"],
+          ["二分类结局", "GLMM", "GEE Logistic", "OR 类型解释不同"],
+          ["缺失数据", "部分 MAR 下可利用可用观测", "通常依赖完整聚类/特定假设", "仍需检查缺失机制"],
+        ],
+      },
+      whenUse: ["同一人多次随访。", "数据嵌套于医院、家庭、学校或社区。", "需要区分个体变化和总体平均关系。", "标准回归把相关观测当独立导致标准误错误。"],
+      dataShape: ["通常使用长表，每行一次测量。", "明确个体 ID、聚类 ID、时间和结局。", "检查随访次数和间隔是否不平衡。", "记录结局分布、随机效应结构和相关结构。"],
+      steps: [
+        {
+          title: "把数据整理成长表",
+          text: "一行代表一个人一次测量，并保留个体、时间和聚类标识。",
+          code: `head(dat[c("id", "site", "time", "group", "score")])\ntable(dat$time, useNA = "ifany")\nlength(unique(dat$id))`,
+          explain: "检查时间标签和个体数，避免宽表列名混入模型。",
+        },
+        {
+          title: "拟合随机截距 LMM",
+          text: "(1 | id) 表示每个个体拥有自己的随机截距；group*time 表示组别随时间变化的差异。",
+          code: `library(lme4)\nfit <- lmer(score ~ group * time + age + (1 | id), data = dat, REML = FALSE)\nsummary(fit)`,
+          explain: "REML=FALSE 便于用最大似然而非 REML 比较固定效应不同的模型；正式报告应说明估计方式。",
+        },
+        {
+          title: "检查是否需要随机斜率",
+          text: "如果个体变化速度不同，可考虑 (time | id)，但模型会更复杂，需要足够随访。",
+          code: `fit_slope <- lmer(score ~ group * time + age + (time | id), data = dat, REML = FALSE)\nanova(fit, fit_slope)`,
+          explain: "随机斜率允许每个人有不同的时间趋势。模型不收敛时不要盲目增加结构，应检查数据和时间编码。",
+        },
+        {
+          title: "用 GEE 估计总体平均效应",
+          text: "指定聚类 ID 和相关结构，并将结局、分组和时间放入均值模型。",
+          code: `library(geepack)\ngee_fit <- geeglm(outcome ~ group * time + age,\n  id = id, data = dat, family = binomial(),\n  corstr = "exchangeable"\n)\nsummary(gee_fit)`,
+          explain: "id 定义同一人的相关观测；exchangeable 假设同一人对不同时间的相关大致相同；结果通常解释为总体平均 OR。",
+        },
+        {
+          title: "诊断并比较，而不是只挑显著结果",
+          text: "检查残差、随机效应分布、聚类数和敏感性，解释两种模型的效应含义。",
+          code: `plot(fit)\nranef(fit)\nlength(unique(dat$site))\n# Logistic LMM / GLMM 可用 glmer(..., family = binomial())`,
+          explain: "随机效应图检查个体偏离；聚类数过少会影响 GEE 稳健标准误；模型选择取决于研究目标和假设。",
+        },
+      ],
+      functions: ["lmer", "glmer", "geeglm", "pivot_longer", "ranef", "summary"],
+      conditions: ["行代表一次测量且 ID 稳定。", "时间编码符合实际随访间隔。", "随机效应/相关结构有数据和设计依据。", "模型收敛并完成残差或稳健性检查。"],
+      interpret: "LMM 的条件效应是同一随机效应下的比较；GEE 的边际效应是总体平均比较。非线性模型中，不能把两者系数直接当成同一个 OR。",
+      readingNotes: ["随机截距和随机斜率不是越多越好。", "GEE 的相关结构主要影响效率，均值模型仍需正确。", "聚类数较少时稳健标准误可能偏小。"],
+      pitfalls: ["把每次随访当独立样本。", "只看 AIC 选择 LMM/GEE。", "不检查模型收敛。", "把条件 OR 与边际 OR 混写。"],
+      practice: "用一个人×三次随访的模拟数据，分别拟合随机截距 LMM 和 exchangeable GEE，写出各自效应在回答什么问题。",
+      references: [
+        ref("lme4 混合模型入门", "https://cran.r-project.org/web/packages/lme4/vignettes/lmer.pdf", "lmer/glmer 语法、随机效应和模型诊断。"),
+        ref("geepack 官方手册", "https://cran.r-project.org/web/packages/geepack/geepack.pdf", "GEE、聚类 ID、相关结构和稳健推断。"),
+        ref("Liang 与 Zeger：Longitudinal Data Analysis Using GEE", "https://doi.org/10.1093/biomet/73.1.13", "GEE 方法学原始文献。"),
+      ],
+    },
+    {
+      type: "advanced",
+      id: "causal-inference",
+      typeLabel: "因果推断",
+      minutes: 38,
+      title: "因果推断设计",
+      aliases: ["因果推断", "DAG", "倾向评分", "目标试验"],
+      hero: "先把目标试验写清，再用观察数据尽量模拟它",
+      audience: "想回答干预、暴露或政策对结局的因果效应，而不只是描述调整后关联。",
+      overview: "因果推断首先定义目标人群、干预策略、结局、随访起点和分析方法，再考虑混杂、选择、测量和缺失。倾向评分、IPW、标准化和双重稳健方法都建立在可识别假设上；软件模型不能替代设计。",
+      features: ["用 DAG 明确混杂和调整变量。", "写出目标试验的纳排、策略和随访。", "区分描述关联与因果估计。", "量化不确定性并做未测混杂敏感性分析。"],
+      concepts: [
+        { term: "估计目标", explain: "要估计何种人群中的何种效应，例如平均处理效应 ATE 或处理者平均效应 ATT。" },
+        { term: "目标试验", explain: "把观察性研究写成假想随机试验：谁入组、何时开始随访、比较哪些策略、结局是什么。" },
+        { term: "混杂", explain: "同时影响暴露和结局，且位于暴露与结局之前的共同原因。" },
+        { term: "中介与对撞", explain: "暴露后的中介变量通常不应按普通混杂调整；对撞变量被条件化后可能引入偏倚。" },
+        { term: "可识别假设", explain: "包括条件可交换性、正性、一致性、正确模型和测量等，通常不能用同一数据完全验证。" },
+        { term: "正性", explain: "不同协变量水平的人都应有接受各种暴露策略的正概率，否则比较没有数据支持。" },
+      ],
+      comparison: {
+        title: "描述关联与因果问题",
+        note: "相同的回归函数，在不同设计和假设下含义可能完全不同。",
+        headers: ["目标", "主要问题", "常用方法", "关键证据"],
+        rows: [
+          ["预测", "新个体的结局风险有多准", "训练/测试、校准、外部验证", "区分度、校准与临床效用"],
+          ["描述关联", "当前数据中变量怎样共同变化", "描述统计、调整回归", "数据代表性、模型拟合"],
+          ["因果效应", "改变暴露策略会怎样", "目标试验、IPW、标准化、G方法", "DAG、时间顺序、正性与敏感性"],
+        ],
+      },
+      whenUse: ["政策、治疗、暴露或干预的效应问题。", "有明确时间顺序和基线协变量。", "可以定义目标人群和比较策略。", "愿意报告未测混杂等敏感性分析。"],
+      dataShape: ["每个时间点的变量要区分基线、随访中与结局后。", "暴露、结局、删失和研究起点定义清楚。", "DAG 在分析前确定调整集。", "检查极端权重、重叠和有效样本。"],
+      steps: [
+        {
+          title: "画 DAG 并写出估计目标",
+          text: "先确定因果问题、时间零点和需要调整的混杂，不要从数据库里所有变量开始。",
+          code: `# 示例估计目标\n# 人群：18 岁以上新诊断患者\n# 策略：早期治疗 vs 延迟治疗\n# 时间零点：诊断日期\n# 结局：12 个月严重并发症\n# 效应：风险差与风险比`,
+          explain: "这段文字不是代码注释摆饰，而是目标试验的核心设计。不同时间零点会产生不同因果问题。",
+        },
+        {
+          title: "检查时间顺序与正性",
+          text: "协变量必须在暴露前测量；各暴露组在每个协变量层都应有人。",
+          code: `table(dat$exposure, useNA = "ifany")\n# 拟合倾向评分后检查分布重叠\nps_model <- glm(treated ~ age + sex + severity, data = dat, family = binomial())\ndat$ps <- predict(ps_model, type = "response")\nsummary(dat$ps)`,
+          explain: "倾向评分是给定基线协变量后接受治疗的概率。两组评分完全不重叠时，不能靠模型外推补出因果效应。",
+        },
+        {
+          title: "计算权重并检查极端值",
+          text: "ATE 权重可写为 treated/ps + (1-treated)/(1-ps)；检查截断、有效样本量和协变量平衡。",
+          code: `dat$w_ate <- ifelse(dat$treated == 1, 1 / dat$ps, 1 / (1 - dat$ps))\nsummary(dat$w_ate)\n# 推荐进一步用 cobalt::bal.tab() 或 WeightIt 检查平衡`,
+          explain: "极端权重会让少数人主导结果。加权后应检查标准化差异，而不是只看加权前后均值。",
+        },
+        {
+          title: "估计效应并正确计算不确定性",
+          text: "加权模型只提供一种实现方式；标准误应考虑权重估计和复杂抽样。",
+          code: `fit <- glm(outcome ~ treated, data = dat, family = binomial(), weights = w_ate)\nexp(coef(fit))\n# 正式研究应使用适合权重和设计的稳健标准误或 bootstrap`,
+          explain: "加权后不能直接把普通模型标准误当最终答案。还需检查置信区间、绝对风险差和研究设计。",
+        },
+        {
+          title: "做阴性对照、E 值或未测混杂敏感性",
+          text: "因果结论依赖不可完全验证的假设，需要量化“要多大未测混杂才能推翻结论”。",
+          code: `# 概念示例：记录主要效应、置信区间下界和 E 值\n# install.packages("EValue")\n# EValue::evalues.OR(est = 1.5, lo = 1.1, hi = 2.0, rare = FALSE)`,
+          explain: "敏感性分析不会证明没有混杂，但能说明结论对未测混杂的稳健程度。",
+        },
+      ],
+      functions: ["glm", "predict", "weighted.mean", "coxph", "survfit"],
+      conditions: ["目标试验和估计目标明确。", "时间零点和时间顺序清楚。", "正性、交换性和一致性等假设有讨论。", "完成平衡、极端权重和未测混杂敏感性分析。"],
+      interpret: "因果效应不是“调整越多变量越准确”。暴露后变量、中介和对撞变量可能使结果更偏；设计、DAG 和时间顺序优先于模型复杂度。",
+      readingNotes: ["倾向评分匹配、IPW 和标准化回答的估计目标可能不同。", "加权后需要检查协变量平衡。", "预测模型追求预测表现，不自动给出干预效应。"],
+      pitfalls: ["把 p 值显著写成因果。", "把随访后变量当基线混杂。", "只检查加权前后均值。", "忽略正性和极端权重。"],
+      practice: "为一个观察性治疗效应问题写出目标试验四要素，画出简化 DAG，并说明 ATE 与 ATT 的差异。",
+      references: [
+        ref("Hernán 与 Robins：Causal Inference: What If", "https://miguelhernan.org/whatifbook", "目标试验、DAG、标准化、IPW 和因果假设。"),
+        ref("Rosenbaum 与 Rubin：倾向评分", "https://doi.org/10.1093/biomet/70.1.41", "倾向评分方法的原始文献。"),
+        ref("EValue 包文档", "https://cran.r-project.org/web/packages/EValue/EValue.pdf", "未测混杂 E 值敏感性分析。"),
+      ],
+    },
+    {
+      type: "bayesian",
+      id: "foundations",
+      typeLabel: "Bayesian",
+      minutes: 28,
+      title: "贝叶斯思维与工作流",
+      aliases: ["贝叶斯", "先验", "后验", "可信区间"],
+      hero: "从先验和似然出发，得到带不确定性的后验",
+      audience: "没学过贝叶斯，只听说过先验、MCMC、可信区间，希望先建立整体框架。",
+      overview: "贝叶斯分析把未知参数视为需要用概率描述的不确定性。先验表达分析前的合理信息，似然提供当前数据的信息，后验结合两者。可信区间是在给定模型、先验和数据下的后验概率区间，但不能替代研究设计和模型检查。",
+      features: ["把已有知识以先验形式明确写出。", "让小样本或复杂模型能够共享信息。", "直接得到参数的概率化区间。", "通过先验预测和后验预测检查模型。"],
+      concepts: [
+        { term: "先验", explain: "分析数据前对参数分布的表达。先验必须有理由，并做敏感性分析。" },
+        { term: "似然", explain: "在给定参数时，数据出现的相对可能性。它由结局分布和模型决定。" },
+        { term: "后验", explain: "结合先验和似然后对参数的更新分布，是贝叶斯推断的核心。" },
+        { term: "可信区间", explain: "在给定模型和先验后，参数落入区间内的后验概率。它不是重复抽样意义上的置信区间。" },
+        { term: "MCMC", explain: "通过抽样近似后验分布。要检查收敛、有效样本量和链的混合。" },
+        { term: "后验预测检查", explain: "从拟合模型生成模拟数据，与真实数据比较，检查模型是否抓住了重要结构。" },
+      ],
+      comparison: {
+        title: "频率学派与贝叶斯推断",
+        note: "两者都能做统计推断，但概率和区间解释不同。研究设计、模型和假设仍同样重要。",
+        headers: ["方面", "频率学派", "贝叶斯"],
+        rows: [
+          ["参数", "固定未知量", "带后验分布的未知量"],
+          ["区间", "重复抽样下的置信区间", "给定模型与先验的可信区间"],
+          ["先验信息", "通常不显式进入", "必须明确模型化"],
+          ["小样本", "依赖渐近性质", "可用先验但先验影响较强"],
+          ["软件诊断", "模型拟合与稳健性", "额外检查 Rhat、ESS、链和后验预测"],
+        ],
+      },
+      whenUse: ["希望显式整合已有信息。", "模型复杂或层级信息需要共享。", "需要完整后验不确定性。", "样本小但先验可有依据地设定。"],
+      dataShape: ["明确参数范围和可解释尺度。", "先验以实际单位表达。", "记录链数、迭代、warmup、种子和采样器。", "至少比较一个合理替代先验或其他模型。"],
+      steps: [
+        {
+          title: "用简单例子理解先验更新",
+          text: "Beta-二项模型是贝叶斯入门最好的例子：成功率参数 θ 用 Beta 先验，观测成功与失败后得到 Beta 后验。",
+          code: `alpha_prior <- 2\nbeta_prior <- 2\nsuccess <- 8\nfailure <- 2\n\nalpha_post <- alpha_prior + success\nbeta_post <- beta_prior + failure\nqbeta(c(0.025, 0.5, 0.975), alpha_post, beta_post)`,
+          explain: "Beta(2,2) 先验在成功与失败之间略偏中性；观测 8 次成功、2 次失败后，后验为 Beta(10,4)。",
+        },
+        {
+          title: "先做先验预测检查",
+          text: "只检查先验分布是否“好看”不够，还要看它产生的数据是否在合理范围。",
+          code: `set.seed(2026)\ntheta_draw <- rbeta(1000, alpha_prior, beta_prior)\ny_prior <- rbinom(1000, size = 10, prob = theta_draw)\nquantile(y_prior, c(0.05, 0.5, 0.95))`,
+          explain: "先验预测把参数先验和似然结合，检查在正式看数据前，模型允许出现哪些结果。",
+        },
+        {
+          title: "拟合后检查 MCMC",
+          text: "Rhat 判断链是否收敛，ESS 检查有效样本量；图还应显示链充分混合且无持续趋势。",
+          code: `# 以 brms 为例\nlibrary(brms)\nfit <- brm(y ~ x, data = dat, family = gaussian(), seed = 2026)\nposterior::summarise_draws(fit)`,
+          explain: "经验上 Rhat 应接近 1，ESS 要足够大；具体软件版本与诊断包可给出更严格建议。",
+        },
+        {
+          title: "做后验预测检查",
+          text: "比较真实数据和模型重复生成的数据，检查分布、极端值、零值和聚类结构。",
+          code: `pp_check(fit, ndraws = 100)\nloo(fit)`,
+          explain: "后验预测图发现系统性失配；LOO 用于比较模型预测，但不能代替设计和先验讨论。",
+        },
+        {
+          title: "改变先验做敏感性分析",
+          text: "用弱信息先验和有依据的替代先验重复分析，比较主要结论。",
+          code: `fit_alt <- update(fit, prior = prior(normal(0, 1), class = "b"), seed = 2026)\nsummary(fit)\nsummary(fit_alt)`,
+          explain: "若先验改变导致结论大幅改变，说明数据信息不足或先验非常重要，应如实报告。",
+        },
+      ],
+      functions: ["rbeta", "rbinom", "qbeta", "brm", "prior_summary", "posterior_predict", "loo", "waic"],
+      conditions: ["先验能解释，并做先验预测检查。", "报告完整采样设置与软件版本。", "完成 Rhat、ESS、链混合和后验预测检查。", "先验或模型替代方案做敏感性分析。"],
+      interpret: "“95% 可信区间”是在当前模型、先验和数据下的后验概率陈述，不表示参数真实值有 95% 的长期频率覆盖。",
+      readingNotes: ["弱信息先验不等于没有先验。", "MCMC 不收敛时不能解释后验。", "模型比较指标不能修复错误模型。"],
+      pitfalls: ["先验完全按希望结果设定。", "Rhat 不好仍报告后验均值。", "把贝叶斯分析当成小样本自动解药。", "不做先验敏感性。"],
+      practice: "用 Beta-binomial 模型比较 Beta(1,1)、Beta(2,2) 和 Beta(10,2) 三种先验在同一数据下的后验和可信区间，并解释差异。",
+      references: [
+        ref("Gelman 等：Bayesian Workflow", "https://arxiv.org/abs/2011.01808", "从先验预测、计算诊断到模型评估的贝叶斯工作流。"),
+        ref("Stan User’s Guide", "https://mc-stan.org/docs/", "贝叶斯模型、采样、诊断和预测。"),
+        ref("rstanarm 用户指南", "https://mc-stan.org/rstanarm/articles/", "贝叶斯回归模型和诊断示例。"),
+      ],
+    },
+    {
+      type: "bayesian",
+      id: "regression",
+      typeLabel: "Bayesian",
+      minutes: 38,
+      title: "贝叶斯回归",
+      aliases: ["brms", "rstanarm", "贝叶斯回归", "后验预测"],
+      hero: "模型形式不神秘，关键是把先验、诊断和预测检查写完整",
+      audience: "已经会线性或 Logistic 回归，希望用 brms 或 rstanarm 完成一个可复现、可诊断的贝叶斯分析。",
+      overview: "贝叶斯回归与频率学派回归共享结局分布、连接函数和数据结构，但参数有先验与后验分布。brms 提供接近 R 公式的语法，rstanarm 也提供熟悉的 glm 风格接口。真正的工作量在模型设定、先验检查、采样诊断、后验预测和敏感性分析。",
+      features: ["拟合线性、Logistic、计数和层级回归。", "用后验分布表达参数与预测不确定性。", "通过部分池化处理多层数据。", "使用后验预测和模型比较检查模型。"],
+      concepts: [
+        { term: "family", explain: "结局分布与连接函数，例如 gaussian、bernoulli、poisson、negbinomial。" },
+        { term: "系数先验", explain: "对回归系数的分布假设，通常放在预测尺度或 log 尺度，必须结合变量单位。" },
+        { term: "warmup", explain: "采样初期丢弃的阶段，让链从初始化过渡到目标后验区域。" },
+        { term: "adapt_delta", explain: "Stan 控制步长、减少发散转移的参数；提高它需检查几何问题，不是万能修复。" },
+        { term: "后验预测", explain: "给定后验参数生成可能的新数据，用于检查模型对实际数据结构的适配。" },
+        { term: "LOO/WAIC", explain: "预测模型比较指标，有适用条件，不能替代模型合理性和外部验证。" },
+      ],
+      comparison: {
+        title: "brms 与 rstanarm",
+        note: "两者都基于 Stan；brms 的公式和分布族更广，rstanarm 接口更接近传统回归函数。",
+        headers: ["方面", "brms", "rstanarm", "学习建议"],
+        rows: [
+          ["核心函数", "brm()", "stan_glm()/stan_lmer()", "先掌握基础回归"],
+          ["语法", "lme4 风格公式", "glm/lmer 风格", "按已有经验选"],
+          ["分布族", "覆盖广", "常用回归族", "先确认 family"],
+          ["诊断", "posterior、bayesplot、loo", "同样可接 posterior 等", "统一检查 Rhat、ESS、PPC"],
+          ["层级模型", "丰富", "支持常见层级结构", "随机效应必须有设计依据"],
+        ],
+      },
+      whenUse: ["需要完整后验和预测不确定性。", "希望在小样本或层级结构中合理使用先验。", "需要贝叶斯模型比较。", "研究团队能解释先验并运行计算诊断。"],
+      dataShape: ["预测变量单位和尺度已整理。", "结局分布与零值、极端值匹配。", "层级 ID 和随机效应结构明确。", "缺失机制和样本量评估完成。"],
+      steps: [
+        {
+          title: "先做频率学派基线",
+          text: "先用 glm() 或 lm() 检查数据、编码和基本关系，再进入贝叶斯模型。",
+          code: `baseline <- glm(outcome ~ exposure + age + sex, data = dat, family = binomial())\nsummary(baseline)`,
+          explain: "基线模型帮助发现完全分离、共线性和编码错误，也提供结果尺度参照。",
+        },
+        {
+          title: "设定 brms 模型与可解释先验",
+          text: "把预测变量标准化或明确单位，再根据合理效应范围设置弱信息先验。",
+          code: `library(brms)\nfit <- brm(\n  outcome ~ exposure + age + sex,\n  data = dat,\n  family = bernoulli(),\n  prior = c(\n    prior(normal(0, 2), class = "b"),\n    prior(normal(0, 5), class = "Intercept")\n  ),\n  chains = 4, iter = 4000, warmup = 2000,\n  cores = 4, seed = 2026\n)`,
+          explain: "normal(0,2) 是 log-odds 尺度上的弱信息先验；单位改变后应重新考虑先验尺度。",
+        },
+        {
+          title: "检查采样诊断",
+          text: "查看 Rhat、ESS、发散转移、树深和链图。出现警告时先找模型几何和数据问题。",
+          code: `posterior::summarise_draws(fit)\nplot(fit)\n# 发散转移与几何问题还需要检查 pp_check、pairs 和模型简化`,
+          explain: "后验数值只有在其由可信 MCMC 样本近似时才能使用。",
+        },
+        {
+          title: "解释后验效应",
+          text: "在同一尺度比较先验、后验、效应区间和数据信息，并报告概率化陈述。",
+          code: `posterior_epred(fit, newdata = dat[1:5, ]) |>\n  posterior::summarise_draws()\nexp(fixef(fit))`,
+          explain: "fixef() 是对数尺度系数；exp() 后才可解释为 OR。预测概率应使用 posterior_epred()。",
+        },
+        {
+          title: "后验预测和模型比较",
+          text: "检查模型生成的结局分布是否接近真实数据，并在合理候选模型间比较。",
+          code: `pp_check(fit, type = "bars", ndraws = 100)\nloo(fit)\n# 与简化模型比较：loo_compare()`,
+          explain: "若模拟数据经常产生大量真实数据中没有的极端值，说明分布族或结构需要重新考虑。",
+        },
+      ],
+      functions: ["brm", "stan_glm", "stan_lmer", "prior_summary", "posterior_predict", "posterior_epred", "loo", "waic", "fixef"],
+      conditions: ["先验与实际变量尺度匹配。", "MCMC 收敛和有效样本量足够。", "完成后验预测检查。", "与合理替代模型或先验做比较。"],
+      interpret: "贝叶斯回归不该只把 p 值换成可信区间。应同时报告先验、模型、采样设置、主要后验分布、预测检查和敏感性分析。",
+      readingNotes: ["OR 和 RR 的尺度不同，exp(β) 只在相应模型中对应 OR。", "credible interval 与 confidence interval 定义不同。", "先验越有信息，敏感性分析越重要。"],
+      pitfalls: ["先验单位与变量单位不一致。", "看到发散转移只提高 adapt_delta。", "只报告后验均值而忽略分布。", "用 LOO 排名的微小差异宣称模型绝对更好。"],
+      practice: "用同一组模拟 Logistic 数据拟合 glm() 与 brm()，比较 OR 的点估计、区间解释、先验敏感性和后验预测。",
+      references: [
+        ref("brms 官方文档", "https://paul-buerkner.github.io/brms/", "公式语法、分布族、先验和层级模型。"),
+        ref("rstanarm 用户指南", "https://mc-stan.org/rstanarm/articles/", "常用贝叶斯回归与层级模型。"),
+        ref("Gelman 等：Bayesian Workflow", "https://arxiv.org/abs/2011.01808", "先验预测、计算诊断与后验评估。"),
+      ],
+    },
+    {
+      type: "review",
+      id: "evidence-synthesis",
+      typeLabel: "证据综合",
+      minutes: 25,
+      title: "证据综合总路线",
+      aliases: ["系统综述", "证据地图", "循证医学"],
+      hero: "先问要综合什么，再决定是做 Meta、范围综述还是伞状综述",
+      audience: "准备写综述或循证报告，但混淆系统综述、Meta、范围综述、伞状综述和研究设计。",
+      overview: "证据综合不是把研究结果写在一张表里。系统综述围绕明确问题系统检索、筛选、评价和综合研究；Meta 分析是其可选统计步骤；范围综述绘制领域广度和概念；伞状综述综合多个系统综述或 Meta 分析。方法由问题决定。",
+      features: ["选择与研究问题匹配的综述类型。", "先写方案和纳排标准。", "处理检索、筛选、偏倚和证据分级。", "让统计合成与研究质量评价互相连接。"],
+      concepts: [
+        { term: "系统综述", explain: "围绕明确问题，使用可重复检索和筛选，评价纳入研究并综合证据。" },
+        { term: "Meta 分析", explain: "对可比效应量做统计合并，可附属于系统综述，也可单独做方法学研究。" },
+        { term: "范围综述", explain: "梳理文献范围、概念、研究类型和空白，通常不强制定量合并。" },
+        { term: "伞状综述", explain: "综合多个系统综述或 Meta 分析，关注证据重叠、质量和一致性。" },
+        { term: "偏倚风险", explain: "研究结果系统偏离真实效应的可能性，必须由设计、测量、选择和报告问题判断。" },
+        { term: "GRADE", explain: "把证据体从高到低评级，考虑偏倚、不一致、间接性、不精确和发表偏倚。" },
+      ],
+      comparison: {
+        title: "综述类型怎么选",
+        note: "问题越聚焦、研究越可比，越可能进入定量 Meta；问题越宽，越可能是范围综述。",
+        headers: ["类型", "主要目的", "通常是否合并", "核心规范"],
+        rows: [
+          ["系统综述", "回答明确效果问题", "可做 Meta", "PRISMA 2020"],
+          ["Meta 分析", "统计合并可比较效应", "是", "效应模型、异质性与偏倚"],
+          ["范围综述", "绘制广度和研究空白", "通常否", "PRISMA-ScR"],
+          ["伞状综述", "综合多个综述", "可能", "AMSTAR 2、重叠和证据分级"],
+        ],
+      },
+      whenUse: ["需要系统回答一个明确研究问题。", "要评估现有证据一致性和空白。", "准备开展 Meta、网状 Meta 或范围综述。", "需要向导师说明综述方法和报告规范。"],
+      dataShape: ["先写 PICO/PECO 问题和纳排标准。", "建立可复现检索式和数据库记录。", "记录筛选流程、排除原因和重复文献。", "预先确定数据提取、偏倚评价和综合方法。"],
+      steps: [
+        {
+          title: "写问题与综述类型",
+          text: "明确人群、暴露/干预、比较、结局、研究设计和时间范围。",
+          code: `# 示例\n# P：成人高血压患者\n# E/I：限盐饮食\n# C：常规饮食建议\n# O：收缩压、心血管事件\n# 设计：RCT 与非随机干预研究分开展示`,
+          explain: "问题越具体，检索和效应量越容易一致；不要把不同问题强行合在一个主要结论里。",
+        },
+        {
+          title: "写方案并预先规定方法",
+          text: "在筛选前确定数据库、检索日期、纳排、提取字段、偏倚工具和合成方式。",
+          code: `# 建议登记 PROSPERO（适用时）或保存完整方案\n# 记录数据库、检索式、日期、筛选人数和冲突解决`,
+          explain: "预先规定能减少看到结果后再改纳排、指标或模型的风险。",
+        },
+        {
+          title: "筛选并保留流程图",
+          text: "记录识别、去重、题录筛选、全文筛选和最终纳入数量。",
+          code: `# PRISMA 流程计数示例\nflow <- data.frame(\n  stage = c("identified", "after_duplicates", "full_text", "included"),\n  n = c(1200, 830, 92, 24)\n)\nflow`,
+          explain: "PRISMA 流图应与实际记录一致，排除原因需分类。",
+        },
+        {
+          title: "评价研究并决定是否合并",
+          text: "先看研究问题和效应量是否足够可比，再考虑异质性和模型。",
+          code: `# 不能只因为 I² 小于某阈值就合并\n# 需同时检查人群、暴露定义、比较、结局时点、设计和偏倚`,
+          explain: "统计异质性小不代表临床和方法学同质。合并不合理时，应叙述性总结或分组展示。",
+        },
+      ],
+      functions: ["rma", "rma.mv", "forest.rma", "funnel.rma", "regtest"],
+      conditions: ["预先写方案和纳排标准。", "检索可重复且包含数据库日期。", "偏倚评价与证据分级与问题匹配。", "报告 PRISMA 流程和所有偏离方案之处。"],
+      interpret: "证据综合的结论强度取决于原始研究质量、检索完整性和综合假设，而不是森林图上的合计菱形是否越过零。",
+      readingNotes: ["Meta 分析不等于系统综述的全部。", "范围综述通常不以效应量合并为主要目标。", "伞状综述必须处理原始综述之间的证据重叠。"],
+      pitfalls: ["先检索再随便改研究问题。", "只搜一个数据库。", "把不可比研究硬做 Meta。", "忽略灰色文献和发表偏倚。"],
+      practice: "为“限盐与血压”问题分别写系统综述和范围综述的研究目的，说明两者纳排和结果呈现的差异。",
+      references: [
+        ref("Cochrane Handbook", "https://training.cochrane.org/handbook", "系统综述全过程的方法学权威指南。"),
+        ref("PRISMA 2020", "https://doi.org/10.1136/bmj.n71", "系统综述检索、筛选、偏倚评价和报告规范。"),
+        ref("PRISMA-ScR", "https://doi.org/10.7326/M18-0850", "范围综述的报告清单。"),
+      ],
+    },
+    {
+      type: "review",
+      id: "meta-analysis",
+      typeLabel: "Meta 分析",
+      minutes: 42,
+      title: "Meta 分析",
+      aliases: ["metafor", "异质性", "森林图", "发表偏倚"],
+      hero: "先把效应量定义一致，再讨论怎样合并",
+      audience: "已有多个研究的效应量、置信区间或四格表，希望完成随机效应 Meta、异质性、偏倚和敏感性分析。",
+      overview: "Meta 分析需要统一效应指标、方向和参照。固定效应假设一个共同真实效应，随机效应允许研究间真实效应分布。异质性、预测区间、研究质量和发表偏倚一起决定结论；I² 不是合并与否的唯一门槛。",
+      features: ["计算并合并 OR、RR、HR、MD、SMD 等效应。", "用森林图表达研究与合并结果。", "量化研究间异质性。", "评价小研究效应和敏感性。"],
+      concepts: [
+        { term: "效应量", explain: "把不同研究的比较结果转换成统一尺度，例如 log OR、均数差或标准化均数差。" },
+        { term: "共同效应与随机效应", explain: "共同效应假设同一真实效应；随机效应认为各研究真实效应围绕总体均值分布。" },
+        { term: "τ² 与 I²", explain: "τ² 是研究间真实效应方差，I² 是总变异中归因于异质性的比例，不能替代临床判断。" },
+        { term: "预测区间", explain: "未来类似研究的效应可能落在什么范围，通常比合并效应置信区间更宽。" },
+        { term: "发表偏倚", explain: "显著结果更易发表或报告，导致效应量被高估。漏斗图和检验在少量研究时不可靠。" },
+        { term: "偏倚风险", explain: "每个原始研究的设计与实施问题，应进入总体证据判断。" },
+      ],
+      comparison: {
+        title: "Meta 分析必须同时报告的层级",
+        note: "合计数不是全部。研究级、合成级与证据级信息都要呈现。",
+        headers: ["层级", "主要输出", "常见指标", "常见错误"],
+        rows: [
+          ["研究级", "每个研究的效应与权重", "OR、RR、MD、CI", "方向或参照组不统一"],
+          ["合成级", "总体效应与不确定性", "合并效应、τ²、I²、预测区间", "只看 I² 决定模型"],
+          ["偏倚级", "研究质量和发表偏倚", "RoB 2、ROBINS-I、漏斗图", "研究少于 10 仍强解释"],
+          ["证据级", "结论可信程度", "GRADE", "把统计显著等同强证据"],
+        ],
+      },
+      whenUse: ["多个研究回答足够相似的问题。", "效应指标可统一。", "研究设计和人群差异可解释。", "已完成系统检索和偏倚评价。"],
+      dataShape: ["每个研究有效应量、标准误或可计算原始数据。", "明确效应方向、参照和单位。", "记录研究设计、人群、随访和偏倚风险。", "避免重复发表研究被当独立证据。"],
+      steps: [
+        {
+          title: "用原始四格表计算效应量",
+          text: "二分类结局可由事件数和总数计算 log OR 与抽样方差，保留研究标签。",
+          code: `library(metafor)\ndat <- escalc(\n  measure = "OR",\n  ai = event_treat, bi = n_treat - event_treat,\n  ci = event_control, di = n_control - event_control,\n  data = dat\n)\nhead(dat[c("study", "yi", "vi")])`,
+          explain: "yi 是 log OR，vi 是抽样方差。所有研究必须采用相同方向，例如治疗组相对对照组。",
+        },
+        {
+          title: "拟合随机效应 Meta",
+          text: "明确估计方法和模型，不要在看到异质性后才临时切换。",
+          code: `fit <- rma(yi, vi, data = dat, method = "REML", test = "z")\nsummary(fit)\nforest(fit, atransf = exp, at = log(c(0.2, 0.5, 1, 2, 5)))`,
+          explain: "REML 估计 τ²；atransf=exp 把 log OR 转回 OR；at 控制森林图刻度。",
+        },
+        {
+          title: "解释异质性和预测区间",
+          text: "报告 τ²、I²、Q 检验和预测区间，并回到人群、干预、结局时点解释。",
+          code: `predict(fit, transf = exp)\n# 亚组和 Meta 回归必须有预先理由\ndat$region <- factor(dat$region)\nfit_sub <- update(fit, mods = ~ region)`,
+          explain: "预测区间表示类似未来研究的可能效应范围；亚组分析过多会增加假阳性。",
+        },
+        {
+          title: "评价小研究效应和敏感性",
+          text: "研究数量足够时再检查漏斗图和 Egger，并执行留一法或高风险研究排除。",
+          code: `if (fit$k >= 10) {\n  funnel(fit)\n  regtest(fit)\n}\nleave1out(fit)`,
+          explain: "漏斗图不对称可能来自发表偏倚，也可能来自真实异质性。少量研究的检验把握度很低。",
+        },
+        {
+          title: "用 GRADE 概括证据",
+          text: "在统计结果之外，评估偏倚风险、不一致、间接性、不精确和发表偏倚。",
+          code: `# 示例证据摘要字段（非统计函数）\nevidence_summary <- data.frame(\n  outcome = "主要结局",\n  studies = fit$k,\n  effect = exp(fit$beta[1]),\n  certainty = "需按 GRADE 评估"\n)`,
+          explain: "合并 OR 置信区间窄，不代表证据等级高；若研究都有偏倚，确定性仍可能很低。",
+        },
+      ],
+      functions: ["rma", "rma.mv", "forest.rma", "funnel.rma", "regtest"],
+      conditions: ["系统检索与纳排标准已完成。", "效应量和方向统一。", "足够研究数量支持相应偏倚分析。", "异质性、预测区间和 GRADE 一并报告。"],
+      interpret: "Meta 分析合并的是效应量，不合并研究之间所有差异。随机效应均值也非未来所有研究的确定值，预测区间常更适合表达研究间不确定性。",
+      readingNotes: ["I² 低仍可能临床异质。", "研究少于 10 时漏斗图解释很弱。", "标准化均数差跨量表解释要谨慎。"],
+      pitfalls: ["把 OR 和 RR 混着合并。", "同一队列的重复文章当独立研究。", "只展示显著亚组。", "忽略偏倚风险与证据确定性。"],
+      practice: "用 8 个模拟二分类研究计算 log OR，拟合随机效应模型，写出合并 OR、95% CI、τ²、I² 和预测区间。",
+      references: [
+        ref("metafor 官方文档", "https://wviechtb.github.io/metafor/", "效应量计算、随机效应、森林图、异质性和偏倚分析。"),
+        ref("Cochrane Handbook", "https://training.cochrane.org/handbook", "系统综述与 Meta 分析的方法学规范。"),
+        ref("PRISMA 2020", "https://doi.org/10.1136/bmj.n71", "综述报告、检索和结果呈现清单。"),
+      ],
+    },
+    {
+      type: "review",
+      id: "network-meta",
+      typeLabel: "网状 Meta",
+      minutes: 38,
+      title: "网状 Meta 分析",
+      aliases: ["NMA", "netmeta", "间接比较", "SUCRA"],
+      hero: "先证明网络连得通、比得合理，再谈谁排第一",
+      audience: "研究包含三种以上干预，且各研究之间通过共同比较形成网络。",
+      overview: "网状 Meta 同时利用直接和间接比较。它要求网络连通、研究总体可传递，并检验直接与间接证据的一致性。排序概率和 SUCRA 是概率化总结，不是“最佳治疗确定概率”，必须与效应区间、证据质量和临床意义一起解释。",
+      features: ["比较多个干预的相对效果。", "使用间接证据扩展比较范围。", "评估网络一致性和局部不一致。", "展示联赛表、森林图和排序。"],
+      concepts: [
+        { term: "连通性", explain: "每种干预通过直接或间接路径与其他干预相连，否则无法在同一模型比较。" },
+        { term: "传递性", explain: "不同比较的研究在效应修饰因素上足够相似，才能组合间接证据。" },
+        { term: "一致性", explain: "直接证据和间接证据应当产生相容的效应估计。" },
+        { term: "共同参照", explain: "网络模型通过参照干预连接所有相对效应，改变参照不会改变基础网络关系。" },
+        { term: "SUCRA", explain: "干预成为最佳的概率排名汇总，不等于效应大小或临床推荐。" },
+        { term: "证据网络偏倚", explain: "某些比较可能被选择性研究或发表，导致网络本身存在结构偏倚。" },
+      ],
+      comparison: {
+        title: "普通 Meta 与网状 Meta",
+        note: "网状比较不是简单把所有研究放进一个森林图，需要网络几何与一致性。",
+        headers: ["方面", "普通 Meta", "网状 Meta", "检查重点"],
+        rows: [
+          ["比较", "通常同一对干预", "多干预网络", "网络连通与几何"],
+          ["主要假设", "研究可合并", "传递性与一致性", "临床和方法异质性"],
+          ["结果", "一对合并效应", "所有两两相对效应", "联赛表和区间"],
+          ["排序", "通常无", "SUCRA/rank probability", "不能脱离不确定性"],
+        ],
+      },
+      whenUse: ["至少三种干预形成连通网络。", "研究问题需要间接比较。", "能评估传递性和一致性。", "团队理解网络证据的不确定性。"],
+      dataShape: ["边代表研究数、点代表干预。", "每条研究记录 treat1、treat2、效应和标准误。", "检查重复研究、零事件和网络断点。", "研究级效应修饰因素需可比较。"],
+      steps: [
+        {
+          title: "先画网络结构",
+          text: "统计每种干预和每条边的研究数，明确是否存在孤立比较。",
+          code: `library(netmeta)\nnetwork <- netmeta(TE, seTE, treat1, treat2, studlab, data = dat, sm = "OR")\nnetgraph(network, plastic = FALSE, number.of.studies = TRUE)`,
+          explain: "netgraph() 展示干预节点和比较边；网络不连通时不能直接做统一 NMA。",
+        },
+        {
+          title: "拟合网络模型与联赛表",
+          text: "选择共同/随机效应框架，输出所有干预两两比较。",
+          code: `summary(network)\nnetleague(network, digits = 2, bracket = "(")`,
+          explain: "联赛表每个格子需同时看方向、效应和置信区间，不能只按点估计排序。",
+        },
+        {
+          title: "检查全局与局部一致性",
+          text: "直接与间接证据不一致时，先检查研究差异，再考虑不一致模型。",
+          code: `netsplit(network)\nnetheat(network)`,
+          explain: "netsplit() 比较直接和间接证据；netheat() 帮助定位不一致来源。",
+        },
+        {
+          title: "解释排序但保留不确定性",
+          text: "结合 SUCRA、效应差、置信区间、偏倚风险和临床意义，而不是只宣布第一名。",
+          code: `rank <- rankogram(network)\n# 还需报告主要两两效应、异质性和一致性结果`,
+          explain: "排序概率会随网络结构、效应指标和模型改变，必须说明这一点。",
+        },
+      ],
+      functions: ["netmeta", "netgraph", "netleague", "netsplit", "netheat", "rankogram"],
+      conditions: ["网络连通且比较结构合理。", "传递性可讨论。", "完成一致性与偏倚评价。", "报告所有两两比较和证据质量。"],
+      interpret: "SUCRA 高只表示在当前模型和数据中成为最佳的概率相对较高，不代表临床绝对优势，也不代表证据确定。",
+      readingNotes: ["闭合网络才可检验某些一致性。", "研究数少的边不确定性很大。", "不同结局的最优干预可能不同。"],
+      pitfalls: ["比较完全不可传递的人群。", "只展示 SUCRA。", "忽略网络中的高风险研究。", "用排序代替临床推荐。"],
+      practice: "为一个四干预网络画节点图，写出主要直接和间接比较，并解释为什么 SUCRA 不能单独决定治疗推荐。",
+      references: [
+        ref("netmeta 官方手册", "https://cran.r-project.org/web/packages/netmeta/netmeta.pdf", "网络 Meta 模型、网络图、一致性与排序。"),
+        ref("PRISMA-NMA", "https://doi.org/10.1136/bmj.n160", "网状 Meta 分析报告扩展。"),
+        ref("Cochrane Handbook", "https://training.cochrane.org/handbook", "间接比较和网络证据的方法学基础。"),
+      ],
+    },
+    {
+      type: "review",
+      id: "scoping-umbrella",
+      typeLabel: "综述方法",
+      minutes: 32,
+      title: "范围综述与伞状综述",
+      aliases: ["范围综述", "伞状综述", "PRISMA-ScR", "AMSTAR 2"],
+      hero: "一个负责绘制研究地图，一个负责检验综述证据",
+      audience: "领域文献很多但问题较宽，或已有多个系统综述，希望梳理空白、重叠和证据质量。",
+      overview: "范围综述回答“有哪些研究、概念和空白”，通常不做效果合并；伞状综述综合多个系统综述或 Meta 分析，重点是综述质量、证据重叠、一致性和结论可信度。两者都需要预先方案和可重复流程。",
+      features: ["系统梳理领域广度和研究类型。", "用图表呈现时间、地区和设计分布。", "评价纳入综述的方法质量。", "处理多重 Meta 分析和证据重叠。"],
+      concepts: [
+        { term: "范围", explain: "范围综述强调广度和概念边界，不要求回答单一精确效应。" },
+        { term: "数据制图", explain: "按统一字段提取研究特征、方法、结局和证据来源。" },
+        { term: "AMSTAR 2", explain: "评价系统综述方法质量与可信度的工具，重点是关键领域和总体可信度。" },
+        { term: "证据重叠", explain: "不同 Meta 分析可能重复纳入相同原始研究，使证据并非独立增加。" },
+        { term: "过度显著性偏倚", explain: "同一研究领域出现异常多显著结果的现象，是伞状综述关注的问题之一。" },
+        { term: "证据分级", explain: "在综述质量和一致性基础上，对每个结局的可信度分级。" },
+      ],
+      comparison: {
+        title: "范围综述与伞状综述",
+        note: "二者都在高层整理证据，但分析单位和研究问题不同。",
+        headers: ["方面", "范围综述", "伞状综述", "核心工具"],
+        rows: [
+          ["分析单位", "原始研究", "系统综述/Meta", "方案与纳排"],
+          ["主要输出", "研究地图与空白", "综述质量和效应一致性", "PRISMA-ScR/AMSTAR 2"],
+          ["定量合并", "通常不做", "可重新提取或汇总", "效应量与重叠分析"],
+          ["主要风险", "边界过宽", "重复研究和低质量综述", "证据制图/综述质量"],
+        ],
+      },
+      whenUse: ["还不确定领域有哪些研究和概念。", "准备正式系统综述前需要先绘制地图。", "已有多个系统综述需要整合。", "需要评价证据重叠和综述质量。"],
+      dataShape: ["预先定义研究问题、纳排和提取字段。", "记录数据库、检索日期和筛选流程。", "范围综述记录研究特征与概念。", "伞状综述记录每篇综述的纳入研究、质量与结局。"],
+      steps: [
+        {
+          title: "写方案和研究问题",
+          text: "范围问题可较宽，但仍需界定人群、概念、情境和证据类型。",
+          code: `# 范围综述示例要素\n# Population: 老年人\n# Concept: 数字健康素养\n# Context: 社区与初级保健\n# Evidence: 定量、定性、混合方法`,
+          explain: "越宽不等于越随意；边界和概念定义必须可操作。",
+        },
+        {
+          title: "制定检索与筛选流程",
+          text: "记录数据库、日期、检索式和筛选人数，报告 PRISMA-ScR 流程。",
+          code: `# 保存检索式字符串和检索日期\n# 记录题录数、去重数、全文数和纳入数\n# 排除原因使用统一分类`,
+          explain: "可复制检索是综述可信度的基础。",
+        },
+        {
+          title: "证据制图",
+          text: "提取研究年份、国家、设计、人群、结局和方法，形成表格和可视化。",
+          code: `library(ggplot2)\n# 示例：研究年份趋势\nggplot(studies, aes(year)) +\n  geom_histogram(binwidth = 1) +\n  labs(x = "发表年份", y = "研究数")`,
+          explain: "图表用于展示研究分布和空白，不应用图形掩盖纳入研究质量。",
+        },
+        {
+          title: "伞状综述评价综述质量和重叠",
+          text: "用 AMSTAR 2 评价综述质量，记录各综述纳入原始研究的重叠，并分级每个结局证据。",
+          code: `# 建立 meta-review 表：综述 ID、结局、效应、CI、AMSTAR 2、原始研究 ID\n# 使用校正覆盖面积或表格评估重叠\n# 根据综述质量、一致性、偏倚和重叠分级`,
+          explain: "多篇 Meta 都显著，不一定代表独立强证据；可能只是同一批原始研究被重复使用。",
+        },
+      ],
+      functions: ["left_join", "group_by", "summarise", "ggplot"],
+      conditions: ["方案和研究边界事先确定。", "检索和筛选可复现。", "范围综述不勉强合并效应。", "伞状综述必须评价综述质量与重叠。"],
+      interpret: "范围综述的“证据地图”不等于疗效证据；伞状综述的“证据金字塔顶端”也不等于每篇纳入综述质量都高。",
+      readingNotes: ["PRISMA-ScR 是报告规范而非质量评分。", "AMSTAR 2 不产生单一总分。", "证据重叠会显著影响结论确定性。"],
+      pitfalls: ["范围综述没有明确概念边界。", "伞状综述把每篇 Meta 当一项独立研究。", "只看发表年份和数量。", "忽略综述质量与原始研究重叠。"],
+      practice: "为同一领域写一个范围综述概念表和一个伞状综述质量/重叠表，说明两者提取字段为何不同。",
+      references: [
+        ref("PRISMA-ScR", "https://doi.org/10.7326/M18-0850", "范围综述的报告清单。"),
+        ref("AMSTAR 2", "https://doi.org/10.1136/bmj.j4008", "系统综述方法质量评价工具。"),
+        ref("Cochrane Handbook", "https://training.cochrane.org/handbook", "系统综述、证据质量与综述方法。"),
+      ],
+    },
+  );
+
+  const modules = window.RZH_COURSE_MODULES || [];
+  const existingIds = new Set(modules.map((item) => item.id));
+  const newModules = [
+    {
+      id: "r-advanced-models",
+      title: "高级建模：非线性、潜变量与缺失数据",
+      subtitle: "从模型问题到诊断和解释",
+      minutes: 26,
+      unit: "analysis",
+      outcome: "能判断何时需要 GAM、SEM、LCA、多重插补或纵向模型，并为模型选择写出依据。",
+      sections: [
+        { heading: "先问模型回答什么", text: "区分预测、关联和因果问题，再考虑模型复杂度。" },
+        { heading: "检查数据条件", text: "样本量、结局分布、重复结构、潜变量识别和缺失机制决定模型是否合适。" },
+        { heading: "诊断与解释", text: "模型收敛不等于合适。检查残差、拟合、稳定性、校准和敏感区域。" },
+      ],
+      code: `# 从入门模型开始，再根据数据结构和假设扩展\nfit_lm <- lm(y ~ x + age + sex, data = dat)\n# 非线性可继续查看 GAM；重复测量可查看 LMM/GEE；缺失可查看多重插补`,
+      functions: ["gam", "lmer", "sem", "poLCA", "mice"],
+      practice: "针对一个研究问题写出最小合适模型、至少两个替代模型和选择依据。",
+    },
+    {
+      id: "r-bayesian",
+      title: "贝叶斯统计入门",
+      subtitle: "先验、后验、诊断与报告",
+      minutes: 22,
+      unit: "analysis",
+      outcome: "能解释可信区间，完成基本先验预测、MCMC 收敛和后验预测检查。",
+      sections: [
+        { heading: "从先验到后验", text: "先验表达分析前信息，数据通过似然更新后验。" },
+        { heading: "检查计算", text: "Rhat、ESS、链混合和发散转移决定后验样本能否使用。" },
+        { heading: "检查模型", text: "先验预测与后验预测检验帮助发现不合理的分布和结构。" },
+      ],
+      code: `# Beta-binomial 示例\nalpha_post <- 2 + 8\nbeta_post <- 2 + 2\nqbeta(c(.025, .975), alpha_post, beta_post)`,
+      functions: ["rbeta", "rbinom", "qbeta", "brm", "posterior_predict", "loo"],
+      practice: "用同一数据改变先验，比较后验均值和可信区间并解释变化。",
+    },
+    {
+      id: "r-evidence-synthesis",
+      title: "证据综合与综述方法",
+      subtitle: "从方案到 Meta 和证据分级",
+      minutes: 20,
+      unit: "analysis",
+      outcome: "能选择综述类型，写出检索与纳排方案，并说明何时可以统计合并。",
+      sections: [
+        { heading: "问题决定综述类型", text: "系统综述、范围综述、Meta 和伞状综述服务不同目的。" },
+        { heading: "先写方案", text: "检索、筛选、提取、偏倚评价和综合方法在看结果前确定。" },
+        { heading: "解释证据", text: "效应、异质性、偏倚和 GRADE 共同构成结论。" },
+      ],
+      code: `# 综述方案至少记录\n# 数据库、检索式、日期、纳排、提取字段、偏倚工具、合成方法`,
+      functions: ["rma", "forest.rma", "regtest", "netmeta"],
+      practice: "为当前研究方向写一段 PECO 问题，并说明选择系统综述还是范围综述。",
+    },
+  ];
+  const modulesToInsert = newModules.filter((item) => !existingIds.has(item.id));
+  const insertIndex = modules.findIndex((module) => module.id === "r-advanced");
+  modules.splice(
+    insertIndex >= 0 ? insertIndex + 1 : modules.length,
+    0,
+    ...modulesToInsert
+  );
+  modules.forEach((module, index) => {
+    module.number = index + 1;
+  });
+
+  if (categoryMap.has("system")) {
+    categoryMap.get("system").detail = `从 R 与 RStudio 入门开始，依次学习语法、数据结构、数据导入与清洗、数据转换、控制流、文本处理、可视化、统计建模、高级模型、贝叶斯和证据综合，共 ${modules.length} 节系统课。`;
+  }
+})();
+
+</script>
+  <script>
+(() => {
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const categoryMap = new Map(categories.map((item) => [item.id, item]));
+
+  if (!categoryMap.has("ml")) {
+    categories.push({
+      id: "ml",
+      title: "机器学习与预测",
+      typeLabel: "Machine Learning",
+      subtitle: "从数据拆分到外部验证",
+      audience: "想做临床预测、风险分层或高维数据分类，而不只是比较几个 p 值。",
+      detail: "先建立预测问题、目标和验证方案，再学习 tidymodels、树模型与集成学习。机器学习更重视样本外表现、校准、公平性、可复现和数据泄漏，而不是训练集分数越高越好。",
+      icon: "sparkles",
+      items: [
+        { title: "机器学习全流程", note: "问题、拆分、泄漏与验证", href: "#guide/ml/workflow", level: "入门" },
+        { title: "tidymodels 流水线", note: "rsample、recipes、workflow、tune、yardstick", href: "#guide/ml/tidymodels", level: "进阶" },
+        { title: "树模型与集成学习", note: "决策树、随机森林、Boosting 与解释", href: "#guide/ml/trees-ensembles", level: "进阶" },
+        { title: "模型评估与校准", note: "AUC、AUPRC、Brier、校准和 DCA", href: "#guide/ml/evaluation", level: "高阶" },
+        { title: "距离、边界与概率模型", note: "KNN、SVM 与朴素贝叶斯", href: "#guide/ml/supervised-algorithms", level: "进阶" },
+        { title: "无监督学习", note: "降维、聚类、异常检测与稳定性", href: "#guide/ml/unsupervised", level: "高阶" },
+        { title: "随机森林", note: "组合多棵树提高预测稳定性", href: "#guide/model/random-forest", level: "进阶" },
+        { title: "支持向量机", note: "间隔边界与核函数", href: "#guide/model/svm", level: "高阶" },
+      ],
+    });
+  }
+
+  const desiredOrder = ["quick", "system", "entry", "cleaning", "transform", "control", "regex", "datetime", "visualization", "parameters", "methods", "models", "advanced", "bayesian", "reviews", "ml", "reporting"];
+  categories.sort((a, b) => {
+    const ai = desiredOrder.indexOf(a.id);
+    const bi = desiredOrder.indexOf(b.id);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
+
+  const ref = (title, url, note) => ({ title, url, note });
+  const mlReferences = [
+    ref("Tidy Modeling with R", "https://www.tmwr.org/", "以 tidymodels 完成预测建模、重采样和调参的开放教材。"),
+    ref("tidymodels 官方入门", "https://www.tidymodels.org/start/", "rsample、recipes、parsnip、workflows、tune 和 yardstick。"),
+    ref("TRIPOD+AI", "https://doi.org/10.1136/bmj-2023-078378", "包含人工智能的预测模型开发、验证和报告规范。"),
+  ];
+
+  window.RZH_GUIDES.push(
+    {
+      type: "ml",
+      id: "workflow",
+      typeLabel: "Machine Learning",
+      minutes: 30,
+      title: "机器学习全流程",
+      aliases: ["机器学习", "预测模型", "数据泄漏", "交叉验证"],
+      hero: "先把测试集锁起来，再允许任何预处理和调参发生",
+      audience: "准备用 Logistic、随机森林或 XGBoost 做风险预测，但不熟悉训练、验证和测试的关系。",
+      overview: "机器学习是在训练数据上学习规则，并在没参与训练的数据上评价表现。整个流程包括问题定义、样本拆分、重采样、预处理、模型训练、调参、最终测试和外部验证。数据泄漏是预后模型最常见的致命错误之一。",
+      features: ["区分预测问题与解释/因果问题。", "在训练集内完成插补、标准化、筛选和调参。", "用独立测试集评价最终模型。", "同时报告区分度、校准和临床效用。"],
+      concepts: [
+        { term: "训练集与测试集", explain: "训练集用于学习和调参，测试集在最终方案确定前不能参与任何选择。" },
+        { term: "交叉验证", explain: "在训练集内部多次拆分，估计泛化表现并做超参数选择。测试集仍保持锁住。" },
+        { term: "数据泄漏", explain: "使用结局或验证数据的信息构造特征、标准化、插补或筛选变量，导致表现被人为高估。" },
+        { term: "目标泄漏", explain: "某个特征实际上来自结局发生后或直接编码了结局，不能在预测时间点获得。" },
+        { term: "外部验证", explain: "在另一个时间、中心或人群验证固定模型，是临床推广前更重要的一步。" },
+        { term: "预测时间零点", explain: "模型允许使用哪些信息，取决于做出预测的那个时点。" },
+      ],
+      comparison: {
+        title: "不同研究目标的评价重点",
+        note: "同一个数据可以拟合模型，但研究目标决定应报告什么。",
+        headers: ["目标", "中心问题", "主要指标", "不能自动得到"],
+        rows: [
+          ["预测", "未来个体的风险估计是否可靠", "校准、AUC、AUPRC、Brier、DCA", "因果效应"],
+          ["解释", "变量与结局在模型中怎样关联", "系数、区间、模型结构", "个体预测一定准确"],
+          ["因果", "改变暴露/干预会怎样", "目标效应、DAG、敏感性", "最好的训练集 AUC"],
+        ],
+      },
+      whenUse: ["结局发生在未来，需要用基线信息预测。", "有足够事件数和可比较验证人群。", "能定义预测时间零点和可用变量。", "团队愿意进行外部验证和校准评价。"],
+      dataShape: ["一行代表预测时间点上的一个对象。", "特征必须在预测时间点可获得。", "事件数、类别比例和缺失模式已检查。", "拆分前后比较关键变量分布。"],
+      steps: [
+        {
+          title: "定义样本、时间零点和预测窗口",
+          text: "先写清何时预测、预测多久内的事件、变量何时可用。",
+          code: `# 示例\n# 人群：首次入院成人\n# 时间零点：入院 24 小时内\n# 预测窗口：住院期间\n# 可用变量：时间零点前已获得的指标`,
+          explain: "预测窗口和变量时间决定模型是否能在真实场景使用。",
+        },
+        {
+          title: "锁定测试集",
+          text: "首选按时间或中心做外部队列；内部验证时保留独立测试集。",
+          code: `library(rsample)\nset.seed(2026)\nsplit <- initial_split(dat, prop = 0.8, strata = outcome)\ntrain <- training(split)\ntest <- testing(split)`,
+          explain: "stratified sampling 保持事件比例；测试集只用于最终评价。",
+        },
+        {
+          title: "只在训练集内调参和预处理",
+          text: "标准化、插补、特征筛选都必须在重采样内重新估计，不能先用全数据。",
+          code: `folds <- vfold_cv(train, v = 5, strata = outcome)\n# 预处理配方和模型调参都放入 workflow，再在 folds 上重采样`,
+          explain: "若先用整个训练集做特征筛选、再用同一训练集交叉验证，仍可能产生选择偏差。",
+        },
+        {
+          title: "最终测试与外部验证",
+          text: "确定模型和阈值后，只在测试集评价一次；如条件允许，再用独立数据库验证。",
+          code: `# 最终模型确定后\nfinal_metrics <- last_fit(final_workflow, split)\ncollect_metrics(final_metrics)`,
+          explain: "在测试集反复试模型会把测试集变成另一种训练信息。",
+        },
+        {
+          title: "报告不确定性、适用边界和公平性",
+          text: "给出 AUC/校准/Brier/区间，并检查亚组表现和数据缺失场景。",
+          code: `# 模型价值不等于单一 AUC\n# 至少报告：事件数、候选变量、验证方式、校准、阈值、亚组表现、适用范围`,
+          explain: "高 AUC 模型可能校准差、亚组失效或缺少行动阈值，不能直接用于临床决策。",
+        },
+      ],
+      functions: ["initial_split", "vfold_cv", "recipe", "workflow", "fit", "predict"],
+      conditions: ["预测时间零点与可用变量明确。", "测试集在最终方案前保持未知。", "所有预处理进入重采样流程。", "报告外部验证、校准与适用人群。"],
+      interpret: "训练集性能不是模型性能。真正有价值的是未参与训练人群中的区分、校准和临床净获益，以及模型在目标场景中的可执行性。",
+      readingNotes: ["事件数通常比总样本量更关键。", "类别不平衡时应同时看 AUPRC、敏感度、特异度和校准。", "变量重要性不是因果效应。"],
+      pitfalls: ["全数据标准化后再交叉验证。", "用测试集反复挑模型。", "把随访后变量作为预测特征。", "只报告 AUC 不报告校准。"],
+      practice: "为一个二分类预测问题写出时间零点、候选变量、训练/测试方案、重采样方案和三类最终指标。",
+      references: mlReferences,
+    },
+    {
+      type: "ml",
+      id: "tidymodels",
+      typeLabel: "Machine Learning",
+      minutes: 42,
+      title: "tidymodels 流水线",
+      aliases: ["tidymodels", "recipes", "parsnip", "workflow"],
+      hero: "把预处理、模型和调参放进同一个可复现流程",
+      audience: "想用统一接口比较 Logistic、树模型和其他算法，避免不同包的数据处理和行为不一致。",
+      overview: "tidymodels 把预测建模拆成一组可组合对象：rsample 负责拆分，recipes 负责预处理，parsnip 提供模型接口，workflows 组合配方与模型，tune 负责调参，yardstick 负责评价。这样能保证同一预处理在训练和验证中按相同规则执行。",
+      features: ["一套语法比较多个模型。", "预处理只在训练折内估计。", "统一重采样、调参和指标。", "保存完整流程而不是只保存一个模型对象。"],
+      concepts: [
+        { term: "recipe", explain: "声明结局、预测变量和预处理步骤，步骤在训练折上估计并应用到其他数据。" },
+        { term: "parsnip", explain: "统一模型接口，同一个 Logistic 可切换 glm、glmnet 等 engine。" },
+        { term: "workflow", explain: "把预处理器和模型绑定，避免遗漏预处理或训练/预测不一致。" },
+        { term: "tune", explain: "在重采样中尝试参数组合，根据验证指标选择。" },
+        { term: "yardstick", explain: "统一分类、回归和概率评价指标，包括 ROC AUC、准确率、Brier 等。" },
+        { term: "last_fit", explain: "用已选参数在训练集拟合并只在测试集评价最终模型。" },
+      ],
+      comparison: {
+        title: "对象各做什么",
+        note: "先理解每层责任，再读完整代码，不会把预处理和模型参数混在一起。",
+        headers: ["对象", "作用", "常见函数", "输出"],
+        rows: [
+          ["数据拆分", "训练/测试/折", "initial_split、vfold_cv", "拆分对象"],
+          ["预处理", "插补、标准化、哑变量", "recipe、step_*", "recipes 配方"],
+          ["模型定义", "算法与引擎", "logistic_reg、rand_forest", "parsnip 模型"],
+          ["组合", "配方 + 模型", "workflow", "可拟合流程"],
+          ["调参", "搜索超参数", "tune_grid", "tuning 结果"],
+          ["评价", "指标和预测", "collect_metrics、roc_auc", "性能估计"],
+        ],
+      },
+      whenUse: ["需要在多个算法之间公平比较。", "预处理步骤较多。", "需要交叉验证和超参数搜索。", "希望保存整个建模流程并复现。"],
+      dataShape: ["明确结局和预测变量。", "分类变量水平在训练集中有足够样本。", "缺失和类别不平衡已进入配方考虑。", "分组或时间结构决定重采样方式。"],
+      steps: [
+        {
+          title: "拆分数据并建立重采样",
+          text: "测试集锁住；训练集内部建立交叉验证。",
+          code: `library(tidymodels)\nset.seed(2026)\nsplit <- initial_split(dat, prop = 0.8, strata = outcome)\ntrain <- training(split)\ntest <- testing(split)\nfolds <- vfold_cv(train, v = 5, strata = outcome)`,
+          explain: "strata 保持事件比例；若有个体重复测量，应使用 group_vfold_cv，按人聚类拆折。",
+        },
+        {
+          title: "定义预处理配方",
+          text: "插补、标准化和哑变量都写入 recipes，不要提前对全数据做。",
+          code: `rec <- recipe(outcome ~ ., data = train) |>\n  step_impute_median(all_numeric_predictors()) |>\n  step_normalize(all_numeric_predictors()) |>\n  step_dummy(all_nominal_predictors())`,
+          explain: "配方先声明，真正估计发生在 fit 或 tune 的训练折内。",
+        },
+        {
+          title: "定义模型与工作流",
+          text: "选择算法、引擎和待调参数，再把配方与模型绑定。",
+          code: `spec <- logistic_reg(penalty = tune(), mixture = 0) |>\n  set_engine("glmnet")\nwf <- workflow(preprocessor = rec, spec = spec)`,
+          explain: "mixture=0 表示岭惩罚；penalty=tune() 表示在重采样中搜索。",
+        },
+        {
+          title: "在训练折内调参",
+          text: "指定参数网格和指标。指标应由研究问题和类别比例决定。",
+          code: `grid <- tune_grid(\n  wf, resamples = folds, grid = 20,\n  metrics = metric_set(roc_auc, accuracy, brier_class)\n)\ncollect_metrics(grid)\nselect_best(grid, metric = "roc_auc")`,
+          explain: "调参只使用训练折。若直接用测试集选择参数，就失去独立评价。",
+        },
+        {
+          title: "最终拟合并锁住测试评价",
+          text: "确定参数后在训练集拟合，再在测试集评价一次。",
+          code: `best <- select_best(grid, metric = "roc_auc")\nfinal_wf <- finalize_workflow(wf, best)\nfinal_result <- last_fit(final_wf, split)\ncollect_metrics(final_result)`,
+          explain: "last_fit() 自动在训练集拟合并在测试集生成预测。仍需检查校准、亚组和临床效用。",
+        },
+      ],
+      functions: ["initial_split", "vfold_cv", "recipe", "step_impute_median", "step_normalize", "step_dummy", "logistic_reg", "workflow", "tune_grid", "select_best", "finalize_workflow", "last_fit", "collect_metrics", "roc_auc", "brier_class"],
+      conditions: ["预处理和调参都在训练折内。", "重采样方式与数据结构匹配。", "指标由预测目标决定。", "最终测试集只评价锁定模型。"],
+      interpret: "tidymodels 的价值是让流程显式、可复现，不是自动选出科学上正确的模型。模型选择仍要结合外部验证、校准和临床可用性。",
+      readingNotes: ["class 指标与 probability 指标不能混用。", "分组数据要用 group_vfold_cv。", "时间序列应按时间切分而非普通随机交叉。"],
+      pitfalls: ["在 recipe 外先做全数据预处理。", "用准确率评价极端不平衡结局。", "只选 AUC 最高的模型。", "测试集反复调参。"],
+      practice: "用相同 recipe 比较 Logistic、随机森林和 XGBoost 三种 parsnip 模型，统一 folds 和指标，并解释哪个适合你的问题。",
+      references: mlReferences,
+    },
+    {
+      type: "ml",
+      id: "trees-ensembles",
+      typeLabel: "树模型",
+      minutes: 40,
+      title: "树模型与集成学习",
+      aliases: ["决策树", "随机森林", "XGBoost", "Boosting"],
+      hero: "树负责切分，集成负责降低单树的不稳定",
+      audience: "数据存在非线性和交互，希望比较决策树、随机森林和梯度提升。",
+      overview: "决策树按阈值递归分区，容易解释但可能不稳定。随机森林用样本和变量随机性训练多棵树并平均；Boosting 顺序增加树，重点修正前一轮误差。复杂模型仍需相同的拆分、调参、校准和外部验证。",
+      features: ["自动处理非线性和交互。", "减少手工指定函数形式。", "随机森林稳健，Boosting 常表现较强。", "可结合变量重要性和局部解释。"],
+      concepts: [
+        { term: "节点与分裂", explain: "树在某个变量阈值处把人群分成两个子组，目标是降低不纯度或预测误差。" },
+        { term: "max_depth", explain: "树的最大深度。越深越容易拟合训练集细节并过拟合。" },
+        { term: "min_n", explain: "节点继续分裂所需最少样本数，越大模型越保守。" },
+        { term: "mtry", explain: "每次分裂随机尝试的变量数。较小 mtry 增加树之间差异，降低相关性。" },
+        { term: "学习率与轮数", explain: "Boosting 中学习率小、轮数多来逐步更新；两者需一起调。" },
+        { term: "变量重要性", explain: "说明模型使用该变量的程度，不是因果效应。相关变量会分摊重要性。" },
+      ],
+      comparison: {
+        title: "决策树、随机森林与 Boosting",
+        note: "模型复杂度越高，越需要固定验证方案和解释边界。",
+        headers: ["模型", "核心思想", "优点", "局限"],
+        rows: [
+          ["单棵决策树", "递归阈值分区", "直观、可画规则", "不稳定、易过拟合"],
+          ["随机森林", "多棵随机树平均", "稳健、调参较少", "模型大、解释是整体的"],
+          ["梯度提升", "顺序拟合残差/梯度", "结构化数据预测常很强", "调参敏感、过拟合和泄漏风险"],
+          ["Stacking/集成", "元模型组合多个预测", "可能提高性能", "流程更复杂，验证必须嵌套"],
+        ],
+      },
+      whenUse: ["非线性与交互明显。", "预测任务比参数解释更重要。", "有足够事件数和独立验证数据。", "能接受模型解释与变量重要性非因果。"],
+      dataShape: ["类别编码和缺失策略一致。", "调参空间预先定义。", "使用与模型复杂度匹配的重采样。", "外部验证前固定模型和阈值。"],
+      steps: [
+        {
+          title: "先建立单棵决策树基线",
+          text: "单树帮助理解分裂逻辑，也作为复杂模型的对照。",
+          code: `library(rpart)\ntree <- rpart(outcome ~ ., data = train, method = "class", cp = 0.01)\nplot(tree, uniform = TRUE, margin = 0.1)\ntext(tree, use.n = TRUE, cex = 0.7)`,
+          explain: "cp 控制剪枝复杂度，越大树越简单。树图代表训练规则，不保证外部泛化。",
+        },
+        {
+          title: "训练随机森林并调关键参数",
+          text: "调 mtry 和最小节点大小，在训练折内用统一指标选择。",
+          code: `library(ranger)\nrf <- ranger(outcome ~ ., data = train,\n  num.trees = 1000, mtry = 3, min.node.size = 10,\n  probability = TRUE, importance = "permutation", seed = 2026\n)`,
+          explain: "probability=TRUE 便于校准；permutation importance 在结局被打乱后观察性能下降。",
+        },
+        {
+          title: "训练梯度提升并控制学习速度",
+          text: "学习率、树深、轮数和正则需统一调参，不能只追求训练集最小误差。",
+          code: `library(xgboost)\ndt <- xgb.DMatrix(as.matrix(train[predictors]), label = train$outcome)\nmodel <- xgb.train(\n  params = list(objective = "binary:logistic", eta = 0.05,\n                max_depth = 3, subsample = 0.8, eval_metric = "logloss"),\n  data = dt, nrounds = 500, verbose = 0\n)`,
+          explain: "eta 是学习率，max_depth 控制交互复杂度，subsample 增加随机性。轮数应通过验证曲线确定。",
+        },
+        {
+          title: "评价校准与亚组表现",
+          text: "高区分度模型仍可能预测概率偏高或偏低，尤其在不平衡结局和不同中心。",
+          code: `# 预测概率后计算 Brier、校准截距/斜率、校准曲线\n# 按 sex、age_group、site 分层重复评价`,
+          explain: "AUC 只看排序，不保证概率准确；临床决策依赖具体风险数值。",
+        },
+        {
+          title: "解释但不夸大因果",
+          text: "变量重要性、偏依赖和局部解释描述模型，不代表改变变量会造成相应因果变化。",
+          code: `library(vip)\nvip(rf, num_features = 15)\npdp::partial(rf, pred.var = "age", train = train, prob = TRUE)`,
+          explain: "偏依赖会受相关变量影响；与数据范围外的预测一样，解释也要限制在观测支持下。",
+        },
+      ],
+      functions: ["rpart", "randomForest", "ranger", "xgb.DMatrix", "xgb.train", "vip"],
+      conditions: ["训练/验证/测试边界固定。", "调参在训练折内完成。", "类别不平衡时同时看校准和 AUPRC。", "外部验证前不反复修改模型。"],
+      interpret: "随机森林和 Boosting 提供预测函数，不提供自动因果机制。变量重要性高说明模型依赖该变量，不能说明干预它会改变结局。",
+      readingNotes: ["树数量足够后，增加树通常不会无限改善性能。", "Boosting 更依赖学习率、轮数和树深联合调参。", "相关变量会相互分摊重要性。"],
+      pitfalls: ["用训练集准确率选择模型。", "在类别不平衡时只看 accuracy。", "把 permutation importance 当因果。", "外部验证后再用同一测试集改模型。"],
+      practice: "用同一训练/测试方案比较单树、随机森林和 Boosting 的 AUC、AUPRC、Brier 和校准，并说明复杂度是否值得。",
+      references: [
+        ref("ranger 官方文档", "https://cran.r-project.org/web/packages/ranger/ranger.pdf", "随机森林、概率预测和重要性。"),
+        ref("XGBoost R 教程", "https://xgboost.readthedocs.io/en/stable/R-package/xgboostPresentation.html", "DMatrix、参数、训练与预测。"),
+        ref("Tidy Modeling with R", "https://www.tmwr.org/", "统一模型工作流与树模型调参。"),
+        ref("TRIPOD+AI", "https://doi.org/10.1136/bmj-2023-078378", "预测模型报告和验证规范。"),
+      ],
+    },
+    {
+      type: "ml",
+      id: "evaluation",
+      typeLabel: "模型评估",
+      minutes: 38,
+      title: "模型评估与校准",
+      aliases: ["AUC", "AUPRC", "Brier", "校准", "DCA"],
+      hero: "能排序、能给出正确风险、还能帮助决策，是三件不同的事",
+      audience: "模型有 AUC，但不知道怎样判断是否真正可用于风险预测和临床决策。",
+      overview: "预测模型评价至少包括区分度、校准、总体误差和临床效用。AUC 衡量排序，AUPRC 在少数类关注时更有用，Brier 综合概率误差，校准曲线检查预测风险与实际风险是否一致，决策曲线评价不同阈值下的净获益。",
+      features: ["区分度评价正确排序能力。", "校准评价预测概率的准确性。", "敏感度、特异度和阈值反映使用场景。", "内部与外部验证分别估计可推广性。"],
+      concepts: [
+        { term: "区分度", explain: "模型把事件风险更高的人排在更前面的能力，代表指标有 AUC 和 C 统计量。" },
+        { term: "校准", explain: "预测 20% 风险的人群实际事件比例是否接近 20%。高 AUC 不代表校准好。" },
+        { term: "Brier score", explain: "预测概率与 0/1 结局差异的平方均值，越低越好，同时受区分度和校准影响。" },
+        { term: "AUPRC", explain: "精确率-召回率曲线下面积，在事件稀少且关注阳性识别时更能反映性能。" },
+        { term: "阈值", explain: "概率转成分类决策的切点，应由获益、成本、资源和预先目标决定。" },
+        { term: "决策曲线", explain: "比较模型与全治/不治策略在不同阈值概率下的净获益。" },
+      ],
+      comparison: {
+        title: "分类模型指标对照",
+        note: "不要用一个指标替代全部评价。",
+        headers: ["指标", "回答什么", "优点", "局限"],
+        rows: [
+          ["AUC", "排序能力", "阈值无关、易比较", "不反映校准，不平衡时可能乐观"],
+          ["AUPRC", "阳性识别的精度与召回", "稀有事件更有信息", "依赖事件比例"],
+          ["Brier", "概率预测总体误差", "兼顾校准和区分", "需明确结局尺度"],
+          ["校准曲线", "不同预测风险是否准确", "直观", "需足够样本和分组"],
+          ["敏感度/特异度", "某阈值下错误类型", "临床可解释", "依赖阈值选择"],
+          ["DCA", "决策净获益", "连接临床后果", "阈值范围和效用假设重要"],
+        ],
+      },
+      whenUse: ["比较多个预测模型。", "决定模型阈值。", "验证模型能否进入临床场景。", "向合作者说明 AUC 之外的性能。"],
+      dataShape: ["结局编码一致。", "预测概率来自未参与训练的数据。", "足够事件数支持区间估计。", "亚组和校准评价有足够样本。"],
+      steps: [
+        {
+          title: "统一预测概率与结局",
+          text: "评价使用概率，不要在模型之间对阈值优化不一致。",
+          code: `library(yardstick)\npred <- data.frame(outcome = factor(test$outcome, levels = c(0,1)),\n                   prob = predict(final_wf, test, type = "prob")$.pred_1)`,
+          explain: "truth 与 estimate/prob 的因子水平必须一致，否则指标会悄悄算错。",
+        },
+        {
+          title: "评价区分度",
+          text: "概率结局报告 ROC AUC、PR AUC 和置信区间。",
+          code: `roc_auc(pred, truth = outcome, prob, event_level = "second")\npr_auc(pred, truth = outcome, prob, event_level = "second")\nroc_curve(pred, truth = outcome, prob)`,
+          explain: "event_level 明确哪个水平是事件。类别不平衡时同时看 PR 曲线。",
+        },
+        {
+          title: "评价校准与总体误差",
+          text: "校准曲线、截距/斜率和 Brier 分数应一起报告。",
+          code: `brier_class(pred, truth = outcome, prob, event_level = "second")\n# 校准可用校准曲线、平滑校准或分组观测/期望比例`,
+          explain: "校准差说明模型给出的风险数值不能直接用于绝对风险沟通。",
+        },
+        {
+          title: "基于场景选择阈值",
+          text: "阈值根据漏诊/误诊代价、资源与净获益确定，不能默认 0.5。",
+          code: `threshold_data <- threshold_perf(\n  pred, truth = outcome, prob,\n  thresholds = seq(0.05, 0.8, 0.05),\n  metrics = metric_set(sens, spec, precision, recall)\n)`,
+          explain: "不同阈值会改变敏感度和特异度，必须与具体行动方案匹配。",
+        },
+        {
+          title: "外部验证与亚组评价",
+          text: "固定模型后再用新中心、新时间或目标人群验证，报告校准和决策指标。",
+          code: `# 外部验证时重新计算 predictions 和 metrics\n# 不重新调参，除非明确开发新模型`,
+          explain: "内部交叉验证展示可重复性，外部验证才更接近真实推广。",
+        },
+      ],
+      functions: ["roc_auc", "pr_auc", "roc_curve", "brier_class", "threshold_perf", "collect_metrics"],
+      conditions: ["评价数据未参与训练和调参。", "事件水平与指标参数一致。", "区分度、校准和临床效用一并报告。", "外部验证不在同一步重新挑模型。"],
+      interpret: "AUC 高并不等于模型可用。临床预测需要预测风险接近真实风险，在合适阈值产生净获益，并在目标人群中保持稳定。",
+      readingNotes: ["AUPRC 基线约等于事件比例。", "Brier 越低越好。", "校准斜率偏离 1 表示过拟合或欠拟合。"],
+      pitfalls: ["只报告 AUC。", "默认 0.5 是临床阈值。", "在一套数据上反复开发再称外部验证。", "亚组样本很少仍做确定比较。"],
+      practice: "为同一模型同时报告 AUC、AUPRC、Brier、校准曲线、两个阈值的敏感度/特异度和一个 DCA 结果。",
+      references: mlReferences.concat([
+        ref("PROBAST", "https://doi.org/10.7326/M18-1377", "预测模型偏倚风险和适用性评价工具。"),
+      ]),
+    },
+    {
+      type: "ml",
+      id: "supervised-algorithms",
+      typeLabel: "监督学习",
+      minutes: 34,
+      title: "距离、边界与概率模型",
+      aliases: ["KNN", "SVM", "朴素贝叶斯"],
+      hero: "先看数据尺度和特征假设，再选算法",
+      audience: "想在 Logistic 和树模型之外了解 KNN、SVM、朴素贝叶斯，并知道它们何时适用。",
+      overview: "KNN 根据邻近样本投票，SVM 寻找间隔或核空间边界，朴素贝叶斯用条件概率做分类。它们对尺度、相关特征、样本量和调参的敏感程度不同。复杂算法没有统一赢家，需要同一验证方案比较。",
+      features: ["KNN 适合局部相似性明显的任务。", "SVM 可处理中小规模非线性边界。", "朴素贝叶斯计算快，适合高维离散特征。", "三者的概率输出和解释都需要额外检查。"],
+      concepts: [
+        { term: "距离", explain: "KNN 依赖变量间距离，连续变量尺度不同会主导最近邻，通常要先标准化。" },
+        { term: "k 与邻居", explain: "k 控制投票范围；太小过拟合，太大过度平滑。" },
+        { term: "支持向量与间隔", explain: "SVM 寻找尽可能宽带的分隔边界，核函数允许非线性。" },
+        { term: "核函数", explain: "RBF 等核把样本映射到更复杂空间，需要调 gamma 和成本 C。" },
+        { term: "条件独立假设", explain: "朴素贝叶斯假设给定类别后特征相互独立，现实中常被违反。" },
+        { term: "概率校准", explain: "某些算法的分数不是校准好的概率，不能直接当临床风险。" },
+      ],
+      comparison: {
+        title: "三种算法怎样选",
+        note: "比较时使用同一拆分、预处理和指标。",
+        headers: ["算法", "核心思想", "主要预处理", "主要参数", "局限"],
+        rows: [
+          ["KNN", "邻近标签投票", "标准化、无关变量筛选", "k、距离", "高维和尺度敏感"],
+          ["SVM", "最大间隔/核边界", "标准化", "cost、kernel、gamma", "概率不天然校准"],
+          ["朴素贝叶斯", "类别条件概率", "离散化/文本特征", "先验、分布假设", "特征相关时过度自信"],
+        ],
+      },
+      whenUse: ["需要拓宽模型候选范围。", "样本规模中等、特征维度受控。", "有统一交叉验证和外部验证方案。", "愿意检查概率校准而非只看分类边界。"],
+      dataShape: ["连续变量尺度和极端值已处理。", "分类变量编码一致。", "高维稀疏特征要考虑专有方法。", "调参在训练折内执行。"],
+      steps: [
+        {
+          title: "建立统一预处理",
+          text: "标准化只在训练折估计，再应用到验证折和测试集。",
+          code: `library(recipes)\nrec <- recipe(outcome ~ ., data = train) |>\n  step_normalize(all_numeric_predictors()) |>\n  step_dummy(all_nominal_predictors())`,
+          explain: "预先全数据标准化会泄漏验证折信息，tidymodels 配方能避免这个问题。",
+        },
+        {
+          title: "KNN 调邻居数",
+          text: "k 太小时对噪声敏感，太大时局部边界被抹平。",
+          code: `# tidymodels 示例\nknn_spec <- nearest_neighbor(neighbors = tune(), weight_func = "rectangular") |>\n  set_engine("kknn") |>\n  set_mode("classification")`,
+          explain: "neighbors 需在交叉验证中搜索；若变量量纲差异大，标准化尤其重要。",
+        },
+        {
+          title: "SVM 调成本与核参数",
+          text: "先尝试 RBF 核，在验证中联合搜索 cost 和 gamma。",
+          code: `svm_spec <- svm_rbf(cost = tune(), rbf_sigma = tune()) |>\n  set_engine("kernlab") |>\n  set_mode("classification")`,
+          explain: "cost 控制间隔违规惩罚，rbf_sigma 控制局部影响范围。",
+        },
+        {
+          title: "朴素贝叶斯检查概率质量",
+          text: "条件独立假设常不成立，概率可能过度自信。",
+          code: `# 可用 naivebayes 引擎或 e1071::naiveBayes\n# 重点检查校准与相关特征对概率的影响`,
+          explain: "分类边界可能不错，但绝对概率仍需校准和外部验证。",
+        },
+      ],
+      functions: ["nearest_neighbor", "svm", "ksvm", "naiveBayes", "recipe", "tune_grid"],
+      conditions: ["统一数据拆分和预处理。", "距离算法先标准化。", "调参在训练折内。", "概率输出做校准检查。"],
+      interpret: "算法没有脱离数据的绝对优劣。KNN、SVM 和朴素贝叶斯在特定数据结构下可用，但都必须和 Logistic/树模型在同一验证框架比较。",
+      readingNotes: ["KNN 不适合直接处理大量无关高维特征。", "SVM 支持向量数量多提示参数或数据复杂。", "朴素贝叶斯的相关特征会违反假设。"],
+      pitfalls: ["不标准化就做 KNN/SVM。", "用默认参数宣布最佳。", "只看 accuracy。", "把 SVM 分数当校准概率。"],
+      practice: "在同一个 5 折交叉验证中比较 Logistic、KNN 和 SVM，固定预处理和指标，解释选择结果。",
+      references: [
+        ref("e1071 官方文档", "https://cran.r-project.org/web/packages/e1071/e1071.pdf", "SVM、朴素贝叶斯和相关机器学习函数。"),
+        ref("tidymodels 模型目录", "https://www.tidymodels.org/find/parsnip/", "各算法可用引擎与参数。"),
+        ref("Tidy Modeling with R", "https://www.tmwr.org/", "统一建模与评估方法。"),
+      ],
+    },
+    {
+      type: "ml",
+      id: "unsupervised",
+      typeLabel: "无监督学习",
+      minutes: 32,
+      title: "无监督学习：降维与聚类",
+      aliases: ["聚类", "PCA", "UMAP", "t-SNE"],
+      hero: "没有真实标签时，更要用稳定性和业务解释约束结论",
+      audience: "希望从大量相关指标中寻找结构、亚型或异常样本，但没有预先定义结局。",
+      overview: "无监督方法寻找数据结构，而不是验证已有标签。PCA 产生线性正交成分，K-means 按中心距离分组，层次聚类产生树状结构，t-SNE/UMAP 主要用于二维可视化。聚类结果依赖标准化、距离、参数和样本，必须检查稳定性。",
+      features: ["压缩高维变量并检查相关结构。", "探索样本或变量之间的相似性。", "发现潜在亚组或异常模式。", "为后续有监督分析生成假设。"],
+      concepts: [
+        { term: "标准化", explain: "方差大的变量会主导距离和 PCA，是否标准化取决于变量单位和分析目的。" },
+        { term: "主成分", explain: "PCA 的线性组合互不相关，按解释方差排序；前两个主成分不保证保留所有结构。" },
+        { term: "距离", explain: "欧氏、曼哈顿、相关距离反映不同相似性，应结合变量类型选择。" },
+        { term: "聚类数", explain: "K-means 需要预设 k；肘部、轮廓系数和稳定性只是辅助，最终要有解释价值。" },
+        { term: "t-SNE/UMAP", explain: "主要用于可视化的非线性嵌入，坐标轴距离和簇间大小不能直接当真实度量。" },
+        { term: "稳定性", explain: "重采样后相同对象是否仍聚在一起，是比单次图形更重要的证据。" },
+      ],
+      comparison: {
+        title: "常见无监督方法",
+        note: "降维与聚类可以组合，但不要混为同一个结论。",
+        headers: ["方法", "主要目的", "输出", "关键限制"],
+        rows: [
+          ["PCA", "线性降维", "主成分、载荷、得分", "线性假设，受尺度影响"],
+          ["K-means", "按中心分组", "簇标签、中心", "需预设 k，偏好球形簇"],
+          ["层次聚类", "树状分组", "树状图与切树结果", "距离和连接方式影响大"],
+          ["t-SNE/UMAP", "二维可视化", "低维嵌入", "轴不可直接解释"],
+          ["异常检测", "寻找罕见模式", "异常分数/标签", "异常不等于数据错误"],
+        ],
+      },
+      whenUse: ["探索多指标相关结构。", "未定义结局的样本分群。", "高维数据可视化。", "发现异常模式并提出后续假设。"],
+      dataShape: ["变量单位和方向需核对。", "决定是否标准化和剔除冗余变量。", "缺失值处理规则明确。", "重采样评估聚类稳定性。"],
+      steps: [
+        {
+          title: "先检查变量和尺度",
+          text: "查看变量单位、方差、相关和缺失，避免一个变量因量纲主导结果。",
+          code: `dat_num <- dat[c("age", "bmi", "sbp", "glucose")]\nsummary(dat_num)\nround(cor(dat_num, use = "pairwise.complete.obs"), 2)`,
+          explain: "相关矩阵帮助识别高度重复变量；不同单位的变量通常需要标准化。",
+        },
+        {
+          title: "PCA 检查解释方差与载荷",
+          text: "主成分不是新测量的真实变量，载荷用于解释各成分代表什么。",
+          code: `pca <- prcomp(dat_num, center = TRUE, scale. = TRUE)\nsummary(pca)\nround(pca$rotation[, 1:3], 2)`,
+          explain: "scale.=TRUE 标准化变量；rotation 是载荷，x 是样本得分。",
+        },
+        {
+          title: "K-means 拟合多个 k",
+          text: "固定 seed，多次起始，并比较不同 k 的稳定性和解释。",
+          code: `set.seed(2026)\nkm <- kmeans(scale(dat_num), centers = 4, nstart = 50)\ntable(km$cluster)`,
+          explain: "nstart 多次随机起点降低局部最优；centers 是预设簇数。",
+        },
+        {
+          title: "重采样检查稳定性",
+          text: "对样本重采样后重新聚类，观察同一簇内对象是否经常被分到一起。",
+          code: `# 使用 clusterboot 或多次随机子样本 + 一致性矩阵\n# 不要只凭一次散点图命名簇`,
+          explain: "稳定簇在不同样本和参数下应反复出现；不稳定结果更适合作为探索性假设。",
+        },
+        {
+          title: "谨慎解释可视化",
+          text: "t-SNE/UMAP 用于观察局部邻域，不直接代表真实距离、密度或簇数。",
+          code: `# library(uwot)\n# umap_fit <- umap(scale(dat_num), n_neighbors = 30, min_dist = 0.1)\n# 同时报告原始变量特征，而不是只展示二维图`,
+          explain: "二维嵌入会为了可视化扭曲距离，不能用簇间空白大小比较真实差异。",
+        },
+      ],
+      functions: ["prcomp", "kmeans", "hclust", "dist", "scale"],
+      conditions: ["标准化和距离选择有理由。", "聚类数不只按一个指标决定。", "完成稳定性和重采样检查。", "无监督分组不自动等于疾病亚型或因果机制。"],
+      interpret: "无监督结构依赖算法、距离和参数。簇中心差异显著只说明在所选方法下分开，不代表存在自然、稳定或临床可行动的亚型。",
+      readingNotes: ["PCA 载荷和样本得分是两个对象。", "K-means 对异常值和尺度敏感。", "UMAP 邻居数影响局部结构。"],
+      pitfalls: ["不标准化就把年龄和血压一起聚类。", "用图决定 k 后直接命名临床亚型。", "把 t-SNE 中簇距离当真。", "不做稳定性分析。"],
+      practice: "对同一组标准化数据分别做 PCA、K-means（k=2–6）和层次聚类，比较主成分解释量、轮廓系数和重采样稳定性。",
+      references: [
+        ref("tidymodels：无监督与降维资源", "https://www.tidymodels.org/find/", "聚类、PCA 与预处理工具入口。"),
+        ref("R 语言实战（第3版）", "https://www.ituring.com.cn/book/2861", "主成分、聚类和降维的入门解释。"),
+        ref("CRAN Cluster Analysis 任务视图", "https://cran.r-project.org/view=Cluster", "聚类、距离与稳定性相关包。"),
+      ],
+    },
+  );
+
+  const modules = window.RZH_COURSE_MODULES || [];
+  if (!modules.some((item) => item.id === "r-machine-learning")) {
+    const mlModule = {
+      id: "r-machine-learning",
+      title: "机器学习与预测模型",
+      subtitle: "拆分、重采样、调参、评价和外部验证",
+      minutes: 25,
+      unit: "analysis",
+      outcome: "能设计一个无明显数据泄漏的二分类预测建模流程，并正确评价区分度、校准和临床效用。",
+      sections: [
+        { heading: "先定义预测时间", text: "明确预测在何时发生、结局窗口和当时可获得的变量。" },
+        { heading: "训练与测试隔离", text: "测试集先锁住；预处理和调参都在训练折内完成。" },
+        { heading: "评价模型价值", text: "不只看 AUC，还看 AUPRC、校准、Brier、阈值和决策曲线。" },
+        { heading: "外部验证", text: "在另一时间或中心验证固定模型，是临床应用前的关键一步。" },
+      ],
+      code: `library(tidymodels)\nset.seed(2026)\nsplit <- initial_split(dat, prop = 0.8, strata = outcome)\nfolds <- vfold_cv(training(split), v = 5, strata = outcome)\n# recipe + workflow + tune_grid + last_fit`,
+      functions: ["initial_split", "vfold_cv", "recipe", "workflow", "tune_grid", "collect_metrics"],
+      practice: "写出本研究的预测时间零点、结局窗口、可用变量、验证方式和主要评价指标。",
+    };
+    const index = modules.findIndex((item) => item.id === "r-model-grid");
+    modules.splice(index >= 0 ? index + 1 : modules.length, 0, mlModule);
+  }
+  modules.forEach((module, index) => {
+    module.number = index + 1;
+  });
+
+  if (categoryMap.has("system")) {
+    categoryMap.get("system").detail = `从 R 与 RStudio 入门开始，依次学习语法、数据结构、数据导入与清洗、数据转换、控制流、文本处理、可视化、统计与高级模型、贝叶斯、证据综合和机器学习，共 ${modules.length} 节系统课。`;
+    if (categoryMap.get("system").items?.[0]) {
+      categoryMap.get("system").items[0].note = `共 ${modules.length} 节，进度保存在当前浏览器`;
+    }
+  }
+})();
+
+</script>
+  <script>
+(() => {
+  const items = [];
+  const add = (item) => items.push({
+    category: "高级分析",
+    level: "中级",
+    aliases: [],
+    tips: [],
+    related: [],
+    params: [],
+    ...item,
+  });
+
+  // 数据清洗与转换
+  add({
+    id: "remove_empty", name: "remove_empty()", package: "janitor", category: "数据清洗",
+    aliases: ["删除空行空列", "empty rows"], summary: "删除完全为空的行或列，常用于清理从电子表格导出的表。",
+    syntax: "remove_empty(dat, which = c(\"rows\", \"cols\"))", returns: "返回删除指定空行/空列后的数据框。",
+    example: `library(janitor)\nremove_empty(dat, which = c("rows", "cols"))`, output: "删除所有单元格都为空的行和列。",
+    params: [["dat", "要清理的数据框。", "必填"], ["which", "删除空行、空列或两者。", '默认 c("rows", "cols")']],
+    tips: ["只删除完全为空的维度；有任意值的边缘列会保留。"], related: ["remove_constant", "clean_names"],
+  });
+  add({
+    id: "remove_constant", name: "remove_constant()", package: "janitor", category: "数据清洗",
+    aliases: ["删除常数变量", "constant columns"], summary: "删除所有非缺失值都相同的列，减少无信息变量。",
+    syntax: "remove_constant(dat, na.rm = TRUE)", returns: "返回删除常数变量后的数据框。",
+    example: `remove_constant(data.frame(a = c(1, 1, 1), b = 1:3), na.rm = TRUE)`,
+    output: "只保留 b 列。", params: [["dat", "输入数据框。", "必填"], ["na.rm", "判断常数时是否忽略 NA。", "默认 TRUE"]],
+    tips: ["常数可能来自导出错误，也可能代表全样本同一政策或分组；删除前确认研究含义。"], related: ["remove_empty", "n_distinct"],
+  });
+  add({
+    id: "get_dupes", name: "get_dupes()", package: "janitor", category: "数据清洗",
+    aliases: ["查看重复", "重复记录"], summary: "显示指定变量组合下的全部重复记录及重复次数。",
+    syntax: "get_dupes(dat, ...)", returns: "返回包含重复行和 dupe_count 的数据框。",
+    example: `get_dupes(dat, patient_id, visit_date)`, output: "列出同一患者同一随访日期的重复记录。",
+    params: [["dat", "输入数据框。", "必填"], ["...", "定义重复组合的变量。", "留空时检查整行重复"]],
+    tips: ["先确定主键。重复不一定错误，必须根据研究设计判断保留或合并。"], related: ["distinct", "count"],
+  });
+  add({
+    id: "tabyl", name: "tabyl()", package: "janitor", category: "描述统计",
+    aliases: ["频数表", "列联表"], summary: "创建带有行、列百分比和缺失提示的可管道频数表。",
+    syntax: "tabyl(dat, var1, var2, show_na = TRUE, show_missing_levels = TRUE, ...)",
+    returns: "返回 data.frame，并可继续交给 adorn_*() 美化。", example: `tabyl(dat, sex, outcome)`,
+    output: "生成性别与结局的二维频数表。", params: [
+      ["dat", "数据框。", "必填"], ["var1 / var2", "一或两个分类变量。", "至少一个"],
+      ["show_na", "是否显示 NA。", "默认 TRUE"], ["show_missing_levels", "是否显示因子中未出现水平。", "默认 TRUE"],
+    ], tips: ["计算百分比前确认分母是行、列还是总数。"], related: ["table", "group_by"],
+  });
+  add({
+    id: "if_any", name: "if_any()", package: "dplyr", category: "数据整理",
+    aliases: ["任一条件", "any across"], summary: "对多列应用条件，只要任意一列满足就返回 TRUE，适合制作用于汇总异常标记的变量。",
+    syntax: "if_any(.cols, .fns, ..., .names = NULL)", returns: "返回逻辑向量。",
+    example: `dat |> filter(if_any(starts_with("invalid"), identity))`, output: "保留至少一个 invalid 列为 TRUE 的行。",
+    params: [["cols", "要检查的列选择。", "必填"], ["fns", "应用条件或函数。", "必填"]],
+    tips: ["它相当于逐行 OR；所有列都要满足时应使用 if_all()。"], related: ["across", "if_all"],
+  });
+  add({
+    id: "join_by", name: "join_by()", package: "dplyr", category: "数据整理",
+    aliases: ["连接键", "join specification"], summary: "明确指定等值、不等值或滚动连接的键，让连接条件比字符串更清楚。",
+    syntax: "join_by(...)", returns: "返回供 *_join() 使用的连接 specification。",
+    example: `left_join(x, y, by = join_by(patient_id, visit_date))`, output: "按 patient_id 与 visit_date 同时匹配。",
+    params: [["...", "一个或多个连接键；可用 equality 或不等式描述。", "必填"]],
+    tips: ["连接前检查键唯一性；右表重复键会复制左表行。"], related: ["left_join", "anti_join"],
+  });
+  add({
+    id: "separate_wider_delim", name: "separate_wider_delim()", package: "tidyr", category: "数据整理",
+    aliases: ["按分隔符拆列", "wide delimiter"], summary: "把一列复合文本按分隔符拆成多个新列。",
+    syntax: "separate_wider_delim(data, cols, delim, ..., names, too_few = \"error\", too_many = \"error\", cols_remove = TRUE)",
+    returns: "返回扩展后的 tibble。", example: `separate_wider_delim(dat, patient_id, "-", names = c("site", "id"))`,
+    output: "把 patient_id 拆成 site 与 id 两列。", params: [["data", "数据框。", "必填"], ["cols", "要拆分的列。", "必填"], ["delim", "分隔模式。", "必填"], ["names", "新列名。", "必填"], ["too_few / too_many", "片段太少或太多时怎样处理。", '默认 "error"']],
+    tips: ["列数不固定时应先诊断，不应忽略太多/太少片段错误。"], related: ["separate_wider_regex", "str_split_fixed"],
+  });
+  add({
+    id: "separate_wider_regex", name: "separate_wider_regex()", package: "tidyr", category: "数据整理",
+    aliases: ["正则拆列", "wide regex"], summary: "用命名捕获分组把复合文本拆成多个列。",
+    syntax: "separate_wider_regex(data, cols, patterns, ..., names_sep = NULL, cols_remove = TRUE)",
+    returns: "返回扩展后的 tibble。", example: `separate_wider_regex(dat, code, patterns = c(site = "[A-Z]+", "-", id = "[0-9]+"))`,
+    output: "用命名模式拆出 site 和 id。", params: [["data", "数据框。", "必填"], ["cols", "要拆分的列。", "必填"], ["patterns", "命名正则向量，未命名元素用于跳过分隔内容。", "必填"]],
+    tips: ["先在小样本验证整条模式是否覆盖全部文本。"], related: ["separate_wider_delim", "str_match"],
+  });
+  add({
+    id: "unnest_wider", name: "unnest_wider()", package: "tidyr", category: "数据整理",
+    aliases: ["列表列变宽", "widen list column"], summary: "把列表列中的命名元素展开为多个新列。",
+    syntax: "unnest_wider(data, col, ..., names_sep = NULL, names_repair = \"check_unique\", simplify = TRUE, ptype = NULL, transform = NULL)",
+    returns: "返回包含新列的 tibble。", example: `unnest_wider(tibble(x = list(a = 1, b = 2)), x)`,
+    output: "得到 a、b 两列。", params: [["data", "数据框。", "必填"], ["col", "要展开的列表列。", "必填"], ["names_sep", "新列名的分隔规则。", "默认 NULL"]],
+    tips: ["先检查每个列表元素名称是否一致，避免产生大量缺失新列。"], related: ["unnest_longer", "pivot_wider"],
+  });
+  add({
+    id: "unnest_longer", name: "unnest_longer()", package: "tidyr", category: "数据整理",
+    aliases: ["列表列变长", "lengthen list column"], summary: "把列表列中的多个值展开成多行。",
+    syntax: "unnest_longer(data, col, ..., values_to = NULL, indices_to = NULL, indices_include = NULL, keep_empty = FALSE, simplify = NULL, ptype = NULL, transform = NULL)",
+    returns: "返回展开后的 tibble。", example: `unnest_longer(tibble(codes = list(c("I10", "E11.9"))), codes)`,
+    output: "每条编码占一行。", params: [["data", "数据框。", "必填"], ["col", "要展开的列表列。", "必填"], ["values_to", "展开值的列名。", "默认沿用列名"]],
+    tips: ["展开后行数会增加，应保留原始患者 ID 才能回溯。"], related: ["unnest_wider", "pivot_longer"],
+  });
+  add({
+    id: "rowwise", name: "rowwise()", package: "dplyr", category: "数据整理",
+    aliases: ["按行操作", "row-wise"], summary: "让后续 dplyr 操作逐行执行，适合每行调用函数或处理列表列。",
+    syntax: "rowwise(data, ...)", returns: "返回 rowwise_df 对象。",
+    example: `dat |> rowwise() |> mutate(total = sum(c(a, b, c), na.rm = TRUE)) |> ungroup()`,
+    output: "每行单独求 a、b、c 的和。", params: [["data", "数据框。", "必填"], ["...", "可保留分组变量。", "可选"]],
+    tips: ["普通向量化 mutate() 通常更快；rowwise() 用于确实需要逐行调用的场景，完成后应 ungroup()。"], related: ["mutate", "across"],
+  });
+  add({
+    id: "fct_relevel", name: "fct_relevel()", package: "forcats", category: "数据整理",
+    aliases: ["重设因子顺序", "参照组"], summary: "手动把某些分类水平移到前面，常用于设置模型参照组。",
+    syntax: "fct_relevel(.f, ..., after = 0L)", returns: "返回水平重排后的因子。",
+    example: `fct_relevel(dat$exposure, "Control")`, output: "把 Control 移到第一个水平。",
+    params: [["f", "因子或字符向量。", "必填"], ["...", "要前移或移动的水平。", "必填"], ["after", "移动到第几个位置之后。", "默认 0L"]],
+    tips: ["参照组变化会改变系数方向，但不会改变模型整体拟合。"], related: ["factor", "fct_reorder"],
+  });
+  add({
+    id: "fct_reorder", name: "fct_reorder()", package: "forcats", category: "数据整理",
+    aliases: ["按数值排序水平", "factor reorder"], summary: "根据另一个数值变量的汇总值重排因子水平，常用于图形排序。",
+    syntax: "fct_reorder(.f, .x, .fun = median, ..., .desc = FALSE)", returns: "返回按指定统计量排序的因子。",
+    example: `dat |> mutate(group = fct_reorder(group, score, median))`, output: "按组中位数排列 group。",
+    params: [["f", "分类变量。", "必填"], ["x", "决定顺序的数值变量。", "必填"], ["fun", "汇总函数。", "默认 median"], ["desc", "是否降序。", "默认 FALSE"]],
+    tips: ["图形排序规则要写进图注，不能悄悄改变组别含义。"], related: ["fct_relevel", "ggplot"],
+  });
+  add({
+    id: "fct_recode", name: "fct_recode()", package: "forcats", category: "数据整理",
+    aliases: ["重命名因子", "recode factor"], summary: "手动把因子水平改成更清楚的标签，同时保持未列出的水平。",
+    syntax: "fct_recode(.f, ...)", returns: "返回重编码后的因子。", example: `fct_recode(dat$sex, "Male" = "M", "Female" = "F")`,
+    output: "把 M/F 标签改为 Male/Female。", params: [["f", "因子。", "必填"], ["...", "新标签 = 旧标签 的映射。", "必填"]],
+    tips: ["多个旧水平可以映射到同一新水平时会合并类别。"], related: ["recode", "fct_lump"],
+  });
+  add({
+    id: "fct_lump", name: "fct_lump()", package: "forcats", category: "数据整理",
+    aliases: ["合并少见水平", "lump factor"], summary: "把不常见因子水平合并为 Other，减少过长类别或极小组。",
+    syntax: "fct_lump(.f, n, prop = NULL, other_level = \"Other\", ties.method = c(\"min\", \"average\", \"first\"))",
+    returns: "返回合并后的因子。", example: `fct_lump(dat$city, n = 8)`, output: "保留最常见 8 个城市，其余合并为 Other。",
+    params: [["f", "因子。", "必填"], ["n", "保留或合并的水平数。", "与 prop 二选一"], ["prop", "按比例阈值合并。", "与 n 二选一"], ["other_level", "其他类别的标签。", '默认 "Other"']],
+    tips: ["合并少见类别可能掩盖重要少数群体，研究分析应谨慎。"], related: ["fct_recode", "count"],
+  });
+  add({
+    id: "geom_pointrange", name: "geom_pointrange()", package: "ggplot2", category: "可视化",
+    aliases: ["区间点图", "误差区间"], summary: "用中心点加一条区间线表示效应估计和置信区间，常用于森林图替代展示。",
+    syntax: "geom_pointrange(mapping = NULL, data = NULL, stat = \"identity\", position = \"identity\", ..., fatten = 4)",
+    returns: "返回可叠加到 ggplot 对象的区间点图层。", example: `ggplot(dat, aes(x = OR, y = reorder(label, OR), xmin = lower, xmax = upper)) +\n  geom_vline(xintercept = 1, linetype = 2) +\n  geom_pointrange()`,
+    output: "每个变量显示 OR 点估计和 95% 置信区间。", params: [["mapping", "至少指定位置、中心值与上下界。", "必填"], ["data", "图层数据。", "可继承"], ["fatten", "中心点相对区间线的粗细倍数。", "默认 4"]],
+    tips: ["横轴使用 OR/HR 时常用对数刻度；区间越线与否要结合效应尺度和研究设计。"], related: ["ggplot", "geom_errorbarh"],
+  });
+
+  // GAM
+  add({
+    id: "s", name: "s()", package: "mgcv", category: "回归与建模", level: "高阶",
+    aliases: ["平滑项", "smooth term"], summary: "在 GAM 公式中声明一个或多个连续变量的惩罚平滑项。",
+    syntax: "s(..., k = -1, fx = FALSE, bs = \"tp\", m = NA, by = NA, xt = NULL, id = NULL, sp = NULL, pc = NULL)",
+    returns: "返回供 gam() 解释的平滑项 specification。", example: `gam(y ~ s(age, k = 6) + sex, data = dat, method = "REML")`,
+    output: "年龄以平滑曲线进入模型。", params: [["...", "一个或多个连续变量。", "必填"], ["k", "基函数维度上限。", "默认 -1 自动选择"], ["fx", "是否固定自由度、不估计惩罚。", "默认 FALSE"], ["bs", "平滑基类型。", '默认 "tp"']],
+    tips: ["k 不足用 gam.check() 检查；EDF 约 1 时接近直线。"], related: ["gam", "te", "ti"],
+  });
+  add({
+    id: "te", name: "te()", package: "mgcv", category: "回归与建模", level: "高阶",
+    aliases: ["张量积平滑", "平滑交互"], summary: "构造多个连续变量之间的张量积平滑，包含各自主效应与交互。",
+    syntax: "te(..., k = NA, bs = \"cr\", m = NA, d = NA, by = NA, fx = FALSE, np = TRUE, xt = NULL, id = NULL, sp = NULL, pc = NULL)",
+    returns: "返回供 gam() 使用的多维平滑项。", example: `gam(y ~ te(time, exposure, k = c(5, 5)), data = dat)`,
+    output: "估计时间和暴露的平滑交互。", params: [["...", "两个或多个连续变量。", "必填"], ["k", "各维度基函数维度。", "按维度设置"], ["bs", "平滑基类型。", '默认 "cr"']],
+    tips: ["同时需要清楚主效应时，可用 ti() 分离主效应和纯交互。"], related: ["s", "ti"],
+  });
+  add({
+    id: "ti", name: "ti()", package: "mgcv", category: "回归与建模", level: "高阶",
+    aliases: ["纯交互平滑", "tensor interaction"], summary: "构造不含低阶主效应的纯张量积交互，常与单独主效应一起使用。",
+    syntax: "ti(..., k = NA, bs = \"cr\", m = NA, d = NA, by = NA, fx = FALSE, np = TRUE, xt = NULL, id = NULL, sp = NULL, mc = NULL, pc = NULL)",
+    returns: "返回供 gam() 的纯交互平滑 specification。", example: `gam(y ~ s(time) + s(exposure) + ti(time, exposure), data = dat)`,
+    output: "分别估计时间主效应、暴露主效应和纯平滑交互。", params: [["...", "两个或多个连续变量。", "必填"], ["k", "各维度维度上限。", "按维度设置"]],
+    tips: ["需要明确主效应和交互分解时，ti() 的解释比 te() 更直接。"], related: ["te", "s"],
+  });
+
+  // SEM
+  add({
+    id: "sem", name: "sem()", package: "lavaan", category: "回归与建模", level: "高阶",
+    aliases: ["结构方程模型", "lavaan sem"], summary: "按模型字符串拟合结构方程模型，可同时包含测量模型和结构路径。",
+    syntax: "sem(model = NULL, data = NULL, ..., group = NULL, cluster = NULL)", returns: "返回 lavaan 模型对象。",
+    example: `model <- "depression ~ anxiety + age"\nfit <- sem(model, data = dat)`, output: "拟合并保存结构模型。",
+    params: [["model", "用 =~、~、~~ 等运算符描述模型的字符串。", "必填"], ["data", "观测数据框。", "必填"], ["...", "估计器、缺失方法、组别等设置。", "按设计选择"]],
+    tips: ["先检查测量模型和模型识别，再解释路径。"], related: ["cfa", "fitMeasures", "parameterEstimates"],
+  });
+  add({
+    id: "fitMeasures", name: "fitMeasures()", package: "lavaan", category: "回归与建模", level: "高阶",
+    aliases: ["模型拟合指标", "CFI RMSEA"], summary: "提取卡方、CFI、TLI、RMSEA、SRMR 等模型拟合指标。",
+    syntax: "fitMeasures(object, fit.measures = \"all\", baseline.model = NULL, ...)", returns: "默认返回命名数值向量。",
+    example: `fitMeasures(fit, c("cfi", "tli", "rmsea", "srmr"))`, output: "返回四类常见拟合指标。",
+    params: [["object", "lavaan 模型对象。", "必填"], ["fit.measures", "要提取的指标名称或 all。", '默认 "all"']],
+    tips: ["拟合指标没有脱离样本量、模型和理论的万能阈值。"], related: ["sem", "cfa"],
+  });
+  add({
+    id: "modificationIndices", name: "modificationIndices()", package: "lavaan", category: "回归与建模", level: "高阶",
+    aliases: ["修正指数", "MI"], summary: "列出若释放参数可能改善模型拟合的提示，仅用于理论驱动的模型修订。",
+    syntax: "modificationIndices(object, standardized = TRUE, sort. = FALSE, minimum.value = 0, ...)",
+    returns: "返回可修改参数、MI 和期望参数改变量。", example: `modificationIndices(fit, sort. = TRUE, minimum.value = 10)`,
+    output: "按 MI 从大到小列出候选修订。", params: [["object", "lavaan 模型对象。", "必填"], ["minimum.value", "只显示 MI 不低于该值的结果。", "默认 0"], ["sort.", "是否排序。", "默认 FALSE"]],
+    tips: ["不能按 MI 最大项机械修改模型。"] , related: ["sem", "fitMeasures"],
+  });
+  add({
+    id: "parameterEstimates", name: "parameterEstimates()", package: "lavaan", category: "回归与建模", level: "高阶",
+    aliases: ["路径系数", "SEM parameters"], summary: "以数据框形式提取 SEM 的载荷、路径、方差和置信区间。",
+    syntax: "parameterEstimates(object, standardized = FALSE, ci = TRUE, level = 0.95, ...)", returns: "返回参数估计数据框。",
+    example: `parameterEstimates(fit, standardized = TRUE, ci = TRUE)`, output: "输出非标准化与标准化路径估计。",
+    params: [["object", "lavaan 模型对象。", "必填"], ["standardized", "是否加入标准化估计。", "默认 FALSE"], ["ci", "是否计算置信区间。", "默认 TRUE"]],
+    tips: ["标准化路径便于不同单位变量比较，但原始尺度仍有实际意义。"], related: ["sem", "standardizedSolution"],
+  });
+  add({
+    id: "standardizedSolution", name: "standardizedSolution()", package: "lavaan", category: "回归与建模", level: "高阶",
+    aliases: ["标准化路径", "standardized estimates"], summary: "返回以标准差单位表达的 SEM 参数估计。",
+    syntax: "standardizedSolution(object, type = \"std.all\", se = TRUE, ci = TRUE, level = 0.95, ...)",
+    returns: "返回标准化参数数据框。", example: `standardizedSolution(fit, type = "std.all", ci = TRUE)`,
+    output: "返回标准化载荷、路径与区间。", params: [["object", "lavaan 模型对象。", "必填"], ["type", "标准化类型。", '默认 "std.all"']],
+    tips: ["标准化系数改变尺度，不改变模型关系和拟合。"], related: ["parameterEstimates", "sem"],
+  });
+  add({
+    id: "measurementInvariance", name: "measurementInvariance()", package: "semTools", category: "量表分析", level: "高阶",
+    aliases: ["测量不变性", "多组 SEM"], summary: "逐层比较不同组之间的形态、载荷、截距等不变性模型。",
+    syntax: "measurementInvariance(model, data, group, strict = FALSE, ...)", returns: "返回一组嵌套 lavaan 模型及比较结果。",
+    example: `measurementInvariance(model, data = dat, group = "sex")`, output: "依次拟合 configural、metric、scalar 等模型。",
+    params: [["model", "lavaan 模型字符串。", "必填"], ["data", "数据框。", "必填"], ["group", "分组变量。", "必填"], ["strict", "是否继续检验残差方差等更严格约束。", "默认 FALSE"]],
+    tips: ["先检查较少约束模型是否可接受，不能直接报告最严格模型。"], related: ["cfa", "fitMeasures"],
+  });
+
+  // LCA / missing / longitudinal
+  add({
+    id: "poLCA", name: "poLCA()", package: "poLCA", category: "高级分析", level: "高阶",
+    aliases: ["潜类别分析", "LCA"], summary: "用分类指标拟合潜类别模型，输出类别比例和每类题目条件概率。",
+    syntax: "poLCA(formula, data, nclass = 3, nrep = 1, maxiter = 1000, graphs = FALSE, verbose = TRUE, ...)",
+    returns: "返回 poLCA 对象，含 probs、P、posterior、BIC 等。", example: `poLCA(cbind(item1, item2, item3) ~ 1, data = dat, nclass = 3, nrep = 20)`,
+    output: "拟合三类别模型并保存分类结果。", params: [["formula", "cbind(指标变量) ~ 1 或含协变量。", "必填"], ["data", "分类指标数据框。", "必填"], ["nclass", "潜类别数。", "需搜索"], ["nrep", "随机起始次数。", "建议多次"], ["maxiter", "最大迭代次数。", "默认 1000"]],
+    tips: ["模型选择要结合信息准则、类别比例、熵和稳定性。"], related: ["poLCA.entropy", "table"],
+  });
+  add({
+    id: "poLCA.entropy", name: "poLCA.entropy()", package: "poLCA", category: "高级分析", level: "高阶",
+    aliases: ["LCA 熵", "分类熵"], summary: "计算潜类别模型的后验分类熵，用于描述分类清晰程度。",
+    syntax: "poLCA.entropy(lc)", returns: "返回熵数值。", example: `poLCA.entropy(fit_lca)`,
+    output: "数值越接近 1，后验分类通常越清晰。", params: [["lc", "已拟合的 poLCA 对象。", "必填"]],
+    tips: ["高熵不能证明类别数正确，也不能消除分类不确定性。"], related: ["poLCA"],
+  });
+  add({
+    id: "with.mids", name: "with.mids()", package: "mice", category: "高级分析", level: "高阶",
+    aliases: ["插补后分析", "with mice"], summary: "在一组多重插补数据上分别运行同一个分析表达式。",
+    syntax: "with.mids(data, expr, ...)", returns: "返回 mira 对象，供 pool() 合并。",
+    example: `fit <- with(imp, glm(outcome ~ exposure + age, family = binomial()))`, output: "为每套插补数据拟合模型。",
+    params: [["data", "mice 返回的 mids 对象。", "必填"], ["expr", "对完整数据执行的分析表达式。", "必填"]],
+    tips: ["不要只分析第一套插补数据。"], related: ["mice", "pool"],
+  });
+  add({
+    id: "glmer", name: "glmer()", package: "lme4", category: "回归与建模", level: "高阶",
+    aliases: ["广义线性混合模型", "GLMM"], summary: "拟合含随机效应的广义线性混合模型，适用于二分类、计数等聚类/纵向结局。",
+    syntax: "glmer(formula, data, family, ...)", returns: "返回 merMod 模型对象。",
+    example: `glmer(outcome ~ group * time + age + (1 | id), data = dat, family = binomial())`,
+    output: "拟合带个体随机截距的 Logistic GLMM。", params: [["formula", "固定效应并在括号中写随机效应。", "必填"], ["data", "数据框。", "必填"], ["family", "结局分布与连接。", "按结局选择"]],
+    tips: ["条件 OR 与 GEE 的总体平均 OR 含义不同；模型不收敛先检查复杂度和数据。"], related: ["lmer", "geeglm"],
+  });
+  add({
+    id: "geeglm", name: "geeglm()", package: "geepack", category: "回归与建模", level: "高阶",
+    aliases: ["广义估计方程", "GEE"], summary: "估计总体平均回归模型，并通过聚类稳健标准误处理组内相关。",
+    syntax: "geeglm(formula, family, data, id, corstr = \"independence\", ...)", returns: "返回 geeglm 对象。",
+    example: `geeglm(outcome ~ group * time + age, family = binomial(), data = dat, id = id, corstr = "exchangeable")`,
+    output: "估计总体平均 Logistic 模型。", params: [["formula", "均值模型。", "必填"], ["family", "结局分布。", "必填"], ["data", "数据框。", "必填"], ["id", "聚类/个体标识。", "必填"], ["corstr", "工作相关结构。", '默认 "independence"']],
+    tips: ["相关结构主要影响效率；聚类数很少时谨慎解释稳健标准误。"], related: ["glmer", "lmer"],
+  });
+  add({
+    id: "ranef", name: "ranef()", package: "lme4", category: "回归与建模", level: "高阶",
+    aliases: ["随机效应", "random effects"], summary: "提取混合模型中每个聚类单位的随机效应估计。",
+    syntax: "ranef(object, condVar = TRUE, ...)", returns: "返回按分组因子组织的随机效应。",
+    example: `ranef(lmer(score ~ time + (1 | id), data = dat))`, output: "返回每个个体的随机截距。",
+    params: [["object", "混合模型对象。", "必填"], ["condVar", "是否返回条件方差。", "默认 TRUE"]],
+    tips: ["随机效应是模型估计，不应直接当个体真实特质。"], related: ["lmer", "glmer"],
+  });
+  add({
+    id: "weighted.mean", name: "weighted.mean()", package: "base", category: "描述统计",
+    aliases: ["加权平均", "weighted average"], summary: "按观测权重计算加权平均数，例如抽样权重或逆概率权重。",
+    syntax: "weighted.mean(x, w, ..., na.rm = FALSE)", returns: "返回加权均数。",
+    example: `weighted.mean(c(10, 20, 30), c(1, 2, 1))`, output: "[1] 20",
+    params: [["x", "数值向量。", "必填"], ["w", "非负权重向量。", "必填"], ["na.rm", "是否忽略缺失。", "默认 FALSE"]],
+    tips: ["权重来自抽样、概率或频率时含义不同，应记录来源。"], related: ["mean", "glm"],
+  });
+
+  // Bayesian
+  add({
+    id: "rbeta", name: "rbeta()", package: "stats", category: "贝叶斯统计", level: "入门",
+    aliases: ["Beta随机数", "beta distribution"], summary: "从 Beta 分布生成随机数，常用于二项概率参数的先验或后验模拟。",
+    syntax: "rbeta(n, shape1, shape2)", returns: "返回长度 n 的概率值。", example: `rbeta(5, 2, 2)`,
+    output: "返回 0 到 1 之间的五个概率样本。", params: [["n", "抽样数量。", "必填"], ["shape1", "Beta 第一形状参数。", "必填"], ["shape2", "Beta 第二形状参数。", "必填"]],
+    tips: ["Beta 分布要求参数为正，常用来描述成功率。"], related: ["qbeta", "rbinom"],
+  });
+  add({
+    id: "qbeta", name: "qbeta()", package: "stats", category: "贝叶斯统计", level: "入门",
+    aliases: ["Beta分位数", "credible interval"], summary: "计算 Beta 分布的分位数，可用于 Beta-Binomial 模型的贝叶斯可信区间。",
+    syntax: "qbeta(p, shape1, shape2, lower.tail = TRUE, log.p = FALSE)", returns: "返回概率尺度上的分位数。",
+    example: `qbeta(c(.025, .975), 10, 4)`, output: "返回 Beta(10,4) 的 95% 可信区间。",
+    params: [["p", "累计概率。", "必填"], ["shape1", "第一形状参数。", "必填"], ["shape2", "第二形状参数。", "必填"]],
+    tips: ["这是特定 Beta 后验下的可信区间，不等同于频率学派置信区间。"], related: ["rbeta", "rbinom"],
+  });
+  add({
+    id: "brm", name: "brm()", package: "brms", category: "贝叶斯统计", level: "高阶",
+    aliases: ["贝叶斯回归", "brms"], summary: "使用 Stan 拟合贝叶斯广义（非线性/多水平）回归模型，语法接近 lme4 公式。",
+    syntax: "brm(formula, data, family = gaussian(), prior = NULL, chains = 4, iter = 2000, warmup = floor(iter/2), cores = getOption(\"mc.cores\", 1), seed = NA, ...)",
+    returns: "返回 brmsfit 对象，包含后验样本和模型信息。", example: `brm(y ~ x + (1 | id), data = dat, family = gaussian(), chains = 4, iter = 4000, seed = 2026)`,
+    output: "拟合包含个体随机截距的贝叶斯模型。", params: [["formula", "响应与预测变量公式，随机效应用 (1 | group)。", "必填"], ["data", "数据框。", "必填"], ["family", "结局分布和连接函数。", "按结局选择"], ["prior", "先验设定。", "需有依据"], ["chains / iter / warmup", "MCMC 链数、总迭代和热身。", "需诊断"], ["seed", "随机种子。", "建议固定"]],
+    tips: ["先做先验预测检查，再拟合；完成后检查 Rhat、ESS、发散和 PPC。"], related: ["prior_summary", "posterior_predict", "loo"],
+  });
+  add({
+    id: "stan_glm", name: "stan_glm()", package: "rstanarm", category: "贝叶斯统计", level: "高阶",
+    aliases: ["贝叶斯GLM", "rstanarm regression"], summary: "用 rstanarm 拟合熟悉的广义线性模型贝叶斯版本。",
+    syntax: "stan_glm(formula, family = gaussian, data, prior = default_prior_coef(family), chains = 4, iter = 2000, warmup = floor(iter/2), cores = 1, seed = NA, ...)",
+    returns: "返回 stanreg 模型对象。", example: `stan_glm(outcome ~ exposure + age, family = binomial, data = dat, chains = 4, seed = 2026)`,
+    output: "拟合并保存贝叶斯 Logistic 模型。", params: [["formula", "模型公式。", "必填"], ["family", "分布族。", "默认 gaussian"], ["data", "数据框。", "必填"], ["prior", "系数、截距等先验。", "需检查尺度"], ["chains / iter", "采样设置。", "需诊断"]],
+    tips: ["默认先验不是“无先验”；应运行 prior_summary() 查看。"], related: ["prior_summary", "posterior_predict"],
+  });
+  add({
+    id: "stan_lmer", name: "stan_lmer()", package: "rstanarm", category: "贝叶斯统计", level: "高阶",
+    aliases: ["贝叶斯混合模型", "Bayesian LMM"], summary: "拟合贝叶斯线性混合模型，用后验分布表达固定效应和随机效应不确定性。",
+    syntax: "stan_lmer(formula, data, prior = default_prior_coef(family), chains = 4, iter = 2000, warmup = floor(iter/2), cores = 1, seed = NA, ...)",
+    returns: "返回 stanreg 混合模型对象。", example: `stan_lmer(score ~ group * time + (1 | id), data = dat, seed = 2026)`,
+    output: "拟合带个体随机截距的贝叶斯纵向模型。", params: [["formula", "含随机效应的公式。", "必填"], ["data", "长表数据。", "必填"], ["prior", "先验设置。", "按尺度设置"], ["chains / iter", "采样设置。", "需诊断"]],
+    tips: ["随机效应与固定效应的先验尺度需要说明。"], related: ["brm", "posterior_predict"],
+  });
+  add({
+    id: "prior_summary", name: "prior_summary()", package: "brms", category: "贝叶斯统计", level: "高阶",
+    aliases: ["查看先验", "prior summary"], summary: "查看 brms 或 rstanarm 模型实际使用的先验，包括默认先验。",
+    syntax: "prior_summary(object, ...)", returns: "返回先验摘要表或打印信息。", example: `prior_summary(fit)`,
+    output: "列出各参数类的先验分布。", params: [["object", "贝叶斯模型对象。", "必填"]],
+    tips: ["确定先验后才方便解释后验和做敏感性分析。"], related: ["brm", "stan_glm"],
+  });
+  add({
+    id: "posterior_predict", name: "posterior_predict()", package: "rstanarm", category: "贝叶斯统计", level: "高阶",
+    aliases: ["后验预测", "posterior predictions"], summary: "从贝叶斯模型的后验预测分布生成新观测值，用于预测检查和预测区间。",
+    syntax: "posterior_predict(object, newdata = NULL, draws = NULL, ...)", returns: "返回后验预测抽样矩阵或数组。",
+    example: `posterior_predict(fit, newdata = dat[1:5, ], draws = 1000)`, output: "每个新样本获得多条后验预测。",
+    params: [["object", "贝叶斯模型。", "必填"], ["newdata", "可选新数据。", "NULL 时用原数据"], ["draws", "使用多少个后验抽样。", "默认使用全部"]],
+    tips: ["它预测新观测，posterior_epred() 预测条件均值/概率。"], related: ["posterior_epred", "pp_check"],
+  });
+  add({
+    id: "posterior_epred", name: "posterior_epred()", package: "rstanarm", category: "贝叶斯统计", level: "高阶",
+    aliases: ["后验期望预测", "expected prediction"], summary: "计算给定预测变量时，后验对条件均值或事件概率的期望。",
+    syntax: "posterior_epred(object, newdata = NULL, draws = NULL, ...)", returns: "返回后验期望预测矩阵。",
+    example: `posterior_epred(fit, newdata = dat[1:5, ], draws = 1000)`, output: "返回每个样本的事件概率后验样本。",
+    params: [["object", "贝叶斯模型。", "必填"], ["newdata", "新数据。", "可选"], ["draws", "抽样数量。", "默认全部"]],
+    tips: ["概率、率或均值的尺度取决于模型 family。"], related: ["posterior_predict"],
+  });
+  add({
+    id: "loo", name: "loo()", package: "loo", category: "贝叶斯统计", level: "高阶",
+    aliases: ["LOO", "近似留一法"], summary: "用 PSIS-LOO 近似留一法评价贝叶斯模型的预测表现。",
+    syntax: "loo(x, ...)", returns: "返回 loo 对象和 ELPD 等诊断。", example: `loo(fit)`,
+    output: "提供 LOO-ELPD、有效参数数和 Pareto k 诊断。", params: [["x", "模型对象、log-likelihood 数组或 loo 输入。", "必填"], ["...", "算法具体参数。", "按包文档"]],
+    tips: ["Pareto k 高表示近似不稳；模型比较差异要结合不确定性。"], related: ["waic", "brm"],
+  });
+  add({
+    id: "waic", name: "waic()", package: "loo", category: "贝叶斯统计", level: "高阶",
+    aliases: ["WAIC", "information criterion"], summary: "计算广泛适用信息准则，用于部分贝叶斯模型预测比较。",
+    syntax: "waic(x, ...)", returns: "返回 WAIC 和有效参数数。", example: `waic(fit)`,
+    output: "WAIC 越小通常表示样本外预测更优。", params: [["x", "含 log-likelihood 的模型对象。", "必填"]],
+    tips: ["WAIC 并不优于 LOO；高影响观测和模型差异要检查。"], related: ["loo"],
+  });
+  add({
+    id: "fixef", name: "fixef()", package: "brms", category: "贝叶斯统计", level: "高阶",
+    aliases: ["固定效应", "fixed effects"], summary: "提取贝叶斯或混合模型的固定效应后验摘要。",
+    syntax: "fixef(object, summary = TRUE, probs = c(0.025, 0.975), ...)", returns: "返回固定效应估计与区间。",
+    example: `fixef(fit)`, output: "返回各固定效应的后验估计。", params: [["object", "模型对象。", "必填"], ["summary", "是否返回摘要而非全部抽样。", "默认 TRUE"], ["probs", "摘要区间概率。", "默认 95%"]],
+    tips: ["Logistic 模型的系数在 log-odds 尺度。"], related: ["brm", "posterior_epred"],
+  });
+
+  // Evidence synthesis
+  add({
+    id: "rma", name: "rma()", package: "metafor", category: "证据综合", level: "高阶",
+    aliases: ["随机效应Meta", "metafor rma"], summary: "对已计算的研究效应和抽样方差拟合 Meta 分析模型。",
+    syntax: "rma(yi, vi, data, method = \"REML\", test = \"z\", ...)", returns: "返回 rma 模型对象。",
+    example: `rma(yi, vi, data = effects, method = "REML")`, output: "估计合并效应、研究间方差和异质性。",
+    params: [["yi", "研究效应量，例如 log OR。", "必填"], ["vi", "效应量抽样方差。", "必填"], ["data", "研究级数据框。", "必填"], ["method", "τ² 估计方法。", '默认 "REML"']],
+    tips: ["效应方向和尺度必须完全一致。"], related: ["forest.rma", "funnel.rma", "regtest"],
+  });
+  add({
+    id: "rma.mv", name: "rma.mv()", package: "metafor", category: "证据综合", level: "高阶",
+    aliases: ["多水平Meta", "相关效应"], summary: "拟合含多个随机效应的 Meta 模型，处理同一研究多结局或多臂的相关效应。",
+    syntax: "rma.mv(yi, V, data, random = ~ 1 | study, struct = \"CS\", method = \"REML\", ...)", returns: "返回 rma.mv 模型对象。",
+    example: `rma.mv(yi, V, data = effects, random = ~ 1 | study/id)`, output: "处理研究内相关效应。",
+    params: [["yi", "效应方向量。", "必填"], ["V", "效应量协方差矩阵。", "必填"], ["random", "随机效应结构。", "必填"], ["struct", "相关结构。", '默认 "CS"']],
+    tips: ["不能把同一研究的多个相关效应当独立普通研究。"], related: ["rma", "netmeta"],
+  });
+  ["forest.rma", "funnel.rma"].forEach((id) => add({
+    id, name: `${id}()`, package: "metafor", category: "证据综合", level: "高阶",
+    aliases: [id.startsWith("forest") ? "森林图" : "漏斗图", "metafor plot"],
+    summary: id.startsWith("forest") ? "绘制 Meta 分析森林图，展示各研究、权重和合并效应。" : "绘制 Meta 分析漏斗图，辅助观察小研究效应。",
+    syntax: `${id}(x, ...)`, returns: "生成图形并返回绘图对象。",
+    example: `${id}(fit)`, output: id.startsWith("forest") ? "生成研究级与合并效应森林图。" : "生成效应与精度关系的漏斗图。",
+    params: [["x", "Meta 分析模型对象。", "必填"], ["...", "刻度、标签、转换和图形选项。", "按文档"]],
+    tips: id.startsWith("funnel") ? ["漏斗图不对称不一定等于发表偏倚。"] : ["图形刻度必须与效应指标一致。"], related: ["rma", "rma.mv"],
+  }));
+  add({
+    id: "regtest", name: "regtest()", package: "metafor", category: "证据综合", level: "高阶",
+    aliases: ["Egger检验", "小研究效应"], summary: "对标准误或样本量进行回归检验小研究效应，常作为 Egger 类检验实现。",
+    syntax: "regtest(x, model = \"lm\", ...)", returns: "返回小研究效应检验对象。", example: `regtest(fit, model = "lm")`,
+    output: "给出回归斜率和检验结果。", params: [["x", "Meta 分析对象。", "必填"], ["model", "检验模型类型。", '默认 "lm"']],
+    tips: ["研究数量和异质性会影响检验，不能单独判定发表偏倚。"], related: ["funnel.rma", "rma"],
+  });
+  add({
+    id: "netmeta", name: "netmeta()", package: "netmeta", category: "证据综合", level: "高阶",
+    aliases: ["网状Meta", "NMA"], summary: "拟合频率学派网络 Meta 模型，估计多干预之间的直接与间接比较。",
+    syntax: "netmeta(TE, seTE, treat1, treat2, studlab, data, sm, common = FALSE, random = TRUE, ...)", returns: "返回 netmeta 网络模型。",
+    example: `netmeta(TE, seTE, treat1, treat2, studlab, data = dat, sm = "OR")`, output: "拟合多干预网络模型。",
+    params: [["TE / seTE", "每条比较的效应与标准误。", "必填"], ["treat1 / treat2", "比较的两个干预。", "必填"], ["studlab", "研究标识。", "必填"], ["sm", "效应指标。", "必填"]],
+    tips: ["先检查网络连通、传递性和一致性。"], related: ["netgraph", "netleague", "netsplit", "netheat"],
+  });
+  ["netgraph", "netleague", "netsplit", "netheat", "rankogram"].forEach((id) => add({
+    id, name: `${id}()`, package: id === "rankogram" ? "netmeta" : "netmeta", category: "证据综合", level: "高阶",
+    aliases: ["网络Meta结果", id], summary: {
+      netgraph: "绘制网状 Meta 的干预节点和研究连接图。",
+      netleague: "生成多干预两两比较的联赛表。",
+      netsplit: "比较直接与间接证据，检查局部不一致性。",
+      netheat: "用净热图辅助检查网络不一致性和比较来源。",
+      rankogram: "生成干预排序概率图，是 SUCRA 等排序摘要的基础。",
+    }[id],
+    syntax: `${id}(x, ...)`, returns: "生成对应网络结果或图形。", example: `${id}(network)`,
+    output: "输出网络结构、联赛表、一致性或排序结果。", params: [["x", "netmeta 网络对象，部分函数也可接收输入数据。", "必填"], ["...", "标签、排序或图形设置。", "可选"]],
+    tips: id === "rankogram" ? ["排序概率不等于临床推荐。"] : ["结果要和网络结构与研究质量一起解释。"], related: ["netmeta"],
+  }));
+
+  // Machine learning / tidymodels
+  add({
+    id: "initial_split", name: "initial_split()", package: "rsample", category: "机器学习", level: "中级",
+    aliases: ["拆分训练测试", "data split"], summary: "把数据分成训练集和测试集，可按结局分层。",
+    syntax: "initial_split(data, prop = 3/4, strata = NULL, ...)", returns: "返回 rsplit 对象，用 training()/testing() 取子集。",
+    example: `split <- initial_split(dat, prop = 0.8, strata = outcome)`, output: "生成 80% 训练集与 20% 测试集。",
+    params: [["data", "数据框。", "必填"], ["prop", "训练集比例。", "默认 3/4"], ["strata", "分层变量，常设为结局。", "推荐分类结局时使用"]],
+    tips: ["测试集在模型定型前不得用于调参或特征选择。"], related: ["vfold_cv", "last_fit"],
+  });
+  add({
+    id: "vfold_cv", name: "vfold_cv()", package: "rsample", category: "机器学习", level: "中级",
+    aliases: ["K折交叉验证", "cross-validation"], summary: "为训练数据生成 K 折重采样，用于模型评估和调参。",
+    syntax: "vfold_cv(data, v = 10, repeats = 1, strata = NULL, ...)", returns: "返回 rset 重采样对象。",
+    example: `vfold_cv(training(split), v = 5, strata = outcome)`, output: "生成 5 个训练/验证拆分。",
+    params: [["data", "训练数据。", "必填"], ["v", "折数。", "默认 10"], ["repeats", "重复次数。", "默认 1"], ["strata", "分层变量。", "推荐使用"]],
+    tips: ["同一人多次观测应使用 group_vfold_cv()，时间序列应按时间切分。"], related: ["initial_split", "tune_grid"],
+  });
+  add({
+    id: "recipe", name: "recipe()", package: "recipes", category: "机器学习", level: "中级",
+    aliases: ["预处理配方", "feature engineering recipe"], summary: "声明结局、预测变量和一系列预处理步骤，步骤在训练折内估计。",
+    syntax: "recipe(formula, data, ...)", returns: "返回 recipes 对象。", example: `recipe(outcome ~ ., data = train) |> step_normalize(all_numeric_predictors())`,
+    output: "建立含标准化的预处理配方。", params: [["formula", "结局与预测变量公式。", "必填"], ["data", "训练数据，用于确定变量角色。", "必填"]],
+    tips: ["在 recipe 外对全数据预处理会造成数据泄漏。"], related: ["step_normalize", "workflow"],
+  });
+  add({
+    id: "workflow", name: "workflow()", package: "workflows", category: "机器学习", level: "中级",
+    aliases: ["建模工作流", "model workflow"], summary: "把预处理器和模型绑定为一个整体，保证训练与预测步骤一致。",
+    syntax: "workflow(preprocessor = NULL, spec = NULL, ...)", returns: "返回 workflow 对象。",
+    example: `workflow(preprocessor = rec, spec = logistic_reg())`, output: "组合预处理配方与模型。",
+    params: [["preprocessor", "recipe 或公式。", "推荐 recipe"], ["spec", "parsnip 模型定义。", "必填"]],
+    tips: ["保存并部署整个 workflow，而不是只保存模型系数。"], related: ["recipe", "tune_grid"],
+  });
+  add({
+    id: "fit", name: "fit()", package: "generics", category: "机器学习", level: "中级",
+    aliases: ["拟合工作流", "fit model"], summary: "通用拟合接口；在 tidymodels 中对 workflow、recipe 或模型对象进行拟合。",
+    syntax: "fit(object, ...)", returns: "返回拟合后的模型或 workflow。", example: `fit(wf, data = train)`,
+    output: "在同一对象中保存预处理参数和模型。", params: [["object", "模型、workflow 或 recipe。", "必填"], ["...", "数据和其他拟合设置。", "按对象类型"]],
+    tips: ["先确认拟合对象是 parsnip 模型还是完整 workflow。"], related: ["workflow", "last_fit"],
+  });
+  [
+    ["step_impute_median", "用训练数据的中位数插补数值变量缺失。"],
+    ["step_normalize", "用训练数据的中心和尺度标准化数值变量。"],
+    ["step_dummy", "把分类预测变量转为哑变量。"],
+  ].forEach(([id, summary]) => add({
+    id, name: `${id}()`, package: "recipes", category: "机器学习", level: "中级",
+    aliases: ["预处理步骤", id], summary,
+    syntax: `${id}(recipe, ..., role = NA, trained = FALSE, skip = TRUE, id = rand_id("${id.replace("step_", "")}"))`,
+    returns: "在 recipe 管道中加入一个预处理步骤。", example: `recipe(outcome ~ ., data = train) |> ${id}(all_numeric_predictors())`,
+    output: "返回更新后的 recipe。", params: [["recipe", "recipes 对象。", "必填"], ["...", "适用列选择。", "按步骤填写"]],
+    tips: ["步骤的参数在训练折中估计，再应用到验证折。"], related: ["recipe", "workflow"],
+  }));
+  add({
+    id: "logistic_reg", name: "logistic_reg()", package: "parsnip", category: "机器学习", level: "中级",
+    aliases: ["Logistic模型规格", "parsnip logistic"], summary: "定义二分类 Logistic 模型规格，再指定 glm、glmnet 等引擎。",
+    syntax: "logistic_reg(mode = \"classification\", penalty = NULL, mixture = NULL, engine = \"glm\")", returns: "返回 parsnip 模型 specification。",
+    example: `logistic_reg(penalty = tune(), mixture = 0) |> set_engine("glmnet")`, output: "定义待调正则化 Logistic 模型。",
+    params: [["penalty", "正则化强度，tune() 表示待调。", "视引擎"], ["mixture", "Lasso/Ridge 混合比例。", "视引擎"], ["engine", "拟合后端。", '默认 "glm"']],
+    tips: ["概率预测与类别预测是两个不同输出。"], related: ["workflow", "tune_grid"],
+  });
+  add({
+    id: "tune_grid", name: "tune_grid()", package: "tune", category: "机器学习", level: "高阶",
+    aliases: ["网格调参", "hyperparameter tuning"], summary: "在重采样上搜索超参数组合并计算统一指标。",
+    syntax: "tune_grid(object, resamples, grid = 10, metrics = NULL, control = control_grid(), ...)", returns: "返回 tuning 结果。",
+    example: `tune_grid(wf, folds, grid = 20, metrics = metric_set(roc_auc, brier_class))`, output: "返回各参数组合在折上的性能。",
+    params: [["object", "workflow 或模型规格。", "必填"], ["resamples", "rset 重采样。", "必填"], ["grid", "参数网格或数量。", "默认 10"], ["metrics", "指标集合。", "按任务选择"]],
+    tips: ["调参只使用训练折和验证折，测试集保持锁定。"], related: ["collect_metrics", "select_best"],
+  });
+  add({
+    id: "select_best", name: "select_best()", package: "tune", category: "机器学习", level: "高阶",
+    aliases: ["最佳参数", "best hyperparameters"], summary: "根据指定指标从调参结果选择一个最终参数组合。",
+    syntax: "select_best(x, metric = NULL, ...)", returns: "返回一行 tibble 参数配置。", example: `select_best(grid, metric = "roc_auc")`,
+    output: "返回 AUC 均值最高的参数。", params: [["x", "调参结果。", "必填"], ["metric", "用于选择的指标。", "需明确"]],
+    tips: ["选择指标应预先规定，不能同时按多个未说明规则挑最有利参数。"], related: ["tune_grid", "finalize_workflow"],
+  });
+  add({
+    id: "finalize_workflow", name: "finalize_workflow()", package: "tune", category: "机器学习", level: "高阶",
+    aliases: ["固定参数", "finalize model"], summary: "把选中的超参数写入工作流，得到可直接拟合的最终流程。",
+    syntax: "finalize_workflow(x, parameters, ...)", returns: "返回参数已固定的 workflow。", example: `finalize_workflow(wf, select_best(grid, "roc_auc"))`,
+    output: "生成最终工作流。", params: [["x", "含待调参数的 workflow。", "必填"], ["parameters", "select_best 返回的参数表。", "必填"]],
+    tips: ["最终流程应保存版本和参数记录。"], related: ["select_best", "last_fit"],
+  });
+  add({
+    id: "last_fit", name: "last_fit()", package: "tune", category: "机器学习", level: "高阶",
+    aliases: ["最终拟合测试", "final holdout"], summary: "用最终工作流在训练集拟合，并在锁定的测试集上评价一次。",
+    syntax: "last_fit(object, split, ...)", returns: "返回 last_fit 结果，可提取预测和指标。", example: `last_fit(final_wf, split)`,
+    output: "输出测试集预测和最终性能。", params: [["object", "已固定参数的 workflow。", "必填"], ["split", "initial_split 对象。", "必填"]],
+    tips: ["测试结果返回后不应再用同一测试集反复杂调模型。"], related: ["initial_split", "collect_metrics"],
+  });
+  add({
+    id: "collect_metrics", name: "collect_metrics()", package: "tune", category: "机器学习", level: "高阶",
+    aliases: ["汇总模型指标", "metrics summary"], summary: "整理调参或最终评价中的各项指标。",
+    syntax: "collect_metrics(x, summarize = TRUE, ...)", returns: "返回指标数据框。", example: `collect_metrics(tuned)`,
+    output: "返回每个参数的指标均值和标准误。", params: [["x", "tune 或 last_fit 结果。", "必填"], ["summarize", "是否汇总各折。", "默认 TRUE"]],
+    tips: ["分类和概率指标应看对应类型，不能混读。"], related: ["tune_grid", "last_fit"],
+  });
+  [
+    ["roc_auc", "计算 ROC AUC，评价二分类模型的排序能力。"],
+    ["pr_auc", "计算精确率-召回率曲线下面积，适合关注少数阳性事件。"],
+    ["brier_class", "计算 Brier 分数，综合评价概率预测误差。"],
+    ["roc_curve", "生成不同阈值下的敏感度与特异度，用于绘制 ROC。"],
+    ["threshold_perf", "在指定概率阈值上计算敏感度、特异度和其他分类指标。"],
+  ].forEach(([id, summary]) => add({
+    id, name: `${id}()`, package: "yardstick", category: "模型评估", level: "高阶",
+    aliases: ["模型指标", id], summary,
+    syntax: `${id}(data, truth, ..., event_level = "first", na_rm = FALSE)`, returns: "返回 tibble 评估结果。",
+    example: `${id}(pred, truth = outcome, prob)`, output: "返回对应模型指标。",
+    params: [["data", "含真实结局与预测的数据框。", "必填"], ["truth", "真实结局列。", "必填"], ["...", "概率或类别的列。", "按指标填写"], ["event_level", "哪一个因子水平是事件。", '默认 "first"']],
+    tips: ["事件水平必须与研究编码一致；AUPRC 基线通常接近事件比例。"], related: ["conf_mat", "collect_metrics"],
+  }));
+  add({
+    id: "ranger", name: "ranger()", package: "ranger", category: "机器学习", level: "高阶",
+    aliases: ["随机森林", "fast random forest"], summary: "快速拟合随机森林分类、回归或生存模型，支持概率预测和变量重要性。",
+    syntax: "ranger(formula, data, num.trees = 500, mtry = NULL, min.node.size = NULL, probability = FALSE, importance = \"none\", seed = NULL, ...)",
+    returns: "返回 ranger 模型对象。", example: `ranger(outcome ~ ., data = train, num.trees = 1000, probability = TRUE, importance = "permutation", seed = 2026)`,
+    output: "拟合随机森林并保存模型。", params: [["formula", "模型公式。", "必填"], ["data", "训练数据。", "必填"], ["num.trees", "树数量。", "默认 500"], ["mtry", "每次分裂尝试变量数。", "需调参"], ["probability", "分类是否输出概率。", "默认 FALSE"], ["importance", "重要性类型。", '默认 "none"'], ["seed", "随机种子。", "建议固定"]],
+    tips: ["变量重要性不是因果效应，相关变量会分摊重要性。"], related: ["randomForest", "vip", "xgb.train"],
+  });
+  add({
+    id: "xgb.DMatrix", name: "xgb.DMatrix()", package: "xgboost", category: "机器学习", level: "高阶",
+    aliases: ["XGBoost数据", "DMatrix"], summary: "把特征矩阵和结局标签整理成 XGBoost 的高效数据对象。",
+    syntax: "xgb.DMatrix(data, label = NULL, missing = NA, weight = NULL, ...)", returns: "返回 xgb.DMatrix。",
+    example: `xgb.DMatrix(data = as.matrix(train[predictors]), label = train$outcome)`, output: "生成训练用 DMatrix。",
+    params: [["data", "数值矩阵或支持的数据对象。", "必填"], ["label", "训练结局标签。", "训练时必填"], ["missing", "视为何种值为缺失。", "默认 NA"]],
+    tips: ["分类变量必须先做明确编码；DMatrix 不会自动理解数据框语义。"], related: ["xgb.train"],
+  });
+  add({
+    id: "xgb.train", name: "xgb.train()", package: "xgboost", category: "机器学习", level: "高阶",
+    aliases: ["梯度提升", "XGBoost训练"], summary: "按参数列表和轮数训练梯度提升树模型。",
+    syntax: "xgb.train(params, data, nrounds, watchlist = list(), obj = NULL, verbose = 1, ...)", returns: "返回 Booster 模型。",
+    example: `xgb.train(list(objective = "binary:logistic", eta = 0.05, max_depth = 3), dtrain, nrounds = 300)`,
+    output: "训练二分类梯度提升模型。", params: [["params", "目标函数、学习率、深度等参数字典。", "必填"], ["data", "xgb.DMatrix。", "必填"], ["nrounds", "提升轮数。", "必填"], ["watchlist", "验证集监控。", "建议使用"]],
+    tips: ["eta、nrounds、max_depth 等要联合调参；训练集损失降低不代表泛化提高。"], related: ["xgb.DMatrix", "ranger"],
+  });
+  add({
+    id: "vip", name: "vip()", package: "vip", category: "模型评估", level: "高阶",
+    aliases: ["变量重要性", "variable importance"], summary: "为模型绘制变量重要性图，可比较不同重要性定义。",
+    syntax: "vip(object, ...)", returns: "返回重要性图并保存数据。", example: `vip(rf, num_features = 15)`,
+    output: "显示模型最依赖的 15 个变量。", params: [["object", "支持重要性提取的模型。", "必填"], ["...", "特征数、指标等图形设置。", "可选"]],
+    tips: ["重要性说明模型依赖程度，不说明变量改变后的因果效应。"], related: ["ranger", "randomForest"],
+  });
+  add({
+    id: "nearest_neighbor", name: "nearest_neighbor()", package: "parsnip", category: "机器学习", level: "中级",
+    aliases: ["KNN模型规格", "nearest neighbours"], summary: "定义 KNN 模型规格，邻居数和权重在训练/调参中确定。",
+    syntax: "nearest_neighbor(mode = \"unknown\", neighbors = NULL, weight_func = NULL, dist_power = NULL, engine = \"kknn\")",
+    returns: "返回 parsnip 模型 specification。", example: `nearest_neighbor(neighbors = tune()) |> set_engine("kknn") |> set_mode("classification")`,
+    output: "定义待调邻居数的 KNN 分类器。", params: [["neighbors", "邻居数 k。", "需调参"], ["weight_func", "邻居权重函数。", "视引擎"], ["dist_power", "距离幂次。", "视引擎"]],
+    tips: ["KNN 对变量尺度和无关变量敏感，应先标准化。"], related: ["recipe", "tune_grid"],
+  });
+  add({
+    id: "ksvm", name: "ksvm()", package: "kernlab", category: "机器学习", level: "高阶",
+    aliases: ["支持向量机", "kernel SVM"], summary: "拟合支持向量分类或回归，支持线性、多项式与 RBF 核。",
+    syntax: "ksvm(x, y = NULL, scaled = TRUE, type = NULL, kernel = \"rbfdot\", kpar = \"automatic\", C = 1, prob.model = FALSE, ...)",
+    returns: "返回 ksvm 模型对象。", example: `ksvm(outcome ~ ., data = train, kernel = "rbfdot", C = 1, prob.model = TRUE)`,
+    output: "拟合 RBF 核 SVM。", params: [["x", "公式或特征。", "必填"], ["y", "结局；使用公式时可为空。", "视调用"], ["kernel", "核函数。", '默认 "rbfdot"'], ["C", "间隔违规成本。", "默认 1"], ["prob.model", "是否估计概率。", "默认 FALSE"]],
+    tips: ["先标准化；概率输出仍需校准检查。"], related: ["svm", "recipe"],
+  });
+  add({
+    id: "naiveBayes", name: "naiveBayes()", package: "e1071", category: "机器学习", level: "中级",
+    aliases: ["朴素贝叶斯", "Naive Bayes"], summary: "按条件独立假设拟合分类模型，计算快，适合作为简单基线。",
+    syntax: "naiveBayes(x, y, laplace = 0, ...)", returns: "返回 naiveBayes 模型对象。",
+    example: `naiveBayes(outcome ~ ., data = train, laplace = 1)`, output: "拟合朴素贝叶斯分类器。",
+    params: [["x", "公式或特征矩阵。", "必填"], ["y", "结局；使用公式时可为空。", "视调用"], ["laplace", "拉普拉斯平滑。", "默认 0"]],
+    tips: ["特征高度相关时概率可能过度自信，应检查校准。"], related: ["ksvm", "roc_auc"],
+  });
+
+  window.RZH_EXTRA_FUNCTIONS_5 = [
+    ...(window.RZH_EXTRA_FUNCTIONS_5 || []),
+    ...items,
+  ];
+
+  window.RZH_PACKAGE_INFO.push(
+    {
+      name: "poLCA",
+      title: "poLCA：潜类别分析",
+      category: "高级建模",
+      level: "高阶",
+      summary: "用分类或有序指标拟合潜类别模型，输出类别比例、条件概率和个体后验分类概率。",
+      useCases: ["识别症状或健康行为亚型", "问卷响应模式分类", "比较多类别模型的 BIC 与分类质量"],
+      functions: ["poLCA", "poLCA.entropy"],
+    },
+    {
+      name: "geepack",
+      title: "geepack：广义估计方程",
+      category: "高级建模",
+      level: "高阶",
+      summary: "拟合广义估计方程，处理个体重复测量或聚类数据，并估计总体平均效应。",
+      useCases: ["重复测量二分类或计数结局", "家庭、医院或社区聚类数据", "总体平均效应与稳健标准误"],
+      functions: ["geeglm"],
+    },
+    {
+      name: "brms",
+      title: "brms：贝叶斯回归建模",
+      category: "贝叶斯统计",
+      level: "高阶",
+      summary: "基于 Stan 的贝叶斯回归框架，公式接近 lme4，支持常见分布、层级结构和后验预测。",
+      useCases: ["贝叶斯线性/Logistic/计数回归", "多水平与随机效应模型", "先验预测、后验预测和模型比较"],
+      functions: ["brm", "prior_summary", "posterior_predict", "fixef"],
+    },
+    {
+      name: "rstanarm",
+      title: "rstanarm：贝叶斯回归接口",
+      category: "贝叶斯统计",
+      level: "高阶",
+      summary: "提供与 glm、lmer 风格接近的 Stan 贝叶斯回归接口，适合从传统模型过渡到贝叶斯模型。",
+      useCases: ["贝叶斯广义线性模型", "贝叶斯混合模型", "后验预测与参数分布"],
+      functions: ["stan_glm", "stan_lmer", "posterior_predict", "posterior_epred"],
+    },
+    {
+      name: "metafor",
+      title: "metafor：Meta 分析",
+      category: "证据综合",
+      level: "高阶",
+      summary: "计算和合并多种效应量，支持随机效应、多水平 Meta、森林图、异质性、偏倚和敏感性分析。",
+      useCases: ["二分类与连续结局 Meta", "相关效应和多水平 Meta", "异质性、漏斗图和发表偏倚"],
+      functions: ["rma", "rma.mv", "forest.rma", "funnel.rma", "regtest"],
+    },
+    {
+      name: "netmeta",
+      title: "netmeta：网状 Meta 分析",
+      category: "证据综合",
+      level: "高阶",
+      summary: "拟合多干预网络 Meta 模型，展示网络结构、联赛表并检查直接与间接证据的一致性。",
+      useCases: ["多干预相对效果", "网络一致性与局部不一致", "SUCRA 或其他排序摘要"],
+      functions: ["netmeta", "netgraph", "netleague", "netsplit", "netheat"],
+    },
+    {
+      name: "tidymodels",
+      title: "tidymodels：预测建模工作流",
+      category: "机器学习",
+      level: "高阶",
+      summary: "统一数据拆分、预处理、模型定义、调参和评价，把数据泄漏风险写入可复现工作流。",
+      useCases: ["比较多种预测模型", "交叉验证与超参数调优", "临床预测模型规范开发"],
+      functions: ["initial_split", "vfold_cv", "recipe", "workflow", "tune_grid", "last_fit", "collect_metrics"],
+    },
+    {
+      name: "ranger",
+      title: "ranger：快速随机森林",
+      category: "机器学习",
+      level: "高阶",
+      summary: "高效拟合随机森林分类、回归和生存模型，支持概率预测、变量重要性及较大数据。",
+      useCases: ["非线性和交互预测", "变量重要性探索", "随机森林基准模型"],
+      functions: ["ranger", "vip"],
+    },
+    {
+      name: "xgboost",
+      title: "xgboost：梯度提升树",
+      category: "机器学习",
+      level: "高阶",
+      summary: "训练正则化梯度提升树，适合结构化数据的分类、回归和排序预测。",
+      useCases: ["高维结构化数据预测", "非线性与复杂交互", "与其他模型统一交叉验证比较"],
+      functions: ["xgb.DMatrix", "xgb.train"],
+    },
+    {
+      name: "kernlab",
+      title: "kernlab：核方法与 SVM",
+      category: "机器学习",
+      level: "高阶",
+      summary: "提供支持向量机和多种核方法，用于中小规模数据的分类与回归。",
+      useCases: ["非线性决策边界", "核函数比较", "SVM 教学与基准模型"],
+      functions: ["ksvm"],
+    },
+  );
+
+  window.RZH_GLOSSARY.push(
+    ["data-dictionary", "数据字典", "数据处理", "说明每个变量的名称、定义、单位、允许范围、缺失编码和来源的文档。", "像数据表的使用说明书。", "分析数据必须与数据字典一起保存。"],
+    ["primary-key", "主键", "数据处理", "能唯一定位一条记录的变量或变量组合。", "像每个人的病历号，或病历号加随访日期。", "重复判断和表连接前必须先定义主键。"],
+    ["missing-code", "缺失编码", "数据处理", "数据文件中表示缺失的特殊值，例如空白、99、-1 或“未知”。", "像表格里的“没填”标记，但不同系统写法不同。", "缺失码必须由数据字典确认，不能只靠自动猜测。"],
+    ["data-leakage", "数据泄漏", "机器学习", "验证数据的信息被用于预处理、特征筛选或调参，导致性能被高估。", "像考试前偷看到了测试题。", "所有预处理和调参都应在训练折内完成。"],
+    ["target-leakage", "目标泄漏", "机器学习", "某个预测特征直接编码了结局，或在预测时间点根本不可能获得。", "像用出院诊断预测入院时是否患病。", "必须核对每个特征的获得时间。"],
+    ["train-test-split", "训练集与测试集", "机器学习", "训练集用于学习和调参，测试集用于最终独立评价。", "像练习册和最终考试分开。", "测试集在模型定型前不能参与选择。"],
+    ["cross-validation", "交叉验证", "机器学习", "把训练数据多次分成训练和验证部分，用于估计泛化性能与调参。", "像轮换做练习题并留出不同小题检查。", "分组数据要用分组交叉验证，时间序列按时间切分。"],
+    ["external-validation", "外部验证", "机器学习", "在开发数据之外的另一时间、中心或人群中验证固定模型。", "像把在本校训练的模型拿到另一家医院测试。", "外部验证比同一数据的交叉验证更接近真实推广。"],
+    ["discrimination", "区分度", "模型评估", "模型把高风险个体排在低风险个体前面的能力。", "像风险排序是否足够准确。", "AUC/C 统计量是常见区分度指标。"],
+    ["calibration", "校准度", "模型评估", "模型预测风险与实际发生风险的一致程度。", "像模型说 20% 风险的人，实际是否约 20% 发生事件。", "AUC 高不代表校准好。"],
+    ["brier-score", "Brier 分数", "模型评估", "预测概率与 0/1 结局差异的平方均值，越低越好。", "同时惩罚错误排序和错误风险数值。", "适用于二分类概率预测。"],
+    ["auprc", "AUPRC", "模型评估", "精确率-召回率曲线下面积，适合阳性事件稀少时评价模型。", "更关注在少量阳性中找得准不准、找得全不全。", "基线通常接近事件比例。"],
+    ["gam", "广义可加模型", "高级建模", "用惩罚平滑函数描述连续变量非线性关系的广义模型。", "像让数据画出弯曲关系，同时限制过度弯曲。", "常用 s() 表示平滑项，用 EDF 描述弯曲程度。"],
+    ["edf", "有效自由度", "高级建模", "GAM 平滑项实际表现出的曲线复杂度。", "EDF 越接近 1，曲线越接近直线。", "EDF 不是简单的参数个数。"],
+    ["measurement-model", "测量模型", "高级建模", "描述潜变量如何由可观测题目或指标测量的模型部分。", "像先确认几道题是否真的在测同一个构念。", "lavaan 中用 =~ 表示。"],
+    ["structural-model", "结构模型", "高级建模", "描述潜变量或观测变量之间路径关系的模型部分。", "像在测量结构成立后比较不同构念之间的关系。", "lavaan 中用 ~ 表示。"],
+    ["local-independence", "局部独立", "高级建模", "在潜类别模型给定类别后，各指标被假设为条件独立。", "像同一类型的人中，各题响应不再互相解释。", "强相关题目可能违反该假设。"],
+    ["latent-entropy", "分类熵", "高级建模", "潜类别模型中个体后验分类的清晰程度。", "越接近 1 通常表示每个人更像只属于一个类别。", "熵高不代表类别数正确。"],
+    ["mcar-mar-mnar", "MCAR、MAR 与 MNAR", "缺失数据", "描述缺失是否依赖其他变量或未观测真实值的三种机制分类。", "像判断缺失是完全随机、可由其他资料解释，还是与真实值本身有关。", "多重插补通常建立在接近 MAR 的假设下。"],
+    ["multiple-imputation", "多重插补", "缺失数据", "生成多套合理缺失数据，分别分析后用 Rubin 规则合并。", "像不假装知道唯一缺失值，而是保留多种可能性。", "要报告插补模型、m、收敛和敏感性分析。"],
+    ["estimand", "估计目标", "因果推断", "明确要估计的人群、处理策略、结局、时间范围和效应尺度。", "像在分析前先说清楚究竟要回答谁的什么因果问题。", "估计目标不同，方法也不同。"],
+    ["target-trial", "目标试验", "因果推断", "把观察性因果问题写成假想随机试验的设计框架。", "像规定谁入组、何时开始、比较什么策略、随访到何时。", "目标试验帮助明确时间零点和分析策略。"],
+    ["conditional-effect", "条件效应", "高级建模", "在相同随机效应或给定个体条件下解释的效应。", "像比较同一个人的不同状态。", "LMM/GLMM 常估计条件效应。"],
+    ["marginal-effect", "总体平均效应", "高级建模", "在目标人群中平均后的效应。", "像对整个人群比较两种策略的平均结果。", "GEE 常估计总体平均效应；非线性模型中不等于条件 OR。"],
+    ["prior", "先验", "贝叶斯统计", "分析数据前对参数的分布假设。", "像在阅读新数据前，对合理效应范围作出的可解释判断。", "先验需要理由、单位和敏感性分析。"],
+    ["posterior", "后验", "贝叶斯统计", "结合先验与数据似然后得到的参数分布。", "像看完数据后更新过的信念和不确定性。", "后验必须在 MCMC 收敛后才可解释。"],
+    ["credible-interval", "可信区间", "贝叶斯统计", "给定模型、先验和数据时，参数落入区间的后验概率。", "像说在模型与先验下，参数有 95% 的后验概率落在其中。", "不要把它直接解释成频率学派置信区间。"],
+    ["rhat", "Rhat", "贝叶斯统计", "比较不同 MCMC 链之间与链内变异的收敛诊断。", "像检查几条采样路线是否走到同一片区域。", "通常希望接近 1，异常时必须先解决采样问题。"],
+    ["posterior-predictive-check", "后验预测检查", "贝叶斯统计", "从后验预测分布模拟数据，并与真实数据比较。", "像让模型重新生成一批“假数据”，看是否像真数据。", "能发现分布、零值和极端值结构的失配。"],
+    ["effect-size", "效应量", "证据综合", "把研究结果表达为可比较大小的指标，例如 OR、RR、HR、MD 或 SMD。", "像把不同研究统一成同一种尺子。", "不同效应量不能随意混在同一个 Meta 中。"],
+    ["heterogeneity", "异质性", "证据综合", "研究之间真实效应或适用人群、干预和设计的差异。", "像多位研究者给出的结果不完全来自同一个总体。", "τ² 表示研究间方差，I² 不是唯一判断依据。"],
+    ["prediction-interval", "预测区间", "证据综合", "随机效应 Meta 中，未来类似研究效应可能落入的范围。", "比平均值置信区间更能表达研究之间的差异。", "通常比合并效应置信区间更宽。"],
+    ["publication-bias", "发表偏倚", "证据综合", "显著或阳性结果更容易被发表、快速发表或被纳入。", "像只看到考试中做对的题。", "漏斗图和 Egger 检验在少量研究时不可靠。"],
+    ["transitivity", "传递性", "证据综合", "不同直接比较中的研究在重要效应修饰因素上足够相似，能形成间接比较。", "像不同比赛场次确实在可比规则和人群下进行。", "传递性是网状 Meta 的核心设计假设。"],
+    ["nma-consistency", "一致性", "证据综合", "同一对干预的直接证据与间接证据产生相容效应。", "像两条路线指向同一答案。", "需要全局与局部一致性检查。"],
+    ["amstar2", "AMSTAR 2", "证据综合", "评价系统综述方法质量和可信度的工具。", "像先检查一项综述是否值得作为证据来源。", "关注关键领域，不产生简单总分。"],
+    ["grade", "GRADE", "证据综合", "对一组证据的确定性进行评级，考虑偏倚、不一致、间接性、不精确和发表偏倚。", "像给整个证据体系评定可信程度，而不是只给单个 p 值。", "证据等级会因研究质量问题降低。"],
+  );
+})();
+
+</script>
+  <script>
 window.RZH_CHART_IMAGES = {
   "plot/bar": "data:image/webp;base64,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",
   "plot/boxplot": "data:image/webp;base64,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",
@@ -107318,6 +109991,7 @@ function renderGuide(type, id) {
   const concepts = guide.concepts || [];
   const comparison = guide.comparison;
   const readingNotes = guide.readingNotes || [];
+  const references = guide.references || [];
   const exampleImage = type === "plot" ? chartImages[`plot/${guide.id}`] : "";
   const relatedGuides = (guide.related || []).map((relatedId) => learningGuides.find((item) => item.id === relatedId)).filter(Boolean);
   app.innerHTML = `
@@ -107458,6 +110132,20 @@ function renderGuide(type, id) {
               <div class="guide-section-title"><span>练</span><div><h2>练习与自查</h2><p>合上示例，尝试自己写一遍；结果不应只“能运行”，还应经得起来源和结构检查。</p></div></div>
               <p>${escapeHtml(guide.practice)}</p>
               <a class="button" href="#functions">遇到不熟悉的函数，打开中文词典 ${icon("arrow-right")}</a>
+            </section>
+          ` : ""}
+
+          ${references.length ? `
+            <section class="panel guide-section guide-references">
+              <div class="guide-section-title"><span>参</span><div><h2>资料依据与延伸阅读</h2><p>优先列出官方文档、方法学指南与报告规范。具体默认值和函数参数仍以你当前安装的 R 包版本为准。</p></div></div>
+              <ul>
+                ${references.map((reference) => `
+                  <li>
+                    <a href="${escapeHtml(reference.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(reference.title)}</a>
+                    ${reference.note ? `<span>${escapeHtml(reference.note)}</span>` : ""}
+                  </li>
+                `).join("")}
+              </ul>
             </section>
           ` : ""}
         </article>
