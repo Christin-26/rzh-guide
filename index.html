@@ -5998,6 +5998,19 @@ html[data-theme="dark"] .theme-icon-sun {
   line-height: 1.6;
 }
 
+.guide-practice {
+  border-color: color-mix(in srgb, var(--brand) 24%, var(--border));
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--brand) 7%, var(--surface)), var(--surface));
+}
+
+.guide-practice > p {
+  max-width: 820px;
+  margin: 0 0 18px;
+  color: var(--text-soft);
+  line-height: 1.85;
+}
+
 .guide-aside {
   position: sticky;
   top: calc(var(--topbar) + 18px);
@@ -63728,6 +63741,1643 @@ window.RZH_GLOSSARY.push(
 
 </script>
   <script>
+(() => {
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const categoryMap = new Map(categories.map((item) => [item.id, item]));
+
+  const textCategory = categoryMap.get("regex");
+  if (textCategory) {
+    Object.assign(textCategory, {
+      title: "文本处理与正则",
+      subtitle: "从字符串到医学文本清洗",
+      audience: "需要处理姓名、编号、问卷开放题、题名、诊断或药物记录的同学。",
+      detail: "先学字符与空白，再掌握 stringr 的检测、提取、替换和拆分，最后进入正则分组、环视与完整清洗流程。每一节都从可运行的小例子开始。",
+      icon: "braces",
+      items: [
+        { title: "字符串基础与文本清理", note: "长度、截取、拼接、空白、大小写与排序", href: "#guide/text/string-basics", level: "入门" },
+        { title: "stringr 常用操作", note: "检测、计数、定位、提取、替换、拆分与合并", href: "#guide/text/stringr-operations", level: "入门" },
+        { title: "正则表达式基础", note: "元字符、字符集、量词、转义与 Base R 对照", href: "#guide/text/regex-patterns", level: "进阶" },
+        { title: "分组、环视与复杂模式", note: "捕获分组、命名分组、环视、贪婪和调试", href: "#guide/text/regex-groups", level: "高阶" },
+        { title: "医学与问卷文本清洗", note: "从杂乱记录到可核对的分析变量", href: "#guide/text/text-cleaning-workflow", level: "应用" },
+      ],
+    });
+  }
+
+  const controlCategory = categoryMap.get("control");
+  if (controlCategory) {
+    Object.assign(controlCategory, {
+      title: "编程与自动化",
+      subtitle: "少复制代码，批量处理对象",
+      audience: "会写基本代码，但面对多个文件、分组或模型时仍在反复复制粘贴。",
+      detail: "先掌握条件、循环和函数，再学习 apply 与 purrr 的批量处理方式。重点不是追求更短的代码，而是让输入、过程和输出都更容易检查。",
+      icon: "terminal",
+      items: [
+        { title: "控制流专题", note: "if、for、while 及执行过程", href: "#control-flow", level: "入门" },
+        { title: "函数与 apply 族", note: "输入输出、lapply、sapply 与批量计算", href: "#learn/r-functions", level: "进阶" },
+        { title: "purrr：批量读取、计算和建模", note: "map、map2、pmap 与结果整理", href: "#guide/text/purrr-iteration", level: "进阶" },
+      ],
+    });
+  }
+
+  if (!categoryMap.has("datetime")) {
+    categories.push({
+      id: "datetime",
+      title: "日期与时间",
+      subtitle: "计算随访、年龄和时间趋势",
+      audience: "数据里有入组日期、随访日期、出生日期或长时间序列，却经常把日期当成普通文字。",
+      detail: "理解 Date 与日期时间类型，使用 lubridate 解析多种格式、提取年月日、计算时间差，并完成随访时间和按月聚合等研究任务。",
+      icon: "workflow",
+      items: [
+        { title: "日期与时间处理", note: "解析、提取、运算、随访时间与聚合", href: "#guide/text/date-time-basics", level: "进阶" },
+        { title: "时间序列与趋势", note: "移动平均、按周月聚合与绘图", href: "#guide/model/time-series", level: "应用" },
+      ],
+    });
+  }
+
+  if (!categoryMap.has("reporting")) {
+    categories.push({
+      id: "reporting",
+      title: "项目与可重复报告",
+      subtitle: "让代码、结果和文档一起更新",
+      audience: "准备写课程作业、毕业论文或科研报告，希望别人能够复现分析。",
+      detail: "从项目目录、脚本分段和函数复用开始，最后使用 Quarto 把说明、代码、表格和图形放在同一份可重复报告中。",
+      icon: "note",
+      items: [
+        { title: "建立 R 项目", note: "路径、脚本、输入、输出和命名", href: "#learn/r-project", level: "入门" },
+        { title: "写出可复用函数", note: "减少重复代码并保留检查点", href: "#learn/r-functions", level: "进阶" },
+        { title: "Quarto 可重复报告", note: "文字、代码和结果同步生成", href: "#learn/r-quarto", level: "应用" },
+        { title: "完成一份完整分析", note: "从原始数据到模型与结果复核", href: "#learn/r-9", level: "应用" },
+      ],
+    });
+  }
+
+  const desiredOrder = ["quick", "system", "entry", "cleaning", "control", "regex", "datetime", "visualization", "parameters", "methods", "models", "reporting"];
+  categories.sort((a, b) => {
+    const ai = desiredOrder.indexOf(a.id);
+    const bi = desiredOrder.indexOf(b.id);
+    return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
+  });
+
+  window.RZH_GUIDES.push(
+    {
+      type: "text",
+      id: "string-basics",
+      typeLabel: "文本处理",
+      minutes: 22,
+      title: "字符串基础与文本清理",
+      aliases: ["字符串", "文本基础", "string basics"],
+      hero: "先看清字符、空白和缺失，再开始改文本",
+      audience: "第一次处理姓名、编号、地址或问卷文字，尤其担心改坏中文和原始记录的同学。",
+      overview: "文本处理的第一步不是立刻写正则，而是弄清每一行代表什么、空字符串和 NA 有什么区别、空格是否携带信息，以及字符数和字节数是否相同。先把基础动作练熟，后面的 stringr 和正则才不会变成碰运气。",
+      features: ["统计字符数、截取片段和拼接文字。", "统一首尾空格、大小写和编号宽度。", "安全处理中文、NA 与空字符串。", "在保留原列的前提下创建清洗后的新列。"],
+      concepts: [
+        { term: "字符向量", explain: "一个变量可以同时保存多条文字，例如 c(\"张\", \"李\", \"王\")。大多数 stringr 函数会对每个元素分别处理。" },
+        { term: "字符数与字节数", explain: "一个汉字可能占多个字节，但通常只算一个字符。检查中文字段长度时应明确使用字符计数。" },
+        { term: "NA 与空字符串", explain: "NA 表示缺失或未知，\"\" 表示确实有一条长度为 0 的文字。两者不能用同一种方式处理。" },
+        { term: "空白", explain: "空格、制表符和换行都属于空白。首尾空白通常应清理，内部空白是否删除则要保留业务含义。" },
+        { term: "向量化", explain: "把整列文字交给函数，而不是自己写循环逐条处理。返回结果通常与输入长度对应。" },
+      ],
+      comparison: {
+        title: "Base R 与 stringr 基础函数对照",
+        note: "老代码里常见 Base R，新的 tidyverse 项目更常用 stringr。知道两者对应关系，读代码时就不容易卡住。",
+        headers: ["任务", "Base R", "stringr", "初学建议"],
+        rows: [
+          ["字符数", "nchar()", "str_length()", "中文字段先确认按字符还是字节计数"],
+          ["截取", "substr()", "str_sub()", "str_sub() 支持从末尾用负数定位"],
+          ["拼接", "paste0() / paste()", "str_c()", "sep 控制同一次拼接，collapse 控制折叠为一条"],
+          ["去首尾空白", "trimws()", "str_trim()", "不改变字符串内部空白"],
+          ["压缩全部空白", "gsub() + 正则", "str_squish()", "会清理首尾并压缩内部连续空白"],
+          ["大写/小写", "toupper() / tolower()", "str_to_upper() / str_to_lower()", "英文姓名还要注意姓名顺序"],
+          ["补齐编号", "sprintf() 或手工处理", "str_pad()", "前导零常被 Excel 误删，读取后应主动补齐"],
+        ],
+      },
+      whenUse: ["姓名、编号、单位或地址格式不统一。", "同一字段夹杂 NA、空字符串、前后空格和全角半角符号。", "需要从固定位置截取年份、地区码或样本编号。", "需要在保留原始值的同时生成可核对的清洗列。"],
+      dataShape: ["先确认一列文字还是多列组合。", "统计 NA、空字符串和首尾空白，不要直接整列替换。", "中文字段要明确字符、字节和显示宽度。", "清洗结果另存新列，并保留原值用于比对。"],
+      steps: [
+        {
+          title: "先看长度与缺失",
+          text: "同一列里出现 0、2、8 等不同长度时，往往意味着空字符串、缺失或格式不统一。",
+          code: `library(stringr)\nids <- c(" A001 ", "A002", "", NA, "A 003")\ntibble::tibble(\n  raw = ids,\n  chars = str_length(ids),\n  missing = is.na(ids),\n  empty = !is.na(ids) & str_length(ids) == 0\n)`,
+          explain: "str_length() 对每条文字计数；is.na() 只识别真正的 NA，空字符串则通过长度 0 被发现。",
+        },
+        {
+          title: "截取与拼接要分清位置",
+          text: "str_sub() 用起止位置截取，负数表示从末尾数。str_c() 负责把多条文字接到一起。",
+          code: `code <- c("CN-2024-001", "CN-2025-014")\nyear_code <- str_sub(code, 4, 7)\nserial <- str_sub(code, -3, -1)\nstr_c(year_code, serial, sep = "-")\nstr_c(serial, collapse = ", ")`,
+          explain: "str_sub(code, 4, 7) 取每条的年份；str_sub(code, -3, -1) 取最后三位；str_c() 的 sep 用于逐个拼接，collapse 把整个结果折叠成一条文字。",
+        },
+        {
+          title: "清理空白而不是删除所有空格",
+          text: "str_trim() 去首尾空白，str_squish() 还会把内部连续空白压成一个空格。",
+          code: `messy <- c("  北京  海淀  ", " 上海 浦东", "广州  天河")\nstr_trim(messy)\nstr_squish(messy)`,
+          explain: "地址中的空格可能只是录入不整齐，也可能是不同字段的分隔。先看少量结果，再决定是否进一步删除全部空格。",
+        },
+        {
+          title: "统一编号宽度",
+          text: "str_pad() 适合恢复前导零；str_trunc() 只适合展示或创建短标签，正式分析不应无故截掉编号。",
+          code: `ids <- c("1", "12", "123")\nstr_pad(ids, width = 5, side = "left", pad = "0")\nstr_trunc("这是一段很长的自由文本", width = 10)`,
+          explain: "width 是目标宽度；side 控制从哪边补齐；str_trunc() 的省略号也会占宽度，不能把它当作数据删除工具。",
+        },
+        {
+          title: "统一大小写并保留原值",
+          text: "英文姓名、变量名或药物名可统一大小写，但中文没有英文意义下的大小写。",
+          code: `name <- c("john DOE", "JANE smith", "王 小 明")\nclean_name <- name |>\n  str_squish() |>\n  str_to_title()\n\ntibble::tibble(raw = name, clean = clean_name)`,
+          explain: "原始列 raw 保留不动，新列 clean 用于后续分析。str_to_title() 对中文姓名不会自动修复姓名顺序，仍要依据数据字典。",
+        },
+      ],
+      functions: ["str_length", "str_sub", "str_c", "str_trim", "str_squish", "str_pad", "str_trunc", "str_to_upper", "str_to_lower", "str_to_title", "nchar", "substr", "paste", "trimws"],
+      conditions: ["先确认 NA 与空字符串的业务含义。", "原始文本列必须保留，清洗结果写入新列。", "中文字段不要用字节数代替字符数判断长度。", "删除空格、标点或大小写信息前要确认它们是否有研究含义。"],
+      interpret: "字符串函数只改变文字表示，不会自动修正录入错误。清洗后要比较原值与新值，统计有多少条发生变化，以及变化是否符合预先规则。",
+      readingNotes: ["count 得到的是字符数，不是字节数。", "str_c() 默认遇到 NA 得到 NA；需要处理缺失时应先显式决定规则。", "str_to_title() 是英文标题格式函数，不应想当然地改变中文姓名。"],
+      pitfalls: ["直接把清洗结果覆盖原始列。", "对所有空格使用删除操作，造成地址或药品名粘连。", "把空字符串和 NA 当成同一种缺失。", "用字符串长度判断数值范围。"],
+      practice: "构造包含 NA、空字符串、前后空格和不同编号宽度的文本向量，创建 raw、clean、length_raw、changed 四列，并核对每一条改动。",
+    },
+    {
+      type: "text",
+      id: "stringr-operations",
+      typeLabel: "文本处理",
+      minutes: 28,
+      title: "stringr 常用操作",
+      aliases: ["字符串匹配", "文本提取", "str_detect"],
+      hero: "先判断有没有，再决定取哪段、改哪里",
+      audience: "已经会做简单筛选和新增变量，希望从编号、诊断、药物记录或问卷回答中提取信息的同学。",
+      overview: "stringr 把常用文本任务统一成一组以 str_ 开头的函数：检测是否匹配、统计次数、定位位置、提取内容、替换文字、拆分字段和合并结果。参数顺序固定为字符串在前、模式在后，因此也很适合写进管道。",
+      features: ["检测与筛选符合条件的记录。", "提取第一个或多个匹配片段。", "替换、删除或标准化文本。", "拆分复合字段，或把多条结果折叠起来。"],
+      concepts: [
+        { term: "pattern", explain: "要寻找的文字或正则表达式。普通文字可以按字面匹配，带特殊符号时可以用 fixed() 明确表示不是正则。" },
+        { term: "detect 与 extract", explain: "str_detect() 只返回 TRUE/FALSE；str_extract() 返回真正匹配到的文字。" },
+        { term: "第一个与全部", explain: "没有 _all 的函数通常只处理每条字符串的第一个匹配；带 _all 的函数会保留所有匹配，并可能返回列表。" },
+        { term: "list-column", explain: "str_extract_all() 和 str_split() 可能为每条记录返回多个值，因此结果是列表列，需要继续展开或合并。" },
+        { term: "capture group", explain: "用圆括号把模式分成几部分，可以只取其中一部分。str_match() 会把整段匹配和各分组分别放在不同列。" },
+      ],
+      comparison: {
+        title: "按任务选择函数",
+        note: "先问自己要的是逻辑值、位置、内容、替换结果还是多列结构，再选函数。",
+        headers: ["要解决的问题", "stringr", "返回什么", "常见用途"],
+        rows: [
+          ["是否包含", "str_detect()", "逻辑向量", "filter() 保留符合格式的记录"],
+          ["出现几次", "str_count()", "整数向量", "统计关键词或数字模式"],
+          ["匹配在哪里", "str_locate() / str_locate_all()", "位置矩阵", "检查模式和定位片段"],
+          ["保留哪些字符串", "str_subset()", "字符向量", "只返回匹配的文字"],
+          ["返回匹配索引", "str_which()", "整数位置", "定位原向量中的第几条"],
+          ["提取内容", "str_extract() / str_extract_all()", "字符或列表", "提取编号、剂量和代码"],
+          ["提取并分组", "str_match() / str_match_all()", "矩阵或列表", "同时获得药名、剂量和单位"],
+          ["替换或删除", "str_replace*() / str_remove*()", "字符向量", "统一日期、清除符号"],
+          ["拆分", "str_split() / str_split_fixed()", "列表或矩阵", "地址、复合编码、多选字段"],
+        ],
+      },
+      whenUse: ["需要从描述性文本中提取结构化变量。", "需要筛选名称符合某规则的变量、文件或记录。", "需要把多种写法统一成同一种格式。", "需要把一条复合记录拆成多个字段。"],
+      dataShape: ["确认每条记录是一个元素还是一列中的多个元素。", "先检查 NA、空字符串和特殊缺失码。", "带 _all 或 split 的结果可能是列表，后续需要明确展开规则。", "提取数值后还要检查转换失败和超出合理范围的值。"],
+      steps: [
+        {
+          title: "检测并筛选",
+          text: "先用逻辑值确认规则命中了哪些记录，不要直接替换整列。",
+          code: `library(stringr)\nlibrary(dplyr)\nfiles <- c("data_2024.csv", "notes.txt", "data_2025.csv")\nstr_detect(files, "\\\\.csv$")\nstr_subset(files, "\\\\.csv$")\nstr_which(files, "\\\\.csv$")`,
+          explain: "\\\\.csv$ 中 $ 表示字符串结尾；str_detect() 返回是否匹配，str_subset() 返回匹配的值，str_which() 返回原向量位置。",
+        },
+        {
+          title: "定位与提取",
+          text: "先看匹配位置和匹配范围，再决定用哪个提取函数。",
+          code: `records <- c("ID: A-102", "ID: B-205", "缺失")\nstr_locate(records, "[A-Z]-\\\\d{3}")\nstr_extract(records, "\\\\d{3}")\nstr_match(records, "^ID: ([A-Z])-(\\\\d{3})$")`,
+          explain: "str_locate() 返回起止位置；str_extract() 取匹配内容；str_match() 的圆括号分组会额外返回字母组和数字组。",
+        },
+        {
+          title: "替换与删除",
+          text: "replace 只处理第一处，replace_all 处理全部；remove 等价于把匹配内容替换为空。",
+          code: `dates <- c("2024/01/15", "2024/02/20")\nstr_replace_all(dates, "/", "-")\ntext <- "A-001；备注：无；A-001"\nstr_remove_all(text, "；备注：无")`,
+          explain: "先小样本确认要替换的是第一处还是全部匹配；替换后的结果仍应另存新列。",
+        },
+        {
+          title: "拆分重复形态的文字",
+          text: "分隔符固定时，str_split_fixed() 能直接得到固定列数；数量不固定时，str_split() 的列表结果更安全。",
+          code: `address <- c("北京市|海淀区|中关村", "上海市|浦东新区|陆家嘴")\nstr_split_fixed(address, "\\\\|", n = 3)\nstr_split(address, "\\\\|", n = 2)`,
+          explain: "竖线在正则中是特殊字符，因此要写成 \\\\|。str_split_fixed() 不足的列会保留空值，多出的内容会保留在最后一列。",
+        },
+        {
+          title: "把多个匹配结果整理成可用结构",
+          text: "列表列不要直接当成普通字符列。先检查每个元素，再选择折叠、展开或只保留第一条。",
+          code: `codes <- c("I10, E11.9", "J45.0")\nall_codes <- str_extract_all(codes, "[A-Z]\\\\d{2}(?:\\\\.\\\\d+)?")\nfirst_code <- str_extract(codes, "[A-Z]\\\\d{2}(?:\\\\.\\\\d+)?")\nstr_c(unlist(all_codes), collapse = "; ")`,
+          explain: "str_extract_all() 返回列表；str_extract() 只取第一条。保留全部还是取第一条，应由分析问题决定。",
+        },
+        {
+          title: "提取数值后做范围检查",
+          text: "文字变成数字并不代表变量正确。转换后检查 NA、范围、单位和异常值。",
+          code: `dose <- c("10 mg", "20 mg", "未知")\ndose_num <- as.numeric(str_extract(dose, "\\\\d+"))\ntibble::tibble(raw = dose, dose_num = dose_num)\nrange(dose_num, na.rm = TRUE)`,
+          explain: "未知记录转换后成为 NA，应统计有多少条转换失败，并核对原始剂量单位是否一致。",
+        },
+      ],
+      functions: ["str_detect", "str_count", "str_starts", "str_ends", "str_locate", "str_locate_all", "str_subset", "str_which", "str_extract", "str_extract_all", "str_match", "str_match_all", "str_replace", "str_replace_all", "str_remove", "str_remove_all", "str_split", "str_split_fixed", "str_flatten", "regex", "fixed"],
+      conditions: ["先用小样本查看匹配结果，再处理整列。", "明确只取第一条还是保留全部匹配。", "所有替换操作都保留原列并记录规则。", "提取数字后继续检查转换失败、范围和单位。"],
+      interpret: "匹配成功只说明文字符合模式，不等于它是真实、有效或有意义的值。例如手机号格式正确，不代表号码真实存在；ICD 编码符合形状，也要核对编码版本。",
+      readingNotes: ["str_locate_all()、str_extract_all() 和 str_split() 往往返回列表。", "str_replace_all() 支持把正则分组引用写进 replacement。", "str_split_fixed() 适合列数固定的格式，列数不稳定时不要硬拆。"],
+      pitfalls: ["把 str_detect() 的逻辑结果当成提取结果。", "在 filter() 里使用 str_extract()，结果含 NA 时导致筛选行为复杂。", "只取第一条编码却不说明选择规则。", "未检查匹配数量就把结果当成完整变量。"],
+      practice: "给定一列样本编号，分别回答：哪些以 CTRL 开头、数字编号是多少、类别和编号能否拆成两列、有多少条无法解析。",
+    },
+    {
+      type: "text",
+      id: "regex-patterns",
+      typeLabel: "正则表达式",
+      minutes: 25,
+      title: "正则表达式基础",
+      aliases: ["regex", "正则语法", "模式匹配"],
+      hero: "把“找什么样的文字”翻译成可测试的规则",
+      audience: "知道要找数字、日期或编码，但一看到反斜杠、方括号和量词就不知道从哪读起。",
+      overview: "正则表达式不是一串需要死记的符号，而是对文字结构的分层描述。先描述固定部分，再写可变部分和次数，最后加上开头、结尾等边界。每增加一小段规则，都应在几条代表性文字上验证。",
+      features: ["检查字符串是否符合某种格式。", "查找、提取部分文字。", "批量替换和统一格式。", "把复杂文本拆成可核对的模式。"],
+      concepts: [
+        { term: "字面字符", explain: "普通汉字、字母和数字通常只匹配自己，例如 abc 只找连续的 abc。" },
+        { term: "字符集 []", explain: "方括号表示匹配其中任意一个字符，[0-9] 是一个数字，[A-Z] 是一个大写英文字母。" },
+        { term: "量词", explain: "量词说明前一个元素出现几次：* 表示 0 次以上，+ 表示 1 次以上，? 表示 0 或 1 次，{3} 表示恰好 3 次。" },
+        { term: "锚点", explain: "^ 表示字符串开始，$ 表示结束。没有锚点时，模式可以在字符串的任何位置匹配。" },
+        { term: "转义", explain: "在 R 字符串里写 \\d，通常要输入 \\\\d。建议先把模式存成变量，再逐步测试。" },
+        { term: "ICU 与 PCRE", explain: "stringr 主要使用 ICU 正则；Base R 的部分函数可切换 Perl/PCRE。在线工具显示成功，也必须回到 R 中验证。" },
+      ],
+      comparison: {
+        title: "常用正则符号速读",
+        note: "先认识最常用的十来个符号，足以解决大多数编号、日期和格式检查问题。",
+        headers: ["写法", "含义", "示例", "注意事项"],
+        rows: [
+          [".", "任意一个字符（通常不含换行）", "A.C 可匹配 ABC、A1C", "想匹配真正的小数点要转义"],
+          ["^", "字符串开始", "^ID", "不加锚点时可在中间匹配"],
+          ["$", "字符串结束", "\\\\.csv$", "检查文件扩展名很有用"],
+          ["[]", "字符集中的一个", "[ABC]", "方括号内的多数特殊字符会改变含义"],
+          ["[^...]", "排除方括号中的字符", "[^0-9]", "表示一个非数字字符"],
+          ["|", "或者", "control|treated", "多个分支要写清边界"],
+          ["* / + / ?", "0+ / 1+ / 0或1次", "\\\\d+", "默认尽量多匹配"],
+          ["{n,m}", "重复 n 到 m 次", "[0-9]{2,3}", "开始和结束数字都要合理"],
+          ["\\\\d / \\\\D", "数字 / 非数字", "\\\\d{3}", "中文资料里常用 0-9 和 [^0-9] 更直观"],
+          ["\\\\w / \\\\s", "单词字符 / 空白", "\\\\w+", "中文、英文和 Unicode 匹配要实际测试"],
+        ],
+      },
+      whenUse: ["规则不只是完全相等，而是“符合某种格式”。", "同一列存在多种书写方式，但结构相同。", "要从复合字段中找数字、日期、编码或标记。", "需要在 R 代码中验证文本格式。"],
+      dataShape: ["收集每种格式的正例和反例，至少各 3 至 5 条。", "先定义匹配整条字符串还是只匹配其中一段。", "英文大小写、全角半角和空白要明确规则。", "把模式写成命名变量，避免在整段代码中重复难读的正则。"],
+      steps: [
+        {
+          title: "从固定文本开始",
+          text: "先匹配完全已知的字面文字，确认函数和位置逻辑。",
+          code: `library(stringr)\ntext <- c("CTRL-001", "TRT-002", "OTHER")\nstr_detect(text, "CTRL")\nstr_subset(text, "^CTRL")`,
+          explain: "第二个规则加入 ^，表示只保留以 CTRL 开头的文字；两者都匹配成功，但含义不同。",
+        },
+        {
+          title: "描述编号结构",
+          text: "把编号拆成固定前缀、连字符和固定宽度数字，再逐段验证。",
+          code: `ids <- c("CTRL-001", "TRT-024", "QC-003", "TRT-24")\nid_pattern <- "^(CTRL|TRT)-[0-9]{3}$"\nstr_detect(ids, id_pattern)\nstr_subset(ids, id_pattern)`,
+          explain: "^(CTRL|TRT) 限定前缀；- 是普通连字符；[0-9]{3} 要求恰好三位数字；$ 防止末尾多出其他字符。",
+        },
+        {
+          title: "检查开始、结尾与整条匹配",
+          text: "只写 \\d+ 会从 A123B 中匹配 123；如果要求整条都是数字，应加锚点。",
+          code: `values <- c("123", "A123", "123B", "12.3")\nstr_detect(values, "\\\\d+")\nstr_detect(values, "^\\\\d+$")`,
+          explain: "第一条规则问“是否包含数字”；第二条规则才问“整个字符串是否只由数字组成”。",
+        },
+        {
+          title: "Base R 与 stringr 对照",
+          text: "读老代码时先分清返回值是位置、逻辑值还是匹配内容。",
+          code: `files <- c("data.csv", "notes.txt", "results.csv")\ngrep("\\\\.csv$", files)\ngrepl("\\\\.csv$", files)\ngrep("\\\\.csv$", files, value = TRUE)\nstr_subset(files, "\\\\.csv$")`,
+          explain: "grep() 默认返回位置，grepl() 返回 TRUE/FALSE，value = TRUE 返回匹配值；str_subset() 直接返回匹配值。",
+        },
+        {
+          title: "把正则写成可读的变量",
+          text: "长模式不要散落在多个函数中。先命名、测试，再把同一个 pattern 用于检测、提取和替换。",
+          code: `date_pattern <- "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"\ndate_text <- c("2025-01-15", "2025/01/15", "20250115")\nvalid <- str_detect(date_text, date_pattern)\ntibble::tibble(raw = date_text, valid = valid)`,
+          explain: "这只能验证 YYYY-MM-DD 的外形，不能保证 2 月 30 日不存在。格式验证之后仍要真正转换为日期并检查 NA。",
+        },
+      ],
+      functions: ["str_detect", "str_subset", "str_count", "str_locate", "str_extract", "str_match", "str_replace_all", "regex", "fixed", "grep", "grepl", "sub", "gsub", "regexpr", "gregexpr", "regmatches"],
+      conditions: ["正则需要同时通过正例和反例测试。", "先明确是整条匹配还是局部匹配。", "复杂模式拆成命名变量并保留测试样例。", "匹配成功后再进行日期、数值和业务范围验证。"],
+      interpret: "正则是模式规则，不是事实校验。它可以帮助识别格式，但不能自动判断内容真实、编码有效或业务合理。",
+      readingNotes: ["R 字符串中的反斜杠需要额外转义。", "str_view() 可以把匹配位置高亮，便于调试。", "在线工具的正则方言可能与 R 不完全一致。"],
+      pitfalls: ["把 \\d 直接写进普通 R 字符串而没有双写反斜杠。", "忘记 ^ 和 $，导致只匹配局部却以为验证了整条。", "用正则判断日期后不转换、不检查真实日期。", "在一个超长模式里同时处理所有格式，最后无法定位错误。"],
+      practice: "为 CTRL-001、TRT-002 这类编号设计模式，并准备至少三个反例。然后说明哪些函数返回逻辑值、位置和内容。",
+    },
+    {
+      type: "text",
+      id: "regex-groups",
+      typeLabel: "正则进阶",
+      minutes: 32,
+      title: "分组、环视与复杂模式",
+      aliases: ["捕获分组", "环视断言", "named capture"],
+      hero: "不只找到整段，还要精确取出其中每一块",
+      audience: "已经会写基本正则，但在药名、剂量、日期和复合编码面前经常抓到过多或过少内容。",
+      overview: "复杂文本通常由几个有意义的片段组成。圆括号可以分组，命名分组可以让结果更易读，环视可以只检查前后条件而不把条件本身放进结果。掌握这些后，正则才适合承担结构化提取任务。",
+      features: ["从一整段记录中同时获取多个字段。", "只提取某个标记前后的数字。", "控制贪婪与非贪婪匹配范围。", "使用命名分组让结果列具有清楚含义。"],
+      concepts: [
+        { term: "捕获分组", explain: "圆括号中的模式会单独保存。str_match() 的第一列是整段匹配，后续列依次对应各分组。" },
+        { term: "命名分组", explain: "把分组命名为 (?<year>...)，结果矩阵的列名会使用该名称，便于后续转换。" },
+        { term: "反向引用", explain: "\\\\1 引用前面第一个分组。它可以识别连续重复的词，也能在替换中重排日期顺序。" },
+        { term: "正向前瞻", explain: "(?=...) 要求当前位置后面跟着某个模式，但该模式不进入返回的匹配内容。" },
+        { term: "正向后顾", explain: "(?<=...) 要求当前位置前面出现某个模式。前后固定文本适合使用后顾。" },
+        { term: "贪婪与非贪婪", explain: ".* 默认尽量多匹配，.*? 尽量少匹配。需要只取第一段闭合标签或分隔内容时尤其重要。" },
+      ],
+      comparison: {
+        title: "分组和环视怎么选",
+        note: "如果结构化提取后还要保留各字段，优先用捕获分组；如果只想去掉前后标记，可以考虑环视。",
+        headers: ["目标", "写法", "返回内容", "建议"],
+        rows: [
+          ["同时提取年份、月份、日期", "(?<year>\\\\d{4})-(?<month>\\\\d{2})-(?<day>\\\\d{2})", "整段加三个命名分组", "适合后续转成三列"],
+          ["只取美元符号后的数字", "(?<=\\\\$)\\\\d+", "数字本身", "美元符号不进入结果"],
+          ["确认数字后面不是百分号", "\\\\d+(?!%)", "数字本身", "百分号不进入结果"],
+          ["识别重复单词", "\\\\b(\\\\w+)\\\\s+\\\\1\\\\b", "重复片段", "\\\\1 引用第一个分组"],
+          ["提取第一段标签内容", "<tag>.*?</tag>", "第一段完整标签", "非贪婪控制结束位置"],
+        ],
+      },
+      whenUse: ["一条记录中包含多个需要拆分的目标。", "标记词与目标值相邻，但结果只需要目标值。", "需要让模式更易读、更可维护。", "匹配范围过大，需要控制贪婪行为。"],
+      dataShape: ["每组正例都必须同时给出预期分组。", "确认捕获分组的编号和命名。", "环视只检查前后文，不要把上下文误当成结果。", "复杂模式必须回到少量真实样式中验证。"],
+      steps: [
+        {
+          title: "用分组拆解药物记录",
+          text: "把药名、剂量和单位分别放进三个分组，而不是事后再次字符串切割。",
+          code: `library(stringr)\nrx <- c("Aspirin 100 mg", "Metformin 500 mg", "Vitamin D 1000 IU")\npattern <- "^(?<drug>[A-Za-z ]+?) (?<dose>[0-9]+) (?<unit>[A-Za-z]+)$"\nmatched <- str_match(rx, pattern)\nmatched`,
+          explain: "str_match() 返回整段匹配和三个分组。药名分组使用非贪婪匹配，避免把空格后的剂量也吞进去。",
+        },
+        {
+          title: "把匹配矩阵变成数据框",
+          text: "提取结果仍然只是字符，需要转换成数值并检查失败记录。",
+          code: `tibble::tibble(\n  raw = rx,\n  drug = matched[, "drug"],\n  dose = as.numeric(matched[, "dose"]),\n  unit = matched[, "unit"]\n)`,
+          explain: "按命名列取值比依赖第 2、3、4 列更清楚。剂量转换为 NA 的行必须回到原记录核对。",
+        },
+        {
+          title: "环视提取标记后的值",
+          text: "当标记位置固定且很短时，环视可以避免把标记本身一起取出。",
+          code: `labels <- c("SBP: 120", "SBP: 135", "DBP: 80")\nstr_extract(labels, "(?<=SBP: )\\\\d+")\nstr_extract(labels, "(?i)(?<=sbp: )\\\\d+")`,
+          explain: "后顾要求前面正好出现 SBP: 加一个空格。第二条加入 ignore-case 选项。若冒号后空格数量变化，应改用捕获分组。",
+        },
+        {
+          title: "控制匹配到哪一段",
+          text: "当多个结束标记同时出现时，贪婪模式可能从第一段一路匹配到最后。",
+          code: `text <- "<div>First</div><div>Second</div>"\nstr_extract(text, "<div>.*</div>")\nstr_extract(text, "<div>.*?</div>")\nstr_extract_all(text, "<div>.*?</div>")`,
+          explain: ".*? 在第一个 </div> 停下；带 _all 的版本会继续寻找下一段。不要机械地给所有量词都加问号，应先明确匹配边界。",
+        },
+        {
+          title: "用可视化与小样本调试",
+          text: "把正例、反例和容易出错的边界案例放在一起，先看高亮匹配，再看提取结果。",
+          code: `tests <- c("A-102", "B-205", "AB-300", "A-12", "A-102-extra")\npattern <- "^([A-Z])-([0-9]{3})$"\nstr_view(tests, pattern)\nstr_match(tests, pattern)`,
+          explain: "str_match() 中未匹配的行整行都是 NA。反例通过数量应与正例一起统计，不能只看成功提取了多少条。",
+        },
+      ],
+      functions: ["str_match", "str_match_all", "str_extract", "str_extract_all", "str_replace", "str_replace_all", "str_view", "regex"],
+      conditions: ["命名分组和捕获顺序经过小样本核对。", "环视依赖的语言环境与数据实际写法一致。", "每个分组都有清晰含义，并记录不匹配规则。", "复杂模式要同时验证正例、反例和边界案例。"],
+      interpret: "分组提取成功只说明某条记录符合当前模式。遇到多种写法时，优先增加可解释的模式分支或分步清洗，而不是无限叠加一个难以维护的超长正则。",
+      readingNotes: ["str_match() 返回矩阵；没有命名分组时按匹配整段、第1组、第2组排列。", "str_extract() 的 group 参数可以直接指定要返回的捕获分组。", "在线正则工具和 R 的方言可能不同，最终必须回归 R 测试。"],
+      pitfalls: ["把整段匹配当成某个分组。", "后顾中的前后文本长度变化后仍然沿用固定模式。", "贪婪匹配跨过了多条记录的内容。", "只在成功案例上测试，没有准备反例。"],
+      practice: "为 \"Aspirin 100 mg\" 设计一个命名分组模式，同时准备缺少单位、单位拼错和剂量含小数的反例，并说明每条反例应该怎样被发现。",
+    },
+    {
+      type: "text",
+      id: "text-cleaning-workflow",
+      typeLabel: "综合案例",
+      minutes: 38,
+      title: "医学与问卷文本清洗",
+      aliases: ["医学文本", "问卷清洗", "文本清洗案例"],
+      hero: "把一段自由文本拆成能核对、能复核的分析变量",
+      audience: "面对血压、心率、ICD 编码、样本编号或开放题回答，知道要提取数字，却不确定规则是否可靠。",
+      overview: "文本清洗不是一次 str_replace_all() 就结束。可靠流程包括保留原值、统一轻微格式差异、提取结构化片段、转换类型、检查失败记录和人工抽样复核。对医学数据，还应保留单位和来源字段，避免把不同含义的数字拼在一起。",
+      features: ["从多种写法的记录中提取血压与心率。", "清理问卷开放题的符号和空白。", "从文件名和样本编号中提取元数据。", "建立原值、清洗值和异常标记的审计列。"],
+      concepts: [
+        { term: "原值与清洗值", explain: "raw 列必须保留，clean 或提取变量写在新增列中，才能回查每一次变化。" },
+        { term: "轻度规范化", explain: "统一全角半角冒号、等号和相邻空格属于轻量处理；删除所有标点或所有数字风险更高。" },
+        { term: "结构化提取", explain: "只取出有明确含义的字段，例如收缩压、舒张压和心率，而不是把整段文字随意删成数字。" },
+        { term: "失败记录", explain: "模式没有匹配、数值转换失败或超出合理范围的行需要单独统计和复核。" },
+        { term: "关键词标记", explain: "检测“满意”或“差”等词只能产生规则标记，不能自动等同于经过验证的情感分析。" },
+      ],
+      comparison: {
+        title: "四类常见文本任务",
+        note: "先判断问题是格式统一、字段提取、结构拆分还是主观内容编码，它们需要的证据不同。",
+        headers: ["任务", "目标", "推荐工具", "必须保留的检查"],
+        rows: [
+          ["姓名与编号", "统一空白和编号宽度", "str_squish、str_pad", "原值、修改数量、重复编号"],
+          ["医学记录", "提取血压、心率、剂量", "str_match、捕获分组、as.numeric", "单位、合理范围、未匹配记录"],
+          ["问卷开放题", "清理符号、标记关键词", "str_remove_all、str_detect", "原回答、规则版本、人工抽样"],
+          ["文件名", "提取日期、扩展名和版本", "str_extract、str_match", "模板是否一致、解析失败清单"],
+        ],
+      },
+      whenUse: ["自由文本中包含结构化信息。", "同一变量存在多种常见写法。", "问卷开放题需要先清理再人工编码。", "需要从文件名、编号或复合标签中提取元数据。"],
+      dataShape: ["明确一条记录对应一个人、一次随访、一次处方还是一份文件。", "每条文字都要能追溯来源。", "拟提取字段必须有单位、合理范围和允许缺失规则。", "先抽取代表不同格式的样本，再运行整列规则。"],
+      steps: [
+        {
+          title: "建立原值与格式检查",
+          text: "先查看长度和代表样例，识别真正 NA、空字符串和无意义占位符。",
+          code: `library(stringr)\nlibrary(dplyr)\nrecords <- tibble::tibble(\n  raw = c(\n    "BP 120/80 mmHg; HR 72 bpm",\n    "SBP=140; DBP=90; pulse=88",\n    "收缩压125，舒张压82，心率68"\n  )\n)\nrecords |> mutate(n_chars = str_length(raw))`,
+          explain: "先保留 raw，并记录字符长度。不要在这一步就把不同单位和不同字段删除。",
+        },
+        {
+          title: "只统一常见分隔符",
+          text: "把全角半角冒号、等号统一为空格，并压缩多余空白，为后续提取准备一致格式。",
+          code: `records <- records |>\n  mutate(\n    record_clean = raw |>\n      str_replace_all(\"[：:=]\", \" \") |>\n      str_squish()\n  )\nrecords$record_clean`,
+          explain: "这一步只统一分隔符，不删除原始文字。清洗后仍能看到血压、心率以及单位。",
+        },
+        {
+          title: "分别提取收缩压、舒张压与心率",
+          text: "为每个目标变量建立明确模式，并把成对血压和单独标记的 SBP/DBP 合并。",
+          code: `records <- records |>\n  mutate(\n    sbp_direct = as.numeric(str_extract(record_clean, \"(?i)(?:SBP|收缩压) ?([0-9]{2,3})\", group = 1)),\n    sbp_pair = as.numeric(str_extract(record_clean, \"(?i)(?:BP|血压) ?([0-9]{2,3})/[0-9]{2,3}\", group = 1)),\n    dbp_direct = as.numeric(str_extract(record_clean, \"(?i)(?:DBP|舒张压) ?([0-9]{2,3})\", group = 1)),\n    dbp_pair = as.numeric(str_extract(record_clean, \"(?i)(?:BP|血压) ?[0-9]{2,3}/([0-9]{2,3})\", group = 1)),\n    sbp = dplyr::coalesce(sbp_direct, sbp_pair),\n    dbp = dplyr::coalesce(dbp_direct, dbp_pair),\n    hr = as.numeric(str_extract(record_clean, \"(?i)(?:HR|heart rate|pulse|心率) ?([0-9]{2,3})\", group = 1))\n  )`,
+          explain: "group = 1 只返回第一个捕获分组。coalesce() 先使用 SBP/DBP 专用字段，没有再使用血压对中的数字。",
+        },
+        {
+          title: "检查未匹配和不可能值",
+          text: "提取完成不等于清洗完成。要同时检查缺失模式、数值范围和原记录是否一致。",
+          code: `records |>\n  mutate(\n    extraction_failed = is.na(sbp) | is.na(dbp) | is.na(hr),\n    implausible = sbp < 50 | sbp > 300 | dbp < 20 | dbp > 200 | hr < 20 | hr > 250\n  ) |>\n  select(raw, sbp, dbp, hr, extraction_failed, implausible)`,
+          explain: "合理范围只是筛查阈值，不是医学诊断标准。所有失败和可疑记录都要回到原文核对。",
+        },
+        {
+          title: "处理问卷开放题时保留人工判断",
+          text: "先清理重复标点和空白，再用关键词做初筛；规则命中必须抽样复核。",
+          code: `feedback <- c(\"服务很好！！！\", \"还可以吧\", \"太差了。。。\", \"价格合适，质量不错\")\nfeedback_clean <- feedback |> str_remove_all(\"[!！~。.]+\") |> str_squish()\npositive <- str_detect(feedback_clean, \"(?i)好|满意|不错|good\")\nnegative <- str_detect(feedback_clean, \"(?i)差|不满|太坏|bad\")\ntibble::tibble(raw = feedback, clean = feedback_clean, positive, negative)`,
+          explain: "这里得到的是“关键词规则标记”，不是心理学意义上的情感得分。否定句、反讽和语境都可能让简单关键词判断出错。",
+        },
+        {
+          title: "输出审计表",
+          text: "最后保存原始值、清洗值、提取变量、失败标记和规则版本，便于合作者复核。",
+          code: `records |>\n  mutate(rule_version = \"text-clean-v1\") |>\n  select(raw, record_clean, sbp, dbp, hr, extraction_failed, implausible, rule_version)`,
+          explain: "规则版本和失败标记能让另一位同学复现同样的提取过程，也能在模式修改后比较新旧结果。",
+        },
+      ],
+      functions: ["str_squish", "str_replace_all", "str_extract", "str_match", "str_remove_all", "str_detect", "str_extract_all", "str_split", "as.numeric", "coalesce"],
+      conditions: ["每条提取字段都有明确名称、单位和合理范围。", "原值、清洗值和失败标记全部保留。", "正则和关键词规则先在代表性样本上验证。", "涉及主观内容时保留人工复核，不把关键词命中当最终结论。"],
+      interpret: "文本清洗的目标是让信息可核对，而不是让所有文字都变得看起来整齐。一个成功提取但医学上不合理的值，比明确保留 NA 更危险。",
+      readingNotes: ["单位必须和数值一起检查。", "全角半角标点、空格和不同字段名称会频繁造成未匹配。", "多条记录共用模式前，应按来源、科室或表单版本检查差异。"],
+      pitfalls: ["一段正则试图同时覆盖所有医学描述。", "把 NA、未知、拒答和空字符串直接合并。", "从整段文字中随意删除非数字后把剩余数字当成剂量。", "关键词命中后直接报告“情感得分”。"],
+      practice: "为一段包含血压、心率的模拟记录设计清洗表，至少包含 raw、clean、sbp、dbp、hr、failed、implausible 和 rule_version 八列。",
+    },
+    {
+      type: "text",
+      id: "date-time-basics",
+      typeLabel: "日期与时间",
+      minutes: 28,
+      title: "日期与时间处理",
+      aliases: ["日期", "随访时间", "lubridate"],
+      hero: "先把它变成真正的日期，再计算间隔和按照时间聚合",
+      audience: "数据里有入组日期、出生日期、事件日期或每日监测值，却仍以普通文字保存，导致排序和相减不可靠。",
+      overview: "日期在 R 中不是普通文字。Date 保存日期，POSIXct 保存日期时间；lubridate 提供直观的 ymd()、month()、interval() 等函数。日期处理的关键是先识别原始格式、确认时区，再计算时间差，并检查负值、不可能日期和缺失。",
+      features: ["把多种字符格式解析成日期。", "提取年、月、日、星期和时间。", "计算年龄、随访天数和研究区间。", "按周、月、年聚合时间序列。"],
+      concepts: [
+        { term: "Date", explain: "只包含年月日，内部存储为距离 1970-01-01 的天数，适合出生日期、入组日期和随访日期。" },
+        { term: "POSIXct", explain: "同时包含日期和时间，内部按时间点存储，适合精确到时分秒的记录。时区会影响显示和转换。" },
+        { term: "解析顺序", explain: "ymd() 表示年-月-日，mdy() 表示月-日-年，dmy() 表示日-月-年。不能只看一个例子猜整列格式。" },
+        { term: "Period", explain: "months(1)、years(1) 等按日历推进，会考虑月份长度和闰年。" },
+        { term: "Duration", explain: "dmonths(1)、dyears(1) 表示精确的秒数长度，更适合需要固定时间间隔的计算。" },
+        { term: "Interval", explain: "由起止时间定义的时间段，可直接判断某日期是否落在区间内。" },
+      ],
+      comparison: {
+        title: "日期任务与常用函数",
+        note: "先把字符转成日期对象，再做排序、加减和分组；直接在原始字符串上计算容易出错。",
+        headers: ["任务", "常用函数", "返回结果", "检查重点"],
+        rows: [
+          ["识别年月日", "ymd() / as.Date()", "Date", "格式顺序和非法日期"],
+          ["识别月日年", "mdy()", "Date", "地区格式差异"],
+          ["解析多种格式", "parse_date_time()", "日期时间", "格式优先级和失败记录"],
+          ["提取年月", "year() / month() / floor_date()", "数值或日期", "研究月份与自然月份是否一致"],
+          ["计算间隔", "减法、difftime()、time_length()", "difftime 或数值", "单位、起点和终点"],
+          ["构造时间段", "interval()", "Interval", "起止是否含边界"],
+        ],
+      },
+      whenUse: ["计算年龄、随访天数或事件发生时间。", "按周、月或季度汇总重复测量数据。", "统一来源不同的日期格式。", "检查日期先后关系和覆盖区间。"],
+      dataShape: ["先确认每一行对应一个时间点还是一个时间区间。", "明确日期格式、时区和单位。", "事件日期不应早于入组日期；出生日期不应晚于调查日期。", "无效日期应保留原字符串和失败原因。"],
+      steps: [
+        {
+          title: "识别并解析日期",
+          text: "先展示原始值，再按真实格式解析。无法解析的记录用 quiet = TRUE 暂时变成 NA，随后单独回查。",
+          code: `library(lubridate)\nraw_date <- c(\"2024-01-15\", \"2024/02/20\", \"20240115\", \"invalid\")\nparsed <- ymd(raw_date, quiet = TRUE)\ntibble::tibble(raw = raw_date, parsed, failed = is.na(parsed))`,
+          explain: "ymd() 能识别多种分隔写法和连续 8 位写法。quiet = TRUE 避免逐条警告，但必须统计 failed。",
+        },
+        {
+          title: "计算随访天数",
+          text: "事件日期减去入组日期，结果是以天为单位的 difftime；转换为数值后才能继续计算。",
+          code: `dat <- tibble::tibble(\n  id = 1:3,\n  enroll = ymd(c(\"2024-01-01\", \"2024-02-10\", \"2024-03-05\")),\n  event = ymd(c(\"2024-04-01\", \"2024-08-20\", \"2024-02-20\"))\n)\ndat <- dat |> mutate(follow_days = as.numeric(event - enroll))\ndat`,
+          explain: "第三条的 follow_days 为负，说明事件日期早于入组日期。不能直接把这个值带进生存模型。",
+        },
+        {
+          title: "区分缺失事件和真实随访终点",
+          text: "生存分析中，未发生事件的人通常以最后一次随访日期作为删失日期，而不是把日期留空。",
+          code: `follow <- tibble::tibble(\n  enroll = ymd(c(\"2024-01-01\", \"2024-02-10\")),\n  event = ymd(c(\"2024-04-01\", NA)),\n  last_visit = ymd(c(\"2024-05-01\", \"2024-08-20\"))\n) |>\n  mutate(\n    end_date = coalesce(event, last_visit),\n    status = as.integer(!is.na(event)),\n    follow_days = as.numeric(end_date - enroll)\n  )`,
+          explain: "coalesce() 优先使用事件日期，没有事件时使用最后随访日期；status 明确区分事件和删失。",
+        },
+        {
+          title: "按周或月聚合",
+          text: "先把每个日期映射到固定的周起点或月初，再分组求和。",
+          code: `daily <- tibble::tibble(\n  date = seq(ymd(\"2025-01-01\"), ymd(\"2025-03-31\"), by = \"day\"),\n  cases = rpois(90, 5)\n)\nmonthly <- daily |>\n  mutate(month_start = floor_date(date, \"month\")) |>\n  summarise(cases = sum(cases), .by = month_start)\nhead(monthly)`,
+          explain: "floor_date() 把日期落到该月第一天；summarise(.by=) 在 dplyr 新版中可直接分组汇总。",
+        },
+        {
+          title: "格式化只是显示",
+          text: "strftime() 或 format() 把日期转回文字用于展示，不应把格式化后的文字再次用于排序和计算。",
+          code: `visit <- ymd(\"2025-06-08\")\nformat(visit, \"%Y年%m月%d日\")\nas.numeric(visit - ymd(\"2025-01-01\"))`,
+          explain: "格式化结果适合标题和报告；日期运算仍应在 Date 对象上完成。",
+        },
+      ],
+      functions: ["ymd", "mdy", "dmy", "ymd_hms", "ymd_hm", "parse_date_time", "year", "month", "day", "wday", "hour", "minute", "second", "days", "weeks", "months", "years", "ddays", "dweeks", "dhours", "dminutes", "interval", "int_length", "time_length", "with_tz", "force_tz", "floor_date", "isoweek", "difftime", "strptime", "strftime"],
+      conditions: ["解析格式与原始记录一致。", "日期时间要明确时区。", "时间差要明确起止、单位和事件/删失定义。", "发现负间隔、重复随访或不可能日期时先回查数据。"],
+      interpret: "两个日期相减得到的是时间间隔，不是无单位小数。报告随访时间时必须说明单位、起点、终点和删失规则。",
+      readingNotes: ["months(1) 与 dmonths(1) 含义不同。", "ymd_hms() 默认时区是 UTC，输入含本地时间时要显式设定 tz。", "日期显示成 2025-01-01 不代表它仍然是字符。"],
+      pitfalls: ["直接用字符串比较日期大小。", "事件日期早于入组日期却未拦截。", "混用 365 天和日历年。", "把本地时间当作 UTC 解析。"],
+      practice: "用模拟的入组、事件和最后随访日期建立一张表，计算 end_date、status、follow_days，并列出全部负间隔或缺失日期。",
+    },
+    {
+      type: "text",
+      id: "purrr-iteration",
+      typeLabel: "编程与自动化",
+      minutes: 30,
+      title: "purrr：批量读取、计算和建模",
+      aliases: ["函数式编程", "map", "批量建模"],
+      hero: "把重复三次以上的代码，整理成一组清楚的输入和输出",
+      audience: "处理多个变量、分组、文件或模型时，经常复制同一段代码并不断改变量名。",
+      overview: "purrr 的 map() 系列把“对每个元素做同一件事”写成函数。它不仅缩短代码，更重要的是让输入对象、处理函数和输出类型分开。map() 返回列表，map_dbl() 等直接返回指定类型的向量，map2() 同时遍历两个输入，pmap() 同时遍历多个输入。",
+      features: ["对列表、向量或分组数据重复同一操作。", "批量计算摘要、拟合模型或读取文件。", "通过输出后缀提前约束结果类型。", "保留中间结果为列表，便于后续逐项核对。"],
+      concepts: [
+        { term: "输入 .x", explain: "要逐个处理的向量、列表或分组结果。长度决定循环次数。" },
+        { term: "处理函数 .f", explain: "对每个元素执行的操作，可传已有函数，也可用 \\(x) 写匿名函数。" },
+        { term: "map 的返回", explain: "map() 始终返回列表，适合每个结果结构较复杂的情况。" },
+        { term: "类型后缀", explain: "map_dbl()、map_chr()、map_lgl()、map_int() 要求每个结果都能转为对应标量，否则会报错，这正是有用的检查。" },
+        { term: "map2 与 pmap", explain: "map2() 同时遍历两个等长输入；pmap() 遍历多个输入，常把列放进一个列表或数据框。" },
+        { term: "reduce", explain: "把多个结果按同一个函数逐步合并，适合连续求和、连接或多个对象合并。" },
+      ],
+      comparison: {
+        title: "for 与 map 的差别",
+        note: "两种写法都能完成任务。purrr 的优势是输入输出更显式，不是必须完全取代 for。",
+        headers: ["方面", "for 循环", "purrr::map", "选择建议"],
+        rows: [
+          ["输入", "手动取序列元素", ".x 明确列出", "多个对象重复处理时 map 更清楚"],
+          ["中间变量", "常需预先创建容器", "直接返回结果", "减少忘记记录位置的风险"],
+          ["输出", "自行决定追加到哪", "map 系列显式控制", "需要数值向量时用 map_dbl"],
+          ["错误定位", "循环中的位置不总是明显", "可保留命名列表逐项检查", "批量读取和建模优先命名输入"],
+          ["复杂状态", "有时更直接", "需要使用 walk 或外部状态", "确实依赖顺序状态时 for 也可以"],
+        ],
+      },
+      whenUse: ["同一操作要应用到多个列、分组或文件。", "想把每组模型结果统一保存。", "需要一次读取多个文件并保留源文件名。", "重复复制代码已经超过两三次。"],
+      dataShape: ["输入长度和命名要清楚。", "函数只接收自己真正需要的数据。", "先对单个元素测试处理函数，再交给 map。", "输出结构要统一，否则复杂列表需要单独整理。"],
+      steps: [
+        {
+          title: "先对单个元素写好函数",
+          text: "先在普通数据上运行一次，确认函数逻辑，再用 map() 重复。",
+          code: `library(purrr)\nsafe_mean <- function(x) {\n  if (all(is.na(x))) return(NA_real_)\n  mean(x, na.rm = TRUE)\n}\nsafe_mean(c(1, 2, NA, 4))\nmap_dbl(mtcars[c(\"mpg\", \"wt\", \"hp\")], safe_mean)`,
+          explain: "map_dbl() 对三列分别运行 safe_mean()，要求每个结果都是单个数值。",
+        },
+        {
+          title: "按组拟合模型",
+          text: "先按分组变量拆分数据，再对每个数据框运行同一个模型。",
+          code: `groups <- split(mtcars, mtcars$cyl)\nmodels <- map(groups, \\(df) lm(mpg ~ wt, data = df))\nr2 <- map_dbl(models, \\(fit) summary(fit)$r.squared)\ntibble::tibble(cyl = names(r2), r_squared = unname(r2))`,
+          explain: "models 保留为列表，便于逐个诊断；map_dbl() 只提取每个模型的 R²。最好给 groups 命名，结果才能对应组别。",
+        },
+        {
+          title: "同时遍历两个输入",
+          text: "map2() 按位置配对两个等长输入；长度不等时不会悄悄补齐。",
+          code: `var1 <- c(\"age\", \"sex\", \"bmi\")\nvar2 <- c(\"score\", \"score\", \"sbp\")\nformulas <- map2(var1, var2, \\(x, y) paste(y, \"~\", x))\nformulas`,
+          explain: "第 1 个 x 与第 1 个 y 配对。结果必须都是单条文字，因此使用 map_chr()。",
+        },
+        {
+          title: "用 pmap 遍历多个参数",
+          text: "参数字段较多时，把每一列作为一个参数放进数据框，再用 pmap() 调用函数。",
+          code: `settings <- tibble::tibble(\n  mean = c(0, 1, 2),\n  sd = c(1, 2, 3),\n  n = c(5, 6, 7)\n)\nset.seed(2026)\nsamples <- pmap(settings, \\(mean, sd, n) rnorm(n, mean, sd))\nlengths(samples)`,
+          explain: "pmap() 把 settings 的每一行作为一次调用。命名参数能让匿名函数更清楚，也避免依赖列顺序。",
+        },
+        {
+          title: "统一整理列表结果",
+          text: "结果结构相同且都有唯一标识时，可以合并成数据框；结构不同则保留列表更容易检查。",
+          code: `results <- list(\n  crude = tibble::tibble(term = \"exposure\", estimate = 1.2),\n  adjusted = tibble::tibble(term = \"exposure\", estimate = 1.1)\n)\npurrr::list_rbind(results, names_to = \"model\")`,
+          explain: "names_to 把列表名称保留成 model 列，避免合并后不知道每一行来自哪个模型。",
+        },
+      ],
+      functions: ["map", "map_dbl", "map_chr", "map_lgl", "map_int", "map2", "pmap", "reduce", "list_rbind", "imap"],
+      conditions: ["先验证单个元素上的函数。", "遍历多个对象时长度和顺序必须明确。", "输出类型应尽量用 map_dbl() 等后缀提前约束。", "批量建模前确认每组样本量和模型能够正常拟合。"],
+      interpret: "map() 不是自动帮你理解数据结构。它的价值在于把输入、函数和输出写清楚。结果长度、名称和结构不对时，应先检查输入，而不是盲目修改循环。",
+      readingNotes: ["map_dbl() 的成功依赖每个结果都是长度为 1 的数值。", "split() 后的组名应保留，结果才能回溯。", "结构化结果相同可合并，结构不同应保留列表。"],
+      pitfalls: ["还没测试单个函数就直接批量运行。", "map() 后忘记结果是列表。", "把 map_dbl() 用于可能返回 NULL 或长度大于 1 的结果。", "分组模型没有保存组名，最后无法对应。"],
+      practice: "把一个按性别或疾病组分组的线性回归任务写两遍：一遍 for 循环，一遍 purrr；比较输入、中间对象和输出结构。",
+    },
+  );
+
+  const textFunctions = [];
+  const addFunction = (item) => textFunctions.push({
+    category: "文本处理",
+    level: "入门",
+    tips: [],
+    related: [],
+    ...item,
+  });
+
+  addFunction({
+    id: "str_length",
+    name: "str_length()",
+    package: "stringr",
+    aliases: ["字符长度", "字符串长度"],
+    summary: "计算每个字符串包含多少个字符，适合检查编号、姓名和自由文本长度。",
+    syntax: "str_length(string)",
+    returns: "返回与输入等长的整数向量；NA 对应 NA。",
+    example: `str_length(c("Hello", "你好", "", NA))`,
+    output: "[1]  5  2  0 NA",
+    params: [["string", "字符向量；每一行文字会成为结果中的一个元素。", "必填"]],
+    tips: ["中文字符通常按字符计数，不要用字节数判断显示长度。", "空字符串长度为 0，不是 NA。"],
+    related: ["nchar", "str_sub"],
+  });
+
+  addFunction({
+    id: "str_sub",
+    name: "str_sub()",
+    package: "stringr",
+    aliases: ["截取字符串", "子字符串", "substring"],
+    summary: "按起止位置截取字符串，负数位置表示从末尾开始计数。",
+    syntax: "str_sub(string, start = 1L, end = -1L)",
+    returns: "返回截取后的字符向量；也可以把赋值形式写成 str_sub(x, 1, 3) <- \"新值\" 来替换片段。",
+    example: `code <- c("CN-2025-001", "CN-2026-014")\nstr_sub(code, 4, 7)\nstr_sub(code, -3, -1)`,
+    output: '[1] "2025" "2026"\n[1] "001" "014"',
+    params: [
+      ["string", "要截取的字符向量。", "必填"],
+      ["start", "起始位置；1 表示第一个字符，负数从末尾计数。", "默认 1"],
+      ["end", "结束位置；-1 表示最后一个字符。", "默认 -1"],
+    ],
+    tips: ["先用少量样本检查字符位置，中英文混排时不要按字节位置计算。", "赋值式替换会修改对象，正式数据建议保留原列并另建新列。"],
+    related: ["substr", "str_length"],
+  });
+
+  addFunction({
+    id: "str_c",
+    name: "str_c()",
+    package: "stringr",
+    aliases: ["拼接字符串", "连接文字", "string concatenate"],
+    summary: "按元素拼接一个或多个字符向量；sep 控制相邻片段，collapse 控制是否把整个结果折叠成一条字符串。",
+    syntax: "str_c(..., sep = \"\", collapse = NULL)",
+    returns: "返回字符向量；默认遇到 NA 时结果为 NA。",
+    example: `first <- c("张", "李", "王")\nlast <- c("三", "四", "五")\nstr_c(first, last)\nstr_c(c("A", "B", "C"), collapse = ", ")`,
+    output: '[1] "张三" "李四" "王五"\n[1] "A, B, C"',
+    params: [
+      ["...", "一个或多个要拼接的字符向量，较长向量会循环对齐。", "必填"],
+      ["sep", "同一条结果内各片段之间的分隔符。", '默认 ""'],
+      ["collapse", "非 NULL 时，把所有最终结果继续折叠成一条字符串。", "默认 NULL"],
+    ],
+    tips: ["不要把字符串相加写成 +，R 会把它当成数值加法。", "需要处理 NA 时先明确应该跳过、保留 NA 还是替换成空字符串。"],
+    related: ["paste", "paste0", "str_flatten"],
+  });
+
+  addFunction({
+    id: "str_trim",
+    name: "str_trim()",
+    package: "stringr",
+    aliases: ["去首尾空白", "trim", "trim whitespace"],
+    summary: "删除字符串左端、右端或两端的空格与空白，不改变内部空白。",
+    syntax: "str_trim(string, side = c(\"both\", \"left\", \"right\"))",
+    returns: "返回删除指定端空白后的字符向量。",
+    example: `x <- c("  Yes  ", " No", "Maybe  ")\nstr_trim(x)\nstr_trim(x, side = "left")`,
+    output: '[1] "Yes"   "No"    "Maybe"\n[1] "Yes  " "No"    "Maybe  "',
+    params: [
+      ["string", "要清理的字符向量。", "必填"],
+      ["side", "删除哪一端：both、left 或 right。", '默认 both'],
+    ],
+    tips: ["str_trim() 不会压缩字符串内部连续空格。", "清理后比较原值，确认没有把有意义的空白删掉。"],
+    related: ["trimws", "str_squish"],
+  });
+
+  addFunction({
+    id: "str_squish",
+    name: "str_squish()",
+    package: "stringr",
+    aliases: ["压缩空白", "清理空白", "squish"],
+    summary: "删除两端空白，并把内部连续的空白压缩成一个普通空格。",
+    syntax: "str_squish(string)",
+    returns: "返回空白已规范化的字符向量。",
+    example: `str_squish("  北京   海淀   中关村  ")`,
+    output: '[1] "北京 海淀 中关村"',
+    params: [["string", "要规范化的字符向量。", "必填"]],
+    tips: ["地址和自由文本会保留每个字段之间的一个空格。", "需要删除全部空格时应另外明确规则。"],
+    related: ["str_trim", "str_replace_all"],
+  });
+
+  addFunction({
+    id: "str_pad",
+    name: "str_pad()",
+    package: "stringr",
+    aliases: ["补齐字符串", "前导零", "pad string"],
+    summary: "把短字符串填充到指定宽度，常用于恢复被 Excel 去掉的编号前导零。",
+    syntax: "str_pad(string, width, side = c(\"left\", \"right\", \"both\"), pad = \" \", use_width = TRUE)",
+    returns: "返回达到目标显示宽度的字符向量。",
+    example: `id <- c("1", "12", "123")\nstr_pad(id, width = 5, side = "left", pad = "0")`,
+    output: '[1] "00001" "00012" "00123"',
+    params: [
+      ["string", "要补齐的字符向量。", "必填"],
+      ["width", "目标宽度；不是要补多少个字符。", "必填"],
+      ["side", "从左侧、右侧或两侧填充。", "默认 left"],
+      ["pad", "用于填充的单个字符或短字符串。", '默认 " "'],
+      ["use_width", "是否按显示宽度计算；中文字符比普通字符更宽。", "默认 TRUE"],
+    ],
+    tips: ["编号如果被读成数值，前导零已经不可恢复，应从原始文件重新读取为字符。", "补齐前后检查编号是否变成重复值。"],
+    related: ["str_length", "str_trunc"],
+  });
+
+  addFunction({
+    id: "str_trunc",
+    name: "str_trunc()",
+    package: "stringr",
+    aliases: ["截断文本", "省略号", "truncate string"],
+    summary: "把过长文本截到指定显示宽度，并用省略号标出被截断的位置。",
+    syntax: "str_trunc(string, width, side = c(\"right\", \"left\", \"center\"), ellipsis = \"...\")",
+    returns: "返回截断后的字符向量，总宽度包含省略号。",
+    example: `str_trunc("这是一段比较长的自由文本", width = 10)`,
+    output: '[1] "这是一段比..."',
+    params: [
+      ["string", "要截断的字符向量。", "必填"],
+      ["width", "目标显示宽度，省略号也会占宽度。", "必填"],
+      ["side", "保留哪一端：right、left 或 center。", "默认 right"],
+      ["ellipsis", "截断标记。", '默认 "..."'],
+    ],
+    tips: ["它适合表格展示，不适合清洗编号或分析变量。", "中文显示宽度与字符数可能不同。"],
+    related: ["str_sub", "str_length"],
+  });
+
+  const caseFunctions = [
+    ["str_to_upper", "str_to_upper()", "转成大写", ["大写", "toupper"], "str_to_upper(\"Hello R\")", "[1] \"HELLO R\""],
+    ["str_to_lower", "str_to_lower()", "转成小写", ["小写", "tolower"], "str_to_lower(\"Hello R\")", "[1] \"hello r\""],
+    ["str_to_title", "str_to_title()", "把每个英文单词的首字母转为大写", ["标题格式", "name case"], "str_to_title(\"john DOE\")", "[1] \"John Doe\""],
+    ["str_to_sentence", "str_to_sentence()", "把句首字母转为大写，其余字母转为小写", ["句子格式", "sentence case"], "str_to_sentence(\"HELLO world. R IS useful\")", "[1] \"Hello world. R is useful\""],
+  ];
+  caseFunctions.forEach(([id, name, summary, aliases, example, output]) => addFunction({
+    id,
+    name,
+    package: "stringr",
+    aliases,
+    summary,
+    syntax: `${id}(string, locale = "en")`,
+    returns: "返回大小写转换后的字符向量；NA 仍为 NA。",
+    example,
+    output,
+    params: [
+      ["string", "要转换大小写的字符向量。", "必填"],
+      ["locale", "大小写规则使用的语言区域；中文通常不受影响。", '默认 "en"'],
+    ],
+    tips: ["大小写转换主要针对拉丁字母，不能自动修正中文姓名或英文姓名顺序。", "清洗姓名时保留原列便于复核。"],
+    related: ["str_squish", id === "str_to_upper" ? "toupper" : id === "str_to_lower" ? "tolower" : "str_sub"],
+  }));
+
+  addFunction({
+    id: "str_count",
+    name: "str_count()",
+    package: "stringr",
+    aliases: ["统计匹配次数", "文字计数", "count pattern"],
+    summary: "统计每个字符串中某个文字或正则模式出现了多少次。",
+    syntax: "str_count(string, pattern = \"\")",
+    returns: "返回整数向量；NA 对应 NA。",
+    example: `str_count(c("banana", "apple", NA), "a")\nstr_count("ID123-456", "[0-9]")`,
+    output: "[1] 3 1 NA\n[1] 6",
+    params: [
+      ["string", "要检查的字符向量。", "必填"],
+      ["pattern", "要计数的普通文字或正则模式。", '默认 ""'],
+    ],
+    tips: ["默认空模式的结果可能不是你以为的字符数，检查字符数应使用 str_length()。", "计数匹配片段，不统计被模式跳过的字符。"],
+    related: ["str_detect", "str_length"],
+  });
+
+  const locateFunction = (id, all) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "stringr",
+    aliases: [all ? "全部匹配位置" : "匹配位置", "locate"],
+    summary: all
+      ? "查找每个字符串中所有匹配片段的起止位置。"
+      : "查找每个字符串中第一个匹配片段的起止位置。",
+    syntax: `${id}(string, pattern)`,
+    returns: all ? "返回位置矩阵组成的列表；未匹配项通常为空矩阵。" : "返回两列矩阵，分别给出 start 和 end。",
+    example: `str_${all ? "locate_all" : "locate"}("The cat sat on the mat", "at")`,
+    output: all
+      ? "[[1]]\n     start end\n[1,]     6   7\n[2,]    10  11\n[3,]    21  22"
+      : "     start end\n[1,]     6   7",
+    params: [
+      ["string", "要搜索的字符向量。", "必填"],
+      ["pattern", "普通文字或正则模式。", "必填"],
+    ],
+    tips: ["默认位置按字符计算。", all ? "结果可能是列表，需要单独处理每一条。" : "未匹配时返回 NA 位置。"],
+    related: [all ? "str_locate" : "str_locate_all", "str_extract"],
+  });
+  locateFunction("str_locate", false);
+  locateFunction("str_locate_all", true);
+
+  ["str_subset", "str_which"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "stringr",
+    aliases: id === "str_subset" ? ["保留匹配文字", "筛选字符串"] : ["匹配索引", "返回位置"],
+    summary: id === "str_subset"
+      ? "只返回符合模式的字符串元素，适合直接查看匹配了哪些文字。"
+      : "返回符合模式的元素在原向量中的位置，适合定位具体记录。",
+    syntax: `${id}(string, pattern, negate = FALSE)`,
+    returns: id === "str_subset" ? "返回符合条件的字符子向量。" : "返回符合条件的整数索引向量。",
+    example: `files <- c("data.csv", "notes.txt", "result.csv")\n${id}(files, "\\\\.csv$")`,
+    output: id === "str_subset" ? '[1] "data.csv"   "result.csv"' : "[1] 1 3",
+    params: [
+      ["string", "要筛选的字符向量。", "必填"],
+      ["pattern", "普通文字或正则模式。", "必填"],
+      ["negate", "TRUE 时反转条件，保留不匹配的元素。", "默认 FALSE"],
+    ],
+    tips: ["先确认模式是否要求从字符串开头或结尾匹配。", "返回空结果不一定是代码错误，也可能是数据中没有该类记录。"],
+    related: ["str_detect", id === "str_subset" ? "str_which" : "str_subset"],
+  }));
+
+  ["str_starts", "str_ends"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "stringr",
+    aliases: [id === "str_starts" ? "开头匹配" : "结尾匹配", "字符串边界"],
+    summary: id === "str_starts" ? "检查字符串是否以指定模式开头。" : "检查字符串是否以指定模式结尾。",
+    syntax: `${id}(string, pattern, negate = FALSE)`,
+    returns: "返回逻辑向量。",
+    example: `x <- c("CTRL-001", "TRT-002")\n${id}(x, "${id === "str_starts" ? "CTRL" : "002"}")`,
+    output: id === "str_starts" ? "[1]  TRUE FALSE" : "[1] FALSE  TRUE",
+    params: [
+      ["string", "要检查的字符向量。", "必填"],
+      ["pattern", "要匹配的开头或结尾。", "必填"],
+      ["negate", "TRUE 时反转逻辑值。", "默认 FALSE"],
+    ],
+    tips: ["它比手写 ^ 或 $ 更直接，但 pattern 仍然支持正则。", "用于筛选前先统计 TRUE 和 FALSE 的数量。"],
+    related: ["str_detect", "str_subset"],
+  }));
+
+  addFunction({
+    id: "str_extract_all",
+    name: "str_extract_all()",
+    package: "stringr",
+    aliases: ["提取全部匹配", "所有匹配片段"],
+    summary: "提取每个字符串中所有匹配片段，常用于一条记录里有多个编码、数字或标签的情况。",
+    syntax: "str_extract_all(string, pattern, simplify = FALSE)",
+    returns: "默认返回字符向量列表；simplify = TRUE 时尝试返回字符矩阵。",
+    example: `str_extract_all(c("I10, E11.9", "J45.0"), "[A-Z][0-9]{2}(?:\\\\.[0-9]+)?")`,
+    output: '[[1]]\n[1] "I10"   "E11.9"\n\n[[2]]\n[1] "J45.0"',
+    params: [
+      ["string", "要提取的字符向量。", "必填"],
+      ["pattern", "正则模式或 fixed() 包装的字面文字。", "必填"],
+      ["simplify", "TRUE 时尝试整理成矩阵，否则保留列表。", "默认 FALSE"],
+    ],
+    tips: ["列表结果不能直接当成普通字符列使用。", "需要第一条时使用 str_extract()，需要全部时保留列表并明确后续规则。"],
+    related: ["str_extract", "str_match_all", "str_split"],
+  });
+
+  ["str_match", "str_match_all"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "stringr",
+    aliases: ["分组提取", "捕获组", "match groups"],
+    summary: id === "str_match" ? "提取第一个匹配，并把圆括号捕获分组分别返回。" : "提取所有匹配及其捕获分组。",
+    syntax: `${id}(string, pattern)`,
+    returns: id === "str_match" ? "返回矩阵：第一列是整段匹配，后续列对应各分组。" : "返回矩阵列表，每个元素包含一条字符串的所有匹配与分组。",
+    example: `rx <- c("Aspirin 100 mg", "Metformin 500 mg")\n${id}(rx, "([A-Za-z]+) ([0-9]+) (mg|mcg)")`,
+    output: "返回整段匹配、药名、剂量和单位四列。",
+    params: [
+      ["string", "要匹配的字符向量。", "必填"],
+      ["pattern", "包含捕获分组的正则模式。", "必填"],
+    ],
+    tips: ["未匹配时整行分组位置为 NA。", "命名分组比依赖列编号更不容易出错。"],
+    related: ["str_extract", "str_extract_all", "str_replace"],
+  }));
+
+  addFunction({
+    id: "str_replace",
+    name: "str_replace()",
+    package: "stringr",
+    aliases: ["替换第一个", "单次替换"],
+    summary: "替换每个字符串中第一个匹配的片段。",
+    syntax: "str_replace(string, pattern, replacement)",
+    returns: "返回替换后的字符向量。",
+    example: `str_replace("cat and cat", "cat", "dog")`,
+    output: '[1] "dog and cat"',
+    params: [
+      ["string", "要修改的字符向量。", "必填"],
+      ["pattern", "匹配文字或正则模式。", "必填"],
+      ["replacement", "替换内容；可用 \\\\1 等引用捕获分组。", "必填"],
+    ],
+    tips: ["需要替换全部匹配时使用 str_replace_all()。", "替换前先另存原列，并抽查多条结果。"],
+    related: ["str_replace_all", "str_remove"],
+  });
+
+  ["str_remove", "str_remove_all"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "stringr",
+    aliases: ["删除匹配", id.endsWith("all") ? "删除全部匹配" : "删除第一个匹配"],
+    summary: id.endsWith("all") ? "删除字符串中所有匹配片段。" : "删除字符串中第一个匹配片段。",
+    syntax: `${id}(string, pattern)`,
+    returns: "返回删除匹配后的字符向量。",
+    example: id.endsWith("all")
+      ? `str_remove_all("A-001；备注：无；A-001", "；备注：无")`
+      : `str_remove("cat and cat", "cat")`,
+    output: id.endsWith("all") ? '[1] "A-001；A-001"' : '[1] " and cat"',
+    params: [
+      ["string", "要修改的字符向量。", "必填"],
+      ["pattern", "要删除的文字或正则模式。", "必填"],
+    ],
+    tips: ["删除比替换更容易误删信息，必须先确认命中了多少条记录。", "保留原列并记录删除规则。"],
+    related: ["str_replace", "str_replace_all"],
+  }));
+
+  addFunction({
+    id: "str_split",
+    name: "str_split()",
+    package: "stringr",
+    aliases: ["拆分字符串", "按分隔符分割"],
+    summary: "按文字或正则分隔符拆分字符串，默认返回列表，因为每条字符串可以拆出不同数量的元素。",
+    syntax: "str_split(string, pattern, n = Inf, simplify = FALSE)",
+    returns: "返回字符向量列表；simplify = TRUE 时尝试返回矩阵。",
+    example: `str_split(c("北京市|海淀区|中关村", "上海市|浦东新区|陆家嘴"), "\\\\|")`,
+    output: '[[1]]\n[1] "北京市" "海淀区" "中关村"\n\n[[2]]\n[1] "上海市" "浦东新区" "陆家嘴"',
+    params: [
+      ["string", "要拆分的字符向量。", "必填"],
+      ["pattern", "分隔模式。", "必填"],
+      ["n", "最多拆成几部分；剩余分隔内容保留在最后一部分。", "默认 Inf"],
+      ["simplify", "是否尝试整理成矩阵。", "默认 FALSE"],
+    ],
+    tips: ["列数无法保证一致时保留列表更安全。", "分隔符是正则特殊字符时要转义，或者用 fixed()。"],
+    related: ["str_split_fixed", "str_extract_all"],
+  });
+
+  addFunction({
+    id: "str_split_fixed",
+    name: "str_split_fixed()",
+    package: "stringr",
+    aliases: ["固定列数拆分", "拆分矩阵"],
+    summary: "按固定分隔符把字符串拆成指定列数，并直接返回矩阵。",
+    syntax: "str_split_fixed(string, pattern, n)",
+    returns: "返回字符矩阵，列数固定为 n。",
+    example: `str_split_fixed(c("北京市|海淀区|中关村", "上海市|浦东新区|陆家嘴"), "\\\\|", n = 3)`,
+    output: '     [,1]     [,2]       [,3]\n[1,] "北京市" "海淀区"   "中关村"\n[2,] "上海市" "浦东新区" "陆家嘴"',
+    params: [
+      ["string", "要拆分的字符向量。", "必填"],
+      ["pattern", "固定分隔模式。", "必填"],
+      ["n", "输出列数；不足补空，多出的内容保留在最后一列。", "必填"],
+    ],
+    tips: ["只有所有记录的结构确实固定时才使用。", "先检查分隔符数量和最大列数。"],
+    related: ["str_split", "str_match"],
+  });
+
+  addFunction({
+    id: "str_flatten",
+    name: "str_flatten()",
+    package: "stringr",
+    aliases: ["折叠字符串", "拼接为一条", "flatten"],
+    summary: "把一个字符向量折叠成一条字符串，可设置普通分隔符和最后一个分隔符。",
+    syntax: "str_flatten(string, collapse = \"\", last = NULL, na.rm = FALSE)",
+    returns: "返回长度为 1 的字符。",
+    example: `str_flatten(c("A", "B", "C"), collapse = ", ")\nstr_flatten(c("A", "B", "C"), collapse = ", ", last = " and ")`,
+    output: '[1] "A, B, C"\n[1] "A, B and C"',
+    params: [
+      ["string", "要折叠的字符向量。", "必填"],
+      ["collapse", "元素之间的分隔符。", '默认 ""'],
+      ["last", "最后两个元素之间的特殊分隔符；NULL 时沿用 collapse。", "默认 NULL"],
+      ["na.rm", "是否移除 NA 后再折叠。", "默认 FALSE"],
+    ],
+    tips: ["str_c(collapse=) 也能折叠，str_flatten() 的意图更明确。", "默认遇见 NA 会传播 NA。"],
+    related: ["str_c", "str_unique"],
+  });
+
+  ["str_sort", "str_order"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "stringr",
+    aliases: ["字符串排序", "自然排序", "numeric sort"],
+    summary: id === "str_sort" ? "按指定语言区域排序字符向量，并支持把数字片段按数值排序。" : "返回字符串排序后的位置索引。",
+    syntax: `${id}(x, decreasing = FALSE, na_last = TRUE, locale = "en", numeric = FALSE, ...)`,
+    returns: id === "str_sort" ? "返回重新排序后的字符向量。" : "返回排序后的整数索引。",
+    example: `files <- c("file10.txt", "file2.txt", "file1.txt")\n${id}(files, numeric = TRUE)`,
+    output: id === "str_sort" ? '[1] "file1.txt"  "file2.txt"  "file10.txt"' : "[1] 3 2 1",
+    params: [
+      ["x", "要排序的字符向量。", "必填"],
+      ["decreasing", "是否降序。", "默认 FALSE"],
+      ["na_last", "NA 是否放到最后。", "默认 TRUE"],
+      ["locale", "排序使用的语言区域。", '默认 "en"'],
+      ["numeric", "是否把字符串中的连续数字按数值解释。", "默认 FALSE"],
+      ["...", "其他排序选项。", "可选"],
+    ],
+    tips: ["普通排序会把 file10 排在 file2 前面；需要自然顺序时设置 numeric = TRUE。", "中文排序规则可能依赖 locale。"],
+    related: ["sort", "str_unique"],
+  }));
+
+  addFunction({
+    id: "str_unique",
+    name: "str_unique()",
+    package: "stringr",
+    aliases: ["文本去重", "唯一文字"],
+    summary: "保留字符向量中第一次出现的唯一值，可以设置是否忽略大小写。",
+    syntax: "str_unique(string, locale = \"en\", ignore_case = FALSE, ...)",
+    returns: "返回去重后的字符向量，保留首次出现顺序。",
+    example: `str_unique(c("A", "b", "A", "B"))\nstr_unique(c("A", "b", "A", "B"), ignore_case = TRUE)`,
+    output: '[1] "A" "b" "B"\n[1] "A" "b"',
+    params: [
+      ["string", "要去重的字符向量。", "必填"],
+      ["locale", "比较文字时使用的语言区域。", '默认 "en"'],
+      ["ignore_case", "是否忽略大小写。", "默认 FALSE"],
+      ["...", "其他比较选项。", "可选"],
+    ],
+    tips: ["去重后应统计减少了多少条，并检查哪些写法被视为同一个值。", "忽略大小写前要确认 A 与 a 在研究数据中确实同义。"],
+    related: ["unique", "str_sort"],
+  });
+
+  addFunction({
+    id: "str_view",
+    name: "str_view()",
+    package: "stringr",
+    aliases: ["查看正则匹配", "高亮匹配", "debug regex"],
+    summary: "在控制台或 HTML 中高亮显示正则匹配位置，是调试模式而不是批量清洗函数。",
+    syntax: "str_view(string, pattern = NULL, match = TRUE, html = FALSE, use_escapes = FALSE)",
+    returns: "用于查看匹配结果；主要效果是打印，不是返回可继续计算的字符向量。",
+    example: `str_view(c("A-102", "B-205", "bad"), "^[A-Z]-[0-9]{3}$")`,
+    output: "在查看器中用 < > 标出每段匹配，并显示未匹配项。",
+    params: [
+      ["string", "要查看的字符向量。", "必填"],
+      ["pattern", "要测试的正则模式；NULL 时可只查看字符串。", "推荐填写"],
+      ["match", "TRUE 高亮匹配，FALSE 显示捕获分组。", "默认 TRUE"],
+      ["html", "是否生成 HTML 查看器。", "默认 FALSE"],
+      ["use_escapes", "是否显示不可见字符。", "默认 FALSE"],
+    ],
+    tips: ["它用于调试，不用于生成最终数据列。", "反例和边界样例应和正例一起查看。"],
+    related: ["str_detect", "str_match"],
+  });
+
+  addFunction({
+    id: "regex",
+    name: "regex()",
+    package: "stringr",
+    aliases: ["正则选项", "忽略大小写", "ICU regex"],
+    summary: "把正则模式和常用选项打包成一个可复用对象，例如忽略大小写、多行和点号匹配换行。",
+    syntax: "regex(pattern, ignore_case = FALSE, multiline = FALSE, comments = FALSE, dotall = FALSE, ...)",
+    returns: "返回带选项的正则模式对象，可传给 stringr 的 pattern 参数。",
+    example: `pattern <- regex("sample", ignore_case = TRUE)\nstr_detect(c("Sample A", "SAMPLE B", "other"), pattern)`,
+    output: "[1]  TRUE  TRUE FALSE",
+    params: [
+      ["pattern", "正则表达式文本。", "必填"],
+      ["ignore_case", "是否忽略大小写。", "默认 FALSE"],
+      ["multiline", "是否让 ^ 和 $ 识别每一行。", "默认 FALSE"],
+      ["comments", "是否允许在模式中写注释。", "默认 FALSE"],
+      ["dotall", "是否让点号匹配换行。", "默认 FALSE"],
+      ["...", "其他 ICU 正则选项。", "可选"],
+    ],
+    tips: ["同一模式需要在多个函数中重复使用时，先存成变量。", "选项会改变匹配意义，应写进代码和注释。"],
+    related: ["fixed", "str_detect"],
+  });
+
+  addFunction({
+    id: "fixed",
+    name: "fixed()",
+    package: "stringr",
+    aliases: ["固定文字匹配", "关闭正则", "literal match"],
+    summary: "告诉 stringr 把 pattern 当作普通文字，不解释其中的正则特殊字符。",
+    syntax: "fixed(pattern, ignore_case = FALSE)",
+    returns: "返回字面匹配模式对象。",
+    example: `text <- c("a.b.c", "axbxc")\nstr_detect(text, ".")\nstr_detect(text, fixed("."))`,
+    output: "[1] TRUE TRUE\n[1]  TRUE FALSE",
+    params: [
+      ["pattern", "要按普通文字查找的内容。", "必填"],
+      ["ignore_case", "是否忽略大小写。", "默认 FALSE"],
+    ],
+    tips: ["搜索括号、点号、竖线等字面字符时尤其有用。", "Base R 中常见对应思路是 fixed = TRUE。"],
+    related: ["regex", "str_detect", "str_replace_all"],
+  });
+
+  ["regexpr", "gregexpr"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "base",
+    category: "符号与正则",
+    level: "中级",
+    aliases: ["Base R 正则位置", id === "gregexpr" ? "全部匹配位置" : "第一个匹配位置"],
+    summary: id === "gregexpr" ? "查找每个字符串中所有匹配的位置和长度。" : "查找每个字符串中第一个匹配的位置和长度。",
+    syntax: `${id}(pattern, text, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)`,
+    returns: "返回带 match.length 属性的整数位置向量；gregexpr() 通常每个字符串一个元素。",
+    example: `text <- "The cat sat on the mat"\n${id}("at", text)`,
+    output: id === "gregexpr" ? "位置为 6、10、21，并带各次匹配长度。" : "第一个 at 的起点为 6，长度为 2。",
+    params: [
+      ["pattern", "正则模式或固定文字。", "必填"],
+      ["text", "要搜索的字符向量。", "必填"],
+      ["ignore.case", "是否忽略大小写。", "默认 FALSE"],
+      ["perl", "是否使用 Perl 兼容正则。", "默认 FALSE"],
+      ["fixed", "是否按普通文字匹配。", "默认 FALSE"],
+      ["useBytes", "是否按字节而不是字符计算。", "默认 FALSE"],
+    ],
+    tips: ["位置结果通常配合 regmatches() 提取内容。", "Base R 与 stringr 的正则方言和返回结构不同。"],
+    related: ["regmatches", "str_locate", id === "regexpr" ? "gregexpr" : "regexpr"],
+  }));
+
+  addFunction({
+    id: "regmatches",
+    name: "regmatches()",
+    package: "base",
+    category: "符号与正则",
+    level: "中级",
+    aliases: ["提取正则结果", "匹配内容"],
+    summary: "从 regexpr() 或 gregexpr() 返回的位置结果中提取匹配内容，也可以通过赋值形式替换匹配。",
+    syntax: "regmatches(x, m, invert = FALSE)",
+    returns: "返回匹配到的文字；invert = TRUE 时返回未匹配部分。",
+    example: `text <- "A-102, B-205"\npos <- gregexpr("[A-Z]-[0-9]{3}", text)\nregmatches(text, pos)`,
+    output: '[[1]]\n[1] "A-102" "B-205"',
+    params: [
+      ["x", "原始字符向量。", "必填"],
+      ["m", "由 regexpr() 或 gregexpr() 得到的匹配位置。", "必填"],
+      ["invert", "是否提取未匹配部分。", "默认 FALSE"],
+    ],
+    tips: ["它只负责从位置结果提取内容，不自己解析 pattern。", "老代码中常见 regexpr() + regmatches() 组合。"],
+    related: ["regexpr", "gregexpr", "str_extract_all"],
+  });
+
+  ["ymd", "mdy", "dmy"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    level: "入门",
+    aliases: ["解析日期", id === "ymd" ? "年月日" : id === "mdy" ? "月日年" : "日月年"],
+    summary: `按 ${id === "ymd" ? "年-月-日" : id === "mdy" ? "月-日-年" : "日-月-年"} 的顺序解析日期。`,
+    syntax: `${id}(..., quiet = FALSE, tz = NULL, locale = Sys.getlocale("LC_TIME"), truncated = 0)`,
+    returns: "返回 Date 向量；无法解析的值变为 NA。",
+    example: `${id}(c("${id === "ymd" ? "2025-01-15" : id === "mdy" ? "01-15-2025" : "15-01-2025"}"))`,
+    output: '[1] "2025-01-15"',
+    params: [
+      ["...", "要解析的一个或多个日期字符。", "必填"],
+      ["quiet", "TRUE 时不逐条显示解析警告。", "默认 FALSE"],
+      ["tz", "时区；纯日期通常保持 NULL。", "默认 NULL"],
+      ["locale", "月份和星期文字所使用的语言区域。", "当前系统设置"],
+      ["truncated", "允许省略的末尾时间组件数量。", "默认 0"],
+    ],
+    tips: ["多个格式混在一列时，先按来源或样式分组检查。", "quiet=TRUE 只是减少警告，不能忽略解析失败。"],
+    related: ["parse_date_time", "as.Date", "ymd_hms"],
+  }));
+
+  ["ymd_hms", "ymd_hm"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["日期时间解析", id === "ymd_hms" ? "年月日时分秒" : "年月日时分"],
+    summary: id === "ymd_hms" ? "解析年月日时分秒并返回日期时间对象。" : "解析年月日时分并返回日期时间对象。",
+    syntax: `${id}(..., quiet = FALSE, tz = "UTC", locale = Sys.getlocale("LC_TIME"), truncated = 0)`,
+    returns: "返回 POSIXct 日期时间向量。",
+    example: `${id}("2025-01-15 ${id === "ymd_hms" ? "14:30:00" : "14:30"}", tz = "Asia/Shanghai")`,
+    output: '[1] "2025-01-15 14:30:00 CST"',
+    params: [
+      ["...", "要解析的日期时间字符。", "必填"],
+      ["quiet", "是否隐藏解析警告。", "默认 FALSE"],
+      ["tz", "输入时间所在时区。", '默认 "UTC"'],
+      ["locale", "月份和星期文字的语言区域。", "当前系统设置"],
+      ["truncated", "允许缺少的末尾时间组件数量。", "默认 0"],
+    ],
+    tips: ["默认 UTC，不明确时区可能让本地时间偏移。", "用 with_tz() 改变显示时区，用 force_tz() 声明原值所在时区。"],
+    related: ["with_tz", "force_tz", "parse_date_time"],
+  }));
+
+  addFunction({
+    id: "parse_date_time",
+    name: "parse_date_time()",
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["多格式日期", "日期解析器"],
+    summary: "按一组候选顺序解析多种日期格式，适合明显混合格式的历史数据。",
+    syntax: "parse_date_time(x, orders, tz = \"UTC\", truncated = 0, quiet = FALSE, locale = Sys.getlocale(\"LC_TIME\"), select_formats = .select_formats, exact = FALSE, train = TRUE, drop = FALSE)",
+    returns: "返回 POSIXct 日期时间向量。",
+    example: `x <- c("2025-01-15", "01/15/2025", "15-Jan-2025")\nparse_date_time(x, orders = c("ymd", "mdy", "dmy"))`,
+    output: "三个值都能解析为 2025-01-15 的日期时间。",
+    params: [
+      ["x", "要解析的字符向量。", "必填"],
+      ["orders", "候选日期顺序，例如 ymd、mdy、dmy。", "必填"],
+      ["tz", "解析后的时区。", '默认 "UTC"'],
+      ["quiet", "是否隐藏警告。", "默认 FALSE"],
+      ["exact", "是否要求完全匹配格式。", "默认 FALSE"],
+      ["drop", "是否丢弃无法解析的值。", "默认 FALSE"],
+    ],
+    tips: ["优先按数据来源分组解析，而不是让候选顺序猜完整列。", "解析后必须检查 NA 和歧义格式。"],
+    related: ["ymd", "mdy", "dmy"],
+  });
+
+  ["hour", "minute", "second"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    aliases: ["提取时间", id === "hour" ? "小时" : id === "minute" ? "分钟" : "秒"],
+    summary: `从日期时间对象中提取${id === "hour" ? "小时" : id === "minute" ? "分钟" : "秒"}。`,
+    syntax: `${id}(x)`,
+    returns: "返回数值向量。",
+    example: `dt <- ymd_hms("2025-01-15 14:30:45")\n${id}(dt)`,
+    output: id === "hour" ? "[1] 14" : id === "minute" ? "[1] 30" : "[1] 45",
+    params: [["x", "日期时间对象。", "必填"]],
+    tips: ["时区会影响小时显示，提取前确认时间含义。", "纯 Date 通常没有有意义的时分秒。"],
+    related: ["ymd_hms", "with_tz"],
+  }));
+
+  ["days", "weeks", "months", "years"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    aliases: ["时间周期", "calendar period"],
+    summary: `创建按日历年月计算的 ${id} 周期对象，可直接加到日期上。`,
+    syntax: `${id}(x = 1)`,
+    returns: "返回 Period 对象。",
+    example: `ymd("2025-01-31") + ${id}(1)`,
+    output: "按日历规则推进相应的日、周、月或年。",
+    params: [["x", "要增加的周期数量，可为负数。", "默认 1"]],
+    tips: ["月份长度和闰年会影响结果。", "需要固定秒数长度时使用 ddays() 等 Duration 函数。"],
+    related: ["ddays", "dweeks", "dhours", "dminutes"],
+  }));
+
+  ["ddays", "dweeks", "dhours", "dminutes"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    aliases: ["固定时长", "duration"],
+    summary: `创建以固定秒数计算的 ${id} 时长对象。`,
+    syntax: `${id}(x = 1)`,
+    returns: "返回 Duration 对象。",
+    example: `ymd_hms("2025-01-01 00:00:00") + ${id}(2)`,
+    output: "按固定秒数推进时间点。",
+    params: [["x", "要增加的时长数量。", "默认 1"]],
+    tips: ["Duration 适合精确时间差，Period 适合按日历推进。", "月份和年份没有固定 Duration 等价物。"],
+    related: ["days", "weeks", "months", "years"],
+  }));
+
+  addFunction({
+    id: "interval",
+    name: "interval()",
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["时间区间", "起止日期"],
+    summary: "用起止时间创建 Interval，可判断日期是否落在研究期间并计算区间长度。",
+    syntax: "interval(start = NULL, end = NULL, tzone = tz(start))",
+    returns: "返回 Interval 对象。",
+    example: `study <- interval(ymd("2025-01-01"), ymd("2025-12-31"))\ntime_length(study, "day")`,
+    output: "[1] 364",
+    params: [
+      ["start", "区间起点。", "必填"],
+      ["end", "区间终点。", "必填"],
+      ["tzone", "时区；纯日期通常使用边界对象时区。", "默认 tz(start)"],
+    ],
+    tips: ["日期范围是否包含终点要结合业务定义。", "日期相减与日历月比例不是同一个概念。"],
+    related: ["int_length", "time_length"],
+  });
+
+  ["int_length", "time_length"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["时间长度", "时间差单位"],
+    summary: id === "int_length" ? "返回 Interval 的精确秒数长度。" : "把时间区间或时长按指定单位返回数值。",
+    syntax: id === "int_length" ? "int_length(int)" : "time_length(x, unit = \"second\")",
+    returns: "返回数值向量。",
+    example: id === "int_length"
+      ? `int_length(interval(ymd("2025-01-01"), ymd("2025-12-31")))`
+      : `time_length(interval(ymd("2025-01-01"), ymd("2025-12-31")), "day")`,
+    output: id === "int_length" ? "[1] 31449600" : "[1] 364",
+    params: id === "int_length"
+      ? [["int", "Interval 对象。", "必填"]]
+      : [["x", "时差、Duration、Period 或 Interval。", "必填"], ["unit", "目标单位，例如 second、day、month 或 year。", '默认 "second"']],
+    tips: ["以 month 或 year 返回时可能包含小数。", "报告随访时间必须写清单位。"],
+    related: ["interval", "difftime"],
+  }));
+
+  ["with_tz", "force_tz"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["时区转换", id === "with_tz" ? "改变显示时区" : "声明原时区"],
+    summary: id === "with_tz" ? "保持同一时间点，把日期时间显示为另一个时区。" : "保持显示的钟表时间不变，把该时间声明为另一个时区。",
+    syntax: `${id}(time, tzone = \"\", ...)`,
+    returns: "返回 POSIXct 日期时间向量。",
+    example: `dt <- ymd_hms("2025-01-15 12:00:00", tz = "UTC")\n${id}(dt, "Asia/Shanghai")`,
+    output: id === "with_tz" ? '[1] "2025-01-15 20:00:00 CST"' : '[1] "2025-01-15 12:00:00 CST"',
+    params: [
+      ["time", "日期时间对象。", "必填"],
+      ["tzone", "目标时区，例如 Asia/Shanghai。", "必填"],
+      ["...", "其他参数。", "可选"],
+    ],
+    tips: ["with_tz() 改的是显示时区，时间点不变。", "force_tz() 会改变实际时间点，误用风险更高。"],
+    related: ["ymd_hms", "force_tz"],
+  }));
+
+  addFunction({
+    id: "floor_date",
+    name: "floor_date()",
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["月初", "周起点", "按时间取整"],
+    summary: "把日期时间向下对齐到秒、分、小时、日、周、月、年等时间单位。",
+    syntax: "floor_date(x, unit = \"seconds\", week_start = getOption(\"lubridate.week.start\", 7))",
+    returns: "返回与输入对应的起始日期时间。",
+    example: `dates <- ymd(c("2025-01-03", "2025-01-28"))\nfloor_date(dates, "month")`,
+    output: '[1] "2025-01-01" "2025-01-01"',
+    params: [
+      ["x", "日期或日期时间向量。", "必填"],
+      ["unit", "对齐单位，如 second、day、week、month、year。", '默认 "seconds"'],
+      ["week_start", "一周从星期几开始。", "默认 7（周日）"],
+    ],
+    tips: ["按周聚合时 week_start 会改变周的分组。", "先确认研究周是否按自然周还是自定义周起点。"],
+    related: ["year", "month", "isoweek"],
+  });
+
+  addFunction({
+    id: "isoweek",
+    name: "isoweek()",
+    package: "lubridate",
+    category: "日期与时间",
+    level: "中级",
+    aliases: ["ISO周", "流行病学周"],
+    summary: "返回日期对应的 ISO 8601 周数，适合按国际统一周规则聚合。",
+    syntax: "isoweek(x)",
+    returns: "返回整数周数。",
+    example: `isoweek(ymd(c("2024-12-30", "2025-01-01")))`,
+    output: "[1] 1 1",
+    params: [["x", "日期或日期时间。", "必填"]],
+    tips: ["ISO 周与简单用一年中第几天除以 7 不同。", "跨年周需要同时保留 ISO 年，不能只看周数。"],
+    related: ["floor_date", "wday"],
+  });
+
+  ["strptime", "strftime"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "base",
+    category: "日期与时间",
+    level: "中级",
+    aliases: [id === "strptime" ? "文字转日期" : "日期转文字", "format date"],
+    summary: id === "strptime" ? "按明确的格式符号把文字解析成日期时间。" : "按格式符号把日期时间转换成文字用于显示。",
+    syntax: id === "strptime" ? "strptime(x, format = \"\", tz = \"\")" : "strftime(x, format = \"\", tz = \"\", usetz = FALSE, ...)",
+    returns: id === "strptime" ? "返回 POSIXlt 日期时间；后续常转为 POSIXct 或 Date。" : "返回格式化后的字符向量。",
+    example: id === "strptime"
+      ? `strptime("15/01/2025", format = "%d/%m/%Y")`
+      : `strftime(ymd("2025-01-15"), "%Y年%m月%d日")`,
+    output: id === "strptime" ? '[1] "2025-01-15 CST"' : '[1] "2025年01月15日"',
+    params: [
+      [id === "strptime" ? "x" : "x", "要转换的文字或日期时间对象。", "必填"],
+      ["format", "日期格式，例如 %Y-%m-%d。", "必填或需与输入一致"],
+      ["tz", "时区。", '默认空或系统设置'],
+      ["usetz", "格式化输出时是否附加时区。", "默认 FALSE（仅 strftime）"],
+    ],
+    tips: ["%m 是月，%M 是分钟；大小写必须准确。", "格式化后的文字不应再用于日期加减。"],
+    related: ["as.Date", "ymd", "parse_date_time"],
+  }));
+
+  addFunction({
+    id: "map",
+    name: "map()",
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["批量循环", "函数式映射", "map list"],
+    summary: "对向量或列表中的每个元素应用同一个函数，并把每个结果保留在列表里。",
+    syntax: "map(.x, .f, ..., .progress = FALSE)",
+    returns: "返回列表，长度与输入相同；命名输入会保留名称。",
+    example: `map(mtcars[c("mpg", "wt", "hp")], mean)`,
+    output: "返回包含 mpg、wt 和 hp 三个均数的命名列表。",
+    params: [
+      [".x", "要逐个处理的向量、列表或数据框。", "必填"],
+      [".f", "处理函数，可写函数名或 \\(x) 匿名函数。", "必填"],
+      ["...", "继续传给 .f 的其他固定参数。", "可选"],
+      [".progress", "是否显示处理进度。", "默认 FALSE"],
+    ],
+    tips: ["先在单个元素上测试 .f。", "结果结构复杂时优先保留列表，不要强行转成数据框。"],
+    related: ["map_dbl", "map2", "pmap"],
+  });
+
+  ["map_dbl", "map_chr", "map_lgl", "map_int"].forEach((id) => addFunction({
+    id,
+    name: `${id}()`,
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["typed map", "批量提取", "map output type"],
+    summary: `对每个元素应用函数，并要求每个结果都是单个${id === "map_dbl" ? "双精度数值" : id === "map_chr" ? "字符" : id === "map_lgl" ? "逻辑值" : "整数"}。`,
+    syntax: `${id}(.x, .f, ..., .progress = FALSE)`,
+    returns: id === "map_dbl" ? "返回数值向量。" : id === "map_chr" ? "返回字符向量。" : id === "map_lgl" ? "返回逻辑向量。" : "返回整数向量。",
+    example: id === "map_dbl"
+      ? `map_dbl(mtcars[c("mpg", "wt", "hp")], mean)`
+      : `map_chr(list(1, 2), \\(x) paste0("ID-", x))`,
+    output: id === "map_dbl" ? "返回三个均数组成的数值向量。" : "返回与输入等长的指定类型向量。",
+    params: [
+      [".x", "要逐个处理的输入。", "必填"],
+      [".f", "每个元素要执行的函数。", "必填"],
+      ["...", "继续传给 .f 的参数。", "可选"],
+      [".progress", "是否显示进度。", "默认 FALSE"],
+    ],
+    tips: ["输出类型不匹配时会报错，这是提前发现问题的检查。", "结果长度不为 1 时不能使用 typed map。"],
+    related: ["map", "map2"],
+  }));
+
+  addFunction({
+    id: "map2",
+    name: "map2()",
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["双输入映射", "并行遍历"],
+    summary: "同时按位置遍历两个长度相同的输入，把一对元素交给同一个函数。",
+    syntax: "map2(.x, .y, .f, ..., .progress = FALSE)",
+    returns: "返回列表，长度与输入一致。",
+    example: `map2(c("age", "sex"), c("score", "score"), \\(x, y) paste(y, "~", x))`,
+    output: '[[1]]\n[1] "score ~ age"\n\n[[2]]\n[1] "score ~ sex"',
+    params: [
+      [".x", "第一个输入。", "必填"],
+      [".y", "第二个输入，长度应与 .x 一致。", "必填"],
+      [".f", "接收 x 和 y 的处理函数。", "必填"],
+      ["...", "继续传给 .f 的参数。", "可选"],
+      [".progress", "是否显示进度。", "默认 FALSE"],
+    ],
+    tips: ["map2() 按位置配对，不是自动按键匹配。", "配对关系复杂时先构造显式数据框。"],
+    related: ["map", "pmap"],
+  });
+
+  addFunction({
+    id: "pmap",
+    name: "pmap()",
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["多参数映射", "并行参数遍历"],
+    summary: "同时遍历多个输入，把每一行或每个位置的多个值作为函数参数。",
+    syntax: "pmap(.l, .f, ..., .progress = FALSE)",
+    returns: "返回列表。",
+    example: `settings <- tibble::tibble(mean = 0:2, sd = 1:3, n = 5:7)\nset.seed(1)\npmap(settings, \\(mean, sd, n) rnorm(n, mean, sd))`,
+    output: "返回三个分别生成 5、6、7 个随机数的向量。",
+    params: [
+      [".l", "输入列表或数据框；每行的一组值对应一次调用。", "必填"],
+      [".f", "处理函数，参数名最好与输入列名对应。", "必填"],
+      ["...", "继续传给 .f 的参数。", "可选"],
+      [".progress", "是否显示进度。", "默认 FALSE"],
+    ],
+    tips: ["输入列的顺序和名称必须清楚。", "可以在匿名函数中命名参数避免位置依赖。"],
+    related: ["map", "map2"],
+  });
+
+  addFunction({
+    id: "reduce",
+    name: "reduce()",
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["累计合并", "fold"],
+    summary: "用一个二元函数把多个元素逐步合并成一个结果。",
+    syntax: "reduce(.x, .f, ..., .init, .dir = c(\"forward\", \"backward\"))",
+    returns: "返回合并后的单个结果。",
+    example: `reduce(1:5, `+`)\nreduce(list(c(1, 2), c(2, 3)), union)`,
+    output: "[1] 15\n[1] 1 2 3",
+    params: [
+      [".x", "要合并的输入。", "必填"],
+      [".f", "接收两个现有结果并返回新结果的函数。", "必填"],
+      ["...", "继续传给 .f 的参数。", "可选"],
+      [".init", "可选的初始值。", "默认缺失"],
+      [".dir", "从前向后或从后向前合并。", "默认 forward"],
+    ],
+    tips: ["合并顺序会影响非交换运算。", "空输入需要明确初始值。"],
+    related: ["map", "list_rbind"],
+  });
+
+  addFunction({
+    id: "list_rbind",
+    name: "list_rbind()",
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["合并列表数据框", "row bind list"],
+    summary: "把多个结构相同的数据框按行合并，并可以把列表名称保留为来源列。",
+    syntax: "list_rbind(x, ..., names_to = rlang::zap(), ptype = NULL)",
+    returns: "返回合并后的数据框。",
+    example: `x <- list(a = data.frame(v = 1), b = data.frame(v = 2))\nlist_rbind(x, names_to = "source")`,
+    output: "返回两行数据框，source 分别记录 a 和 b。",
+    params: [
+      ["x", "数据框列表。", "必填"],
+      ["...", "其他参数。", "可选"],
+      ["names_to", "把列表名称写入哪一列；默认丢弃名称。", "默认 zap"],
+      ["ptype", "可选的输出原型，用于提前约束列类型。", "默认 NULL"],
+    ],
+    tips: ["各数据框列含义应一致，列类型冲突要先处理。", "保留来源名称便于回查每个结果来自哪个组或文件。"],
+    related: ["map", "bind_rows"],
+  });
+
+  addFunction({
+    id: "imap",
+    name: "imap()",
+    package: "purrr",
+    category: "编程与控制",
+    level: "中级",
+    aliases: ["带索引映射", "named map"],
+    summary: "同时遍历元素及其名称或位置，并把名称或索引作为第二个参数传给函数。",
+    syntax: "imap(.x, .f, ...)",
+    returns: "返回列表，并保留输入名称。",
+    example: `scores <- list(math = 80, english = 90)\nimap(scores, \\(value, name) paste(name, value, sep = ": "))`,
+    output: '$math\n[1] "math: 80"\n\n$english\n[1] "english: 90"',
+    params: [
+      [".x", "带名称或可索引的输入。", "必填"],
+      [".f", "接收元素和名称/索引的函数。", "必填"],
+      ["...", "继续传给 .f 的参数。", "可选"],
+    ],
+    tips: ["命名列表的第二个参数是名称，未命名时通常是整数位置。", "应先检查 names() 是否符合预期。"],
+    related: ["map", "map2"],
+  });
+
+  addFunction({
+    id: "coalesce",
+    name: "coalesce()",
+    package: "dplyr",
+    category: "数据整理",
+    level: "入门",
+    aliases: ["合并缺失值", "优先取值", "fill missing"],
+    summary: "按顺序返回第一个非缺失值，可以把来自不同字段或不同规则的同一变量合并起来。",
+    syntax: "coalesce(..., .ptype = NULL, .size = NULL)",
+    returns: "返回与输入等长、类型兼容的向量。",
+    example: `coalesce(c(NA, 20, NA), c(10, 30, NA))`,
+    output: "[1] 10 20 NA",
+    params: [
+      ["...", "一个或多个可兼容的向量，按从左到右顺序取值。", "必填"],
+      [".ptype", "可选的输出类型原型。", "默认 NULL"],
+      [".size", "可选的输出长度。", "默认 NULL"],
+    ],
+    tips: ["参数顺序决定优先级。", "两个变量含义不同时，不要为了补缺失而直接合并。"],
+    related: ["if_else", "case_when", "replace_na"],
+  });
+
+  window.RZH_EXTRA_FUNCTIONS_5 = [
+    ...(window.RZH_EXTRA_FUNCTIONS_5 || []),
+    ...textFunctions,
+  ];
+
+  const parameterKb = window.RZH_PARAMETER_KB?.functions || {};
+  ["str_detect", "str_extract", "str_replace_all"].forEach((id) => {
+    const pattern = parameterKb[id]?.parameters?.find((item) => item.name === "pattern");
+    if (pattern) {
+      pattern.required = true;
+      pattern.defaultKnown = false;
+      pattern.default = "";
+    }
+  });
+  const parameterOverrides = window.RZH_PARAMETER_OVERRIDES ||= { functions: {}, names: {} };
+  parameterOverrides.functions ||= {};
+  parameterOverrides.functions.str_extract = {
+    ...(parameterOverrides.functions.str_extract || {}),
+    group:
+      "指定返回第几个捕获分组：1 表示第一个圆括号分组；传命名分组名称可直接按名称取。没有必要分组时保留 NULL。",
+  };
+
+  Object.assign(window.RZH_PLAIN_FUNCTION_GUIDES ||= {}, {
+    str_squish: {
+      gist: "str_squish() 先清掉两端空白，再把中间连续多个空白压成一个空格。",
+      analogy: "像把一张写得很松的标签重新对齐，词与词之间只留一个正常间隔。",
+      remember: "内部空格仍然保留一个，因此它不等于删除所有空格。",
+      params: { string: "要清理的一条或多条文字。" },
+      steps: ["先保留原列。", "用 str_squish() 生成新列。", "抽查中文、英文和空字符串是否处理正确。"],
+    },
+    str_sub: {
+      gist: "str_sub() 按字符位置截取一段文字，用负数可以从末尾定位。",
+      analogy: "像用尺子在一行文字上量出起止位置，再把中间部分剪下来。",
+      remember: "1 是第一个字符，-1 是最后一个字符。",
+      params: { start: "从哪个字符开始。", end: "截到哪个字符结束。" },
+      steps: ["先打印原字符串。", "分别测试正向和负向位置。", "把截取结果和原值放在一起核对。"],
+    },
+    str_match: {
+      gist: "str_match() 不仅找到整段匹配，还能把圆括号中的分组逐列取出。",
+      analogy: "像把一张复合标签拆成整张标签、姓名、编号和日期几格。",
+      remember: "结果第一列是整段匹配，后面才是各分组。",
+      params: { pattern: "包含捕获分组的正则模式。" },
+      steps: ["先用 str_view() 查看匹配。", "再运行 str_match()。", "检查未匹配的行和每个分组含义。"],
+    },
+    str_split: {
+      gist: "str_split() 按分隔符把一条文字拆成多个部分。",
+      analogy: "像按包装盒上的分隔线把一条长标签拆成几个小标签。",
+      remember: "拆出的数量可能不同，所以默认结果是列表。",
+      params: { pattern: "决定在哪里分割。", n: "最多拆成几部分。" },
+      steps: ["先检查分隔符数量。", "用少量记录测试。", "确认后续要保留列表还是合并成列。"],
+    },
+    ymd: {
+      gist: "ymd() 按年、月、日的顺序把文字转换为真正日期。",
+      analogy: "像把三块日期积木按“年-月-日”的顺序重新装回去。",
+      remember: "转换前顺序必须先看真实数据。",
+      params: { quiet: "是否隐藏解析警告。" },
+      steps: ["查看原始日期样例。", "用 ymd() 转换。", "统计失败为 NA 的记录。"],
+    },
+    interval: {
+      gist: "interval() 用起点和终点构造一个可计算的时间区间。",
+      analogy: "像在研究日历上圈出从入组到结束的一段范围。",
+      remember: "区间长度和日历月比例不是同一个概念。",
+      params: { start: "区间起点。", end: "区间终点。" },
+      steps: ["确认起止日期都不晚于彼此。", "构造 interval。", "用 time_length() 指定单位计算。"],
+    },
+    map: {
+      gist: "map() 对一组元素逐个执行同一个函数，并把结果放进列表。",
+      analogy: "像给一排样本逐个做同一项检查，再按原顺序收集报告。",
+      remember: "先对单个样本试通，再批量运行。",
+      params: { ".x": "要逐个处理的内容。", ".f": "对每个元素执行的函数。" },
+      steps: ["写一个只处理单条数据的函数。", "先用一条测试。", "再用 map() 批量执行并核对结果长度。"],
+    },
+  });
+
+  window.RZH_GLOSSARY.push(
+    ["character-vector", "字符向量", "文本处理", "由一条或多条文字组成的数据对象，是 stringr 函数最常见的输入。", "像一排长度可能不同的文字标签。", "c(\"A\", \"B\", NA) 是长度为 3 的字符向量。"],
+    ["capture-group", "捕获分组", "文本处理", "正则中用圆括号划出的子模式，可单独提取或替换。", "像从完整标签中额外圈出姓名和编号。", "str_match(x, \"([A-Z])-([0-9]+)\") 会返回两个分组。"],
+    ["lookaround", "环视断言", "文本处理", "只检查目标前后是否有某种文字，但前后条件本身不作为提取结果。", "像核对门前有没有指定路牌，但不把路牌写进清单。", "(?<=SBP: )\\\\d+ 只取出标签后的数字。"],
+    ["fixed-match", "固定文字匹配", "文本处理", "把搜索内容当作普通文字，而不是正则表达式。", "像查找一个具体的句号，而不是“任意字符”。", "str_detect(x, fixed(\".\")) 搜索真正的点号。"],
+    ["list-column", "列表列", "文本处理", "数据框中的某一列，每个单元格可以保存一个长度不同的向量或结果对象。", "像每个文件格里还能再放一个小抽屉。", "str_extract_all() 和 str_split() 的结果常需要后续展开。"],
+    ["follow-up-time", "随访时间", "流行病学", "从研究起点到事件、删失或研究结束之间的时间长度。", "像从入组当天开始掐表，到事件或最后一次随访时停表。", "随访天数必须有清晰起点、终点和单位。"],
+    ["date-time-type", "日期时间类型", "R 基础", "R 用来保存日期或时间点的对象类型，常见 Date、POSIXct 和 POSIXlt。", "像专门的日历格子，不是普通文字。", "Date 适合日期，POSIXct 适合精确到时间点和时区。"],
+  );
+})();
+
+</script>
+  <script>
 window.RZH_CHART_IMAGES = {
   "plot/bar": "data:image/webp;base64,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",
   "plot/boxplot": "data:image/webp;base64,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",
@@ -104161,6 +105811,8 @@ function peekFunctionPill(id, label = null) {
 }
 
 function parameterHint(item, name, providedHint) {
+  const override = parameterOverride(item.id, name);
+  if (override?.specific) return override.description;
   return providedHint || item.paramTips?.[name] || commonParamHints[name] ||
     "先确认这个参数控制什么，再只修改与当前任务有关的设置；其余参数保持默认通常更安全。";
 }
@@ -105516,7 +107168,7 @@ function renderHome() {
           <div class="home-mini-stats home-stats-inline">
             <span><b>${functions.length}</b> 函数</span>
             <span><b>${courseModules.length}</b> 系统课</span>
-            <span><b>19</b> 图形示例</span>
+            <span><b>${learningGuides.length}</b> 教学专题</span>
           </div>
         </div>
       </section>
@@ -105627,8 +107279,8 @@ function guideFunctionMarkup(functionId) {
       </div>
       <p>${escapeHtml(item.summary)}</p>
       <dl>
-        ${resolvedFunctionParameters(item).slice(0, 6).map(([name, description, usage, hint]) => `
-          <div><dt>${escapeHtml(name)}</dt><dd><span>${escapeHtml(usage)}</span>${escapeHtml(description)}${hint ? ` ${escapeHtml(hint)}` : ""}</dd></div>
+        ${resolvedFunctionParameters(item).slice(0, 6).map((parameter) => `
+          <div><dt>${escapeHtml(parameter[0])}</dt><dd><span>${escapeHtml(parameter[2])}</span>${parameterCellMarkup(item, parameter)}</dd></div>
         `).join("")}
       </dl>
       <a class="text-link" href="#function/${item.id}">查看完整参数与示例 ${icon("arrow-right")}</a>
@@ -105642,7 +107294,7 @@ function renderGuide(type, id) {
     renderNotFound();
     return;
   }
-  const typeLabel = guideTypeLabel(type);
+  const typeLabel = guide.typeLabel || guideTypeLabel(type);
   const definition = guide.definition || guide.overview;
   const features = guide.features || guide.whenUse;
   const concepts = guide.concepts || [];
@@ -105655,7 +107307,7 @@ function renderGuide(type, id) {
       <a class="detail-back" href="#learn">${icon("arrow-left")} 返回教学专区</a>
       <header class="guide-hero">
         <div class="guide-hero-copy">
-          <div class="function-tags">${badge(typeLabel, "brand")}${guide.aliases.map((alias) => badge(alias)).join("")}</div>
+          <div class="function-tags">${badge(typeLabel, "brand")}${guide.minutes ? badge(`约 ${guide.minutes} 分钟`, "blue") : ""}${guide.aliases.map((alias) => badge(alias)).join("")}</div>
           <h1>${escapeHtml(guide.title)}</h1>
           <p class="guide-lead">${escapeHtml(guide.hero)}</p>
         </div>
@@ -105782,6 +107434,14 @@ function renderGuide(type, id) {
               ${guide.pitfalls.map((item, index) => `<div><span>${index + 1}</span><p>${escapeHtml(item)}</p></div>`).join("")}
             </div>
           </section>
+
+          ${guide.practice ? `
+            <section class="panel guide-section guide-practice">
+              <div class="guide-section-title"><span>练</span><div><h2>练习与自查</h2><p>合上示例，尝试自己写一遍；结果不应只“能运行”，还应经得起来源和结构检查。</p></div></div>
+              <p>${escapeHtml(guide.practice)}</p>
+              <a class="button" href="#functions">遇到不熟悉的函数，打开中文词典 ${icon("arrow-right")}</a>
+            </section>
+          ` : ""}
         </article>
 
         <aside class="guide-aside">
