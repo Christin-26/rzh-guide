@@ -1450,6 +1450,14 @@ html[data-theme="dark"] .theme-icon-sun {
   font-size: 12px;
 }
 
+button.detail-back {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+
 .detail-back:hover {
   color: var(--brand);
 }
@@ -8251,7 +8259,7 @@ body {
   min-height: 132px;
   display: grid;
   grid-template-columns: 28px 42px minmax(0, 1fr) auto;
-  grid-template-rows: auto auto;
+  grid-template-rows: auto auto auto;
   align-items: center;
   gap: 8px 12px;
   padding: 17px;
@@ -8300,6 +8308,79 @@ body {
   color: var(--muted);
   font-size: 10.5px;
   font-weight: 650;
+}
+
+.teaching-category-progress {
+  grid-column: 3;
+  grid-row: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+}
+
+.teaching-category-track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-strong) 74%, transparent);
+}
+
+.teaching-category-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand-vivid), var(--accent-vivid));
+}
+
+.teaching-category-progress small {
+  color: var(--brand-strong);
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.category-progress-card {
+  display: grid;
+  grid-template-columns: minmax(170px, .48fr) minmax(180px, 1fr);
+  align-items: center;
+  gap: 12px 22px;
+  margin: -4px 0 26px;
+  padding: 18px 20px;
+  border: 1px solid color-mix(in srgb, var(--brand) 22%, var(--border));
+  border-radius: var(--radius-md);
+  background:
+    linear-gradient(115deg,
+      color-mix(in srgb, var(--brand-pale) 82%, var(--surface)),
+      color-mix(in srgb, var(--accent-soft) 48%, var(--surface)));
+  box-shadow: var(--glass-inner);
+}
+
+.category-progress-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.category-progress-copy span {
+  color: var(--muted);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+
+.category-progress-copy strong {
+  color: var(--brand-strong);
+  font-size: 13px;
+}
+
+.category-progress-card .progress-track {
+  margin: 0;
+}
+
+.category-progress-card > small {
+  grid-column: 1 / -1;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1.6;
 }
 
 .category-hero,
@@ -9452,6 +9533,14 @@ body {
 }
 
 @media (max-width: 820px) {
+  .category-progress-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .category-progress-card > small {
+    grid-column: 1;
+  }
+
   .learning-dock {
     right: 14px;
     bottom: calc(78px + env(safe-area-inset-bottom));
@@ -109651,7 +109740,8 @@ const state = {
   notes: safeRead("rzh-notes", {}),
   courseCompleted: new Set(safeRead("rzh-course-progress", [])),
   quickCompleted: new Set(safeRead("rzh-quick-progress", [])),
-  lastLearning: safeRead("rzh-learning-last", null),
+  teachingVisited: new Set(safeRead("rzh-teaching-visited", [])),
+  activeTeachingCategory: safeRead("rzh-active-teaching-category", ""),
   functionQuery: "",
   functionCategory: "全部",
   functionPackage: "全部",
@@ -111195,18 +111285,18 @@ function teachingCategoryItemMarkup(item, categoryId, context) {
     ${icon("arrow-right")}
   `;
   if (item.basicsTab) {
-    return `<a class="${className}" href="#basics/${escapeHtml(item.basicsTab)}">${shared}</a>`;
+    return `<a class="${className}" href="#basics/${escapeHtml(item.basicsTab)}" data-teaching-category="${escapeHtml(categoryId)}">${shared}</a>`;
   }
   if (item.workflow) {
-    return `<a class="${className}" href="#workflow/${escapeHtml(item.workflow)}">${shared}</a>`;
+    return `<a class="${className}" href="#workflow/${escapeHtml(item.workflow)}" data-teaching-category="${escapeHtml(categoryId)}">${shared}</a>`;
   }
   const href = item.href === "#course-roadmap" && context === "home" ? "#learn" : item.href;
-  return `<a class="${className}" href="${escapeHtml(href)}">${shared}</a>`;
+  return `<a class="${className}" href="${escapeHtml(href)}" data-teaching-category="${escapeHtml(categoryId)}">${shared}</a>`;
 }
 
 function teachingCategoryResourcesMarkup(category, context) {
   const items = category.items || [];
-  const preferredOrder = ["入门", "进阶", "高阶", "应用"];
+  const preferredOrder = ["入门", "进阶", "高阶", "应用", "工具"];
   const levels = preferredOrder.filter((level) => items.some((item) => item.level === level));
   if (!levels.length) {
     return `<div class="teaching-resource-grid">${items.map((item) => teachingCategoryItemMarkup(item, category.id, context)).join("")}</div>`;
@@ -111239,6 +111329,7 @@ function teachingZoneMarkup(context = "home", limit = teachingCategories.length)
       </div>
       <div class="teaching-category-grid">
         ${categories.map((category, index) => {
+          const progress = teachingCategoryProgress(category);
           return `
             <a class="teaching-category-card" href="#learn/category/${category.id}">
               <span class="teaching-category-number">${String(index + 1).padStart(2, "0")}</span>
@@ -111248,6 +111339,12 @@ function teachingZoneMarkup(context = "home", limit = teachingCategories.length)
                 <small>${escapeHtml(category.subtitle)}</small>
               </span>
               <span class="teaching-category-count">${category.items.length} 个入口</span>
+              ${context === "learn" ? `
+                <span class="teaching-category-progress">
+                  <span class="teaching-category-track" role="progressbar" aria-label="${escapeHtml(category.title)}进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><i style="width:${progress.percent}%"></i></span>
+                  <small>${progress.completed} / ${progress.total} ${progress.unit}</small>
+                </span>
+              ` : ""}
               ${icon("arrow-right")}
             </a>
           `;
@@ -111263,11 +111360,15 @@ function renderTeachingCategory(categoryId) {
     renderNotFound();
     return;
   }
+  const categoryProgress = teachingCategoryProgress(category);
+  const progressLabel = categoryProgress.mode === "done" ? "已完成" : "已学习";
+  state.activeTeachingCategory = category.id;
+  safeWrite("rzh-active-teaching-category", category.id);
   app.innerHTML = `
     <div class="page page-enter">
       <header class="category-hero">
         <div>
-          <a class="detail-back" href="#learn">${icon("arrow-left")} 返回教学目录</a>
+          <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
           <span class="eyebrow">教学方向</span>
           <h1>${escapeHtml(category.title)}</h1>
           <p>${escapeHtml(category.detail)}</p>
@@ -111278,6 +111379,14 @@ function renderTeachingCategory(categoryId) {
           <strong>${category.items.length}</strong><small>个学习入口</small>
         </aside>
       </header>
+      <section class="category-progress-card" aria-label="${escapeHtml(category.title)}学习进度">
+        <div class="category-progress-copy">
+          <span>本专区学习进度</span>
+          <strong>${progressLabel} ${categoryProgress.completed} / ${categoryProgress.total} ${categoryProgress.unit}</strong>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="${escapeHtml(category.title)}学习进度" aria-valuenow="${categoryProgress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${categoryProgress.percent}%"></span></div>
+        <small>${categoryProgress.mode === "done" ? "完成课程或快速练习后，这里会自动更新。" : "进入并学习本专区中的条目后，这里会自动更新。"}</small>
+      </section>
       <section class="section-block">
         <div class="section-title-row">
           <div>
@@ -111451,7 +111560,7 @@ function renderGuide(type, id) {
   const relatedGuides = (guide.related || []).map((relatedId) => learningGuides.find((item) => item.id === relatedId)).filter(Boolean);
   app.innerHTML = `
     <div class="page">
-      <a class="detail-back" href="#learn">${icon("arrow-left")} 返回教学专区</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="guide-hero">
         <div class="guide-hero-copy">
           <div class="function-tags">${badge(typeLabel, "brand")}${guide.minutes ? badge(`约 ${guide.minutes} 分钟`, "blue") : ""}${guide.aliases.map((alias) => badge(alias)).join("")}</div>
@@ -111792,7 +111901,7 @@ function renderPackageDetail(id) {
     .join("");
   app.innerHTML = `
     <div class="page page-enter">
-      <a class="detail-back" href="#packages">${icon("arrow-left")} 返回 R 包目录</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="package-detail-hero">
         <span class="package-mark large">${escapeHtml(pkg.name.slice(0, 2))}</span>
         <div>
@@ -111856,7 +111965,7 @@ function renderFunctionDetail(id) {
   const functionSyntax = resolvedFunctionSyntax(item);
   app.innerHTML = `
     <div class="page">
-      <a class="detail-back" href="#functions">${icon("arrow-left")} 返回函数词典</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="function-hero">
         <div>
           <span class="eyebrow">${escapeHtml(item.category)} · ${escapeHtml(item.package)} 包</span>
@@ -111975,93 +112084,121 @@ function quickProgressCount() {
   return quickStartSteps.filter((step) => state.quickCompleted.has(step.id)).length;
 }
 
-function rememberLearning(kind, id, title) {
-  state.lastLearning = { kind, id, title, at: new Date().toISOString() };
-  safeWrite("rzh-learning-last", state.lastLearning);
+function teachingItemHref(item) {
+  if (item.basicsTab) return `#basics/${item.basicsTab}`;
+  if (item.workflow) return `#workflow/${item.workflow}`;
+  return item.href || "";
+}
+
+function teachingCategoryItemHrefs(category) {
+  return [...new Set((category.items || []).map(teachingItemHref).filter(Boolean))];
+}
+
+function teachingRouteMatches(route, href) {
+  const target = href.replace(/^#\/?/, "");
+  return Boolean(target) && route === target;
+}
+
+function teachingCategoryById(id) {
+  return teachingCategories.find((category) => category.id === id) || null;
+}
+
+function teachingCategoryMatchesRoute(category, route) {
+  return teachingCategoryItemHrefs(category).some((href) => teachingRouteMatches(route, href));
+}
+
+function teachingCategoryForRoute(route) {
+  if (route.startsWith("learn/category/")) {
+    return teachingCategoryById(route.split("/")[2]);
+  }
+  if (route === "learn" || route === "home") return null;
+  if (route === "learn/quick") return teachingCategoryById("quick");
+
+  const activeCategory = teachingCategoryById(state.activeTeachingCategory);
+  if (route.startsWith("learn/")) {
+    if (activeCategory && activeCategory.id !== "system" && teachingCategoryMatchesRoute(activeCategory, route)) {
+      return activeCategory;
+    }
+    return teachingCategoryById("system");
+  }
+
+  const matches = teachingCategories.filter((category) => teachingCategoryMatchesRoute(category, route));
+  if (route.startsWith("guide/")) {
+    if (activeCategory && matches.some((category) => category.id === activeCategory.id)) return activeCategory;
+    return matches[0] || null;
+  }
+  if (activeCategory && teachingCategoryMatchesRoute(activeCategory, route)) return activeCategory;
+  return null;
+}
+
+function teachingCategoryProgress(category) {
+  if (!category) return { completed: 0, total: 0, percent: 0, unit: "项", mode: "visited" };
+  if (category.id === "system") {
+    const completed = courseProgressCount();
+    const total = courseModules.length;
+    return { completed, total, percent: total ? Math.round((completed / total) * 100) : 0, unit: "课", mode: "done" };
+  }
+  if (category.id === "quick") {
+    const completed = quickProgressCount();
+    const total = quickStartSteps.length;
+    return { completed, total, percent: total ? Math.round((completed / total) * 100) : 0, unit: "步", mode: "done" };
+  }
+  const hrefs = teachingCategoryItemHrefs(category);
+  const completed = hrefs.filter((href) => state.teachingVisited.has(`${category.id}|${href}`)).length;
+  return { completed, total: hrefs.length, percent: hrefs.length ? Math.round((completed / hrefs.length) * 100) : 0, unit: "项", mode: "visited" };
+}
+
+function isTeachingChildRoute(route) {
+  return (route.startsWith("learn/") && route !== "learn" && !route.startsWith("learn/category/"))
+    || route.startsWith("guide/")
+    || route.startsWith("basics/")
+    || route.startsWith("control-flow")
+    || route.startsWith("workflow/");
+}
+
+function recordTeachingVisit(route) {
+  const category = teachingCategoryForRoute(route);
+  if (!category || category.id === "system" || category.id === "quick" || !isTeachingChildRoute(route)) return;
+  const matchingHref = teachingCategoryItemHrefs(category).find((href) => teachingRouteMatches(route, href));
+  if (!matchingHref) return;
+  const key = `${category.id}|${matchingHref}`;
+  if (state.teachingVisited.has(key)) return;
+  state.teachingVisited.add(key);
+  safeWrite("rzh-teaching-visited", [...state.teachingVisited]);
 }
 
 function updateLearningDock() {
   if (!learningDock) return;
   const route = currentRoute();
-  const routeModule = route.startsWith("learn/") && route !== "learn/quick"
-    ? courseModules.find((module) => module.id === route.split("/")[1])
-    : null;
-  let context = null;
-
-  if (route === "learn/quick") {
-    context = {
-      kind: "quick",
-      title: "十分钟快速入门",
-      completed: quickProgressCount(),
-      total: quickStartSteps.length,
-      overviewHref: "#learn/quick",
-      resumeHref: "#learn/quick",
-    };
-  } else if (routeModule) {
-    context = {
-      kind: "course",
-      title: `第 ${routeModule.number} 课 · ${routeModule.title}`,
-      completed: courseProgressCount(),
-      total: courseModules.length,
-      overviewHref: "#learn",
-      resumeHref: `#learn/${routeModule.id}`,
-    };
-  } else if (state.lastLearning?.kind === "quick" && state.quickCompleted.size) {
-    context = {
-      kind: "quick",
-      title: "十分钟快速入门",
-      completed: quickProgressCount(),
-      total: quickStartSteps.length,
-      overviewHref: "#learn/quick",
-      resumeHref: "#learn/quick",
-    };
-  } else if (state.lastLearning?.kind === "course") {
-    const lastModule = courseModules.find((module) => module.id === state.lastLearning.id);
-    context = {
-      kind: "course",
-      title: lastModule ? `上次学到 · ${lastModule.title}` : "系统课程",
-      completed: courseProgressCount(),
-      total: courseModules.length,
-      overviewHref: "#learn",
-      resumeHref: lastModule ? `#learn/${lastModule.id}` : "#learn",
-    };
-  } else if (state.quickCompleted.size) {
-    context = {
-      kind: "quick",
-      title: "十分钟快速入门",
-      completed: quickProgressCount(),
-      total: quickStartSteps.length,
-      overviewHref: "#learn/quick",
-      resumeHref: "#learn/quick",
-    };
-  } else if (state.courseCompleted.size) {
-    context = {
-      kind: "course",
-      title: "系统课程",
-      completed: courseProgressCount(),
-      total: courseModules.length,
-      overviewHref: "#learn",
-      resumeHref: `#learn/${recommendedCourseLesson().id}`,
-    };
-  }
-
-  if (!context || !context.total) {
+  const category = teachingCategoryForRoute(route);
+  const isTeachingChild = category && isTeachingChildRoute(route);
+  if (!isTeachingChild) {
     learningDock.classList.add("is-hidden");
     learningDock.innerHTML = "";
     document.body.classList.remove("has-learning-dock");
     return;
   }
 
-  const percent = Math.round((context.completed / context.total) * 100);
+  const progress = teachingCategoryProgress(category);
+  const routeModule = route.startsWith("learn/") && route !== "learn/quick"
+    ? courseModules.find((module) => module.id === route.split("/")[1])
+    : null;
+  const guide = route.startsWith("guide/")
+    ? findGuide(route.split("/")[1], route.split("/")[2])
+    : null;
+  const currentTitle = route === "learn/quick"
+    ? "十分钟快速入门"
+    : routeModule?.title || guide?.title || routeMeta(route).title;
+
   learningDock.classList.remove("is-hidden");
   document.body.classList.add("has-learning-dock");
   learningDock.innerHTML = `
-    <a class="learning-dock-main" href="${context.overviewHref}" aria-label="查看${context.kind === "quick" ? "快速入门" : "系统课程"}进度">
-      <span class="learning-dock-kicker">学习进度 · ${context.completed} / ${context.total}</span>
-      <strong>${escapeHtml(context.title)}</strong>
-      <span class="learning-dock-track" role="progressbar" aria-label="学习进度" aria-valuenow="${percent}" aria-valuemin="0" aria-valuemax="100"><i style="width:${percent}%"></i></span>
+    <a class="learning-dock-main" href="#learn/category/${category.id}" aria-label="返回${escapeHtml(category.title)}教学专区">
+      <span class="learning-dock-kicker">${escapeHtml(category.title)} · ${progress.completed} / ${progress.total} ${progress.unit}</span>
+      <strong>${escapeHtml(currentTitle)}</strong>
+      <span class="learning-dock-track" role="progressbar" aria-label="${escapeHtml(category.title)}学习进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><i style="width:${progress.percent}%"></i></span>
     </a>
-    <a class="learning-dock-resume" href="${context.resumeHref}">继续</a>
+    <a class="learning-dock-resume" href="#learn/category/${category.id}">目录</a>
   `;
 }
 
@@ -112205,7 +112342,7 @@ function renderLearnHubLegacy() {
 function renderErrorAnalyzer() {
   app.innerHTML = `
     <div class="page page-enter">
-      <a class="detail-back" href="#reference">${icon("arrow-left")} 返回基础速查</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="page-header compact">
         <span class="eyebrow">报错分析</span>
         <h1 class="page-title">把 R 报错复制进来</h1>
@@ -112230,10 +112367,9 @@ function renderErrorAnalyzer() {
 function renderQuickStart() {
   const completed = quickProgressCount();
   const progress = quickStartSteps.length ? Math.round((completed / quickStartSteps.length) * 100) : 0;
-  rememberLearning("quick", "quick", "十分钟快速入门");
   app.innerHTML = `
     <div class="page">
-      <a class="detail-back" href="#learn">${icon("arrow-left")} 返回系统学习</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="page-header">
         <span class="eyebrow">快速入门 · 约 10 分钟</span>
         <h1 class="page-title">十分钟快速入门 R</h1>
@@ -112410,7 +112546,6 @@ function renderCourseLesson(id) {
     renderNotFound();
     return;
   }
-  rememberLearning("course", module.id, module.title);
   const done = state.courseCompleted.has(module.id);
   const previous = courseModules[index - 1];
   const next = courseModules[index + 1];
@@ -112420,7 +112555,7 @@ function renderCourseLesson(id) {
     : courseModules;
   app.innerHTML = `
     <div class="page">
-      <a class="detail-back" href="#learn">${icon("arrow-left")} 返回课程路线</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <div class="lesson-layout">
         <aside class="lesson-rail" aria-label="课程章节">
           <span class="eyebrow">${escapeHtml(currentUnit?.title || "系统课程")}</span>
@@ -112753,7 +112888,7 @@ function renderErrors() {
   const categories = ["全部", ...new Set(errorCatalog.map((item) => item.category))];
   app.innerHTML = `
     <div class="page">
-      <a class="detail-back" href="#reference">${icon("arrow-left")} 返回基础速查</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="page-header">
         <span class="eyebrow">报错速查</span>
         <h1 class="page-title">R 报错排查</h1>
@@ -112784,7 +112919,7 @@ function renderErrorDetail(id) {
   }
   app.innerHTML = `
     <div class="page page-enter">
-      <a class="detail-back" href="#errors">${icon("arrow-left")} 返回报错速查</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="page-header compact">
         <span class="eyebrow">报错排查 · ${escapeHtml(item.category)}</span>
         <h1 class="code-title">${escapeHtml(item.error)}</h1>
@@ -113228,7 +113363,7 @@ function renderWorkflowGroup(groupId) {
   const items = workflows.filter((item) => item.group === groupId);
   app.innerHTML = `
     <div class="page page-enter">
-      <a class="detail-back" href="#workflows">${icon("arrow-left")} 返回问题分类</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="category-hero compact">
         <div>
           <span class="eyebrow">问题导航</span>
@@ -113261,7 +113396,7 @@ function renderWorkflowDetail(id) {
   const parentGroup = workflowGroupDefinitions.find(([groupId]) => groupId === selected.group);
   app.innerHTML = `
     <div class="page page-enter">
-      <a class="detail-back" href="#workflows/${escapeHtml(selected.group)}">${icon("arrow-left")} 返回${escapeHtml(parentGroup?.[1] || "问题分类")}</a>
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
       <header class="workflow-detail-hero">
         <div>
           <span class="eyebrow">${escapeHtml(selected.level)} · ${escapeHtml(selected.time)}</span>
@@ -113913,8 +114048,15 @@ function routeMeta(route) {
 function parentRoute(route) {
   if (route.startsWith("function/")) return "functions";
   if (route.startsWith("package/")) return "packages";
-  if (route.startsWith("guide/")) return "learn";
-  if (route.startsWith("learn/category/") || (route.startsWith("learn/") && route !== "learn")) return "learn";
+  if (route.startsWith("guide/")) {
+    const matches = teachingCategories.filter((item) => teachingCategoryMatchesRoute(item, route));
+    const active = teachingCategoryById(state.activeTeachingCategory);
+    const category = active && matches.some((item) => item.id === active.id) ? active : matches[0];
+    return category ? `learn/category/${category.id}` : "learn";
+  }
+  if (route.startsWith("learn/category/")) return "learn";
+  if (route === "learn/quick") return "learn/category/quick";
+  if (route.startsWith("learn/") && route !== "learn") return "learn/category/system";
   if (route.startsWith("workflow/")) {
     const id = decodeURIComponent(route.split("/")[1]);
     const item = workflows.find((workflow) => workflow.id === id);
@@ -113933,20 +114075,19 @@ function parentRoute(route) {
 }
 
 function goBackFromPage() {
-  const route = currentRoute();
-  let sameOriginReferrer = false;
-  try {
-    sameOriginReferrer = Boolean(document.referrer) && new URL(document.referrer).origin === window.location.origin;
-  } catch {
-    sameOriginReferrer = false;
+  ensureRouteHistory();
+  const index = Number(window.history.state?.rzhIndex || 0);
+  if (index > 0) {
+    window.history.back();
+    return;
   }
-  if (sameOriginReferrer && window.history.length > 1) window.history.back();
-  else navigate(parentRoute(route));
+  navigate(parentRoute(currentRoute()));
 }
 
 function renderRoute() {
   const route = currentRoute();
   const meta = routeMeta(route);
+  recordTeachingVisit(route);
   closeFunctionPeek();
   document.title = `${meta.title} · R知`;
   breadcrumb.textContent = meta.crumb;
@@ -114243,10 +114384,24 @@ function quickSearch(query) {
   navigate("functions");
 }
 
+let routeAtLocation = currentRoute();
+
+function ensureRouteHistory() {
+  if (Number.isInteger(window.history.state?.rzhIndex)) return;
+  window.history.replaceState({ ...(window.history.state || {}), rzhIndex: 0 }, "", window.location.href);
+}
+
 function navigate(route) {
   const next = `#${route}`;
-  if (window.location.hash === next) renderRoute();
-  else window.location.hash = next;
+  if (window.location.hash === next) {
+    renderRoute();
+    return;
+  }
+  ensureRouteHistory();
+  const index = Number(window.history.state?.rzhIndex || 0);
+  window.history.pushState({ ...(window.history.state || {}), rzhIndex: index + 1 }, "", next);
+  routeAtLocation = route;
+  renderRoute();
 }
 
 function buildSearchItems() {
@@ -114695,9 +114850,15 @@ function closeAccentDialog() {
 }
 
 document.addEventListener("click", (event) => {
+  const teachingLink = event.target.closest("[data-teaching-category]");
+  if (teachingLink) {
+    state.activeTeachingCategory = teachingLink.dataset.teachingCategory;
+    safeWrite("rzh-active-teaching-category", state.activeTeachingCategory);
+  }
   const actionElement = event.target.closest("[data-action]");
   if (actionElement) {
     const action = actionElement.dataset.action;
+    if (action === "go-back") goBackFromPage();
     if (action === "quick-search") openSearch(actionElement.dataset.query);
     if (action === "home-learning") handleHomeLearning(actionElement);
     if (action === "toggle-teaching-category") toggleTeachingCategory(actionElement.dataset.categoryId);
@@ -114883,6 +115044,16 @@ document.addEventListener("click", (event) => {
   }
 });
 
+document.addEventListener("click", (event) => {
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
+  const link = event.target.closest('a[href^="#"]');
+  if (!link || link.target === "_blank" || link.hasAttribute("data-action") || link.classList.contains("skip-link")) return;
+  const href = link.getAttribute("href");
+  if (!href || href === "#" || href === "#app") return;
+  event.preventDefault();
+  navigate(href.slice(1));
+});
+
 document.addEventListener("submit", (event) => {
   const quickErrorForm = event.target.closest("[data-quick-error-form]");
   if (quickErrorForm) {
@@ -115027,7 +115198,16 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && document.body.classList.contains("nav-open")) closeMobileNav();
 });
 
-window.addEventListener("hashchange", renderRoute);
+function handleRouteLocationChange() {
+  const route = currentRoute();
+  if (route === routeAtLocation) return;
+  routeAtLocation = route;
+  renderRoute();
+}
+
+ensureRouteHistory();
+window.addEventListener("popstate", handleRouteLocationChange);
+window.addEventListener("hashchange", handleRouteLocationChange);
 initTheme();
 updateAccentControls();
 updateFavoriteCount();
