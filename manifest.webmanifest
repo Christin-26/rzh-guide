@@ -1,0 +1,17 @@
+{
+  "name": "R知 中文 R 函数与任务导航",
+  "short_name": "R知",
+  "description": "面向公共卫生、医学与心理学研究的中文 R 函数与任务导航",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ee",
+  "theme_color": "#2f6b5b",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
