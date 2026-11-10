@@ -51496,8 +51496,8 @@ window.RZH_GUIDES = [
     steps: [
       {
         title: "定义滞后窗口",
-        text: "例如 lag = 0:14 表示当天到第 14 天。窗口不能机械套用，应结合生物学机制、数据和预先假设。",
-        code: "library(dlnm)\ncb <- crossbasis(\n  dat$pm25,\n  lag = 0:14,\n  argvar = list(fun = \"ns\", df = 3),\n  arglag = list(fun = \"ns\", df = 3)\n)",
+        text: "例如 lag = c(0, 14) 表示当天到第 14 天。窗口不能机械套用，应结合生物学机制、数据和预先假设。",
+        code: "library(dlnm)\ncb <- crossbasis(\n  dat$pm25,\n  lag = c(0, 14),\n  argvar = list(fun = \"ns\", df = 3),\n  arglag = list(fun = \"ns\", df = 3)\n)",
       },
       {
         title: "把 crossbasis 放进回归",
@@ -52018,7 +52018,7 @@ window.RZH_GUIDE_FUNCTIONS = [
     syntax: "crossbasis(x, lag, argvar = list(), arglag = list(), group = NULL)",
     returns: "返回 crossbasis 对象，可直接放进回归模型。",
     level: "进阶",
-    example: `library(dlnm)\ncb <- crossbasis(\n  dat$pm25,\n  lag = 0:14,\n  argvar = list(fun = "ns", df = 3),\n  arglag = list(fun = "ns", df = 3)\n)`,
+    example: `library(dlnm)\ncb <- crossbasis(\n  dat$pm25,\n  lag = c(0, 14),\n  argvar = list(fun = "ns", df = 3),\n  arglag = list(fun = "ns", df = 3)\n)`,
     output: "生成暴露-滞后矩阵，后续放进 glm() 或 coxph()。",
     params: [
       ["x", "每日或每位对象的连续暴露值。", "必填", "单位应一致，且缺失处理规则要先确定。"],
@@ -53556,7 +53556,7 @@ window.RZH_ADVANCED_GUIDE_FUNCTIONS = [
         ],
       },
       readingNotes: [
-        "lag=0:14 表示当天到第 14 天，不是“第 14 天以后”。",
+        "dlnm 2.4.10 中写 lag=c(0,14)，表示当天到第 14 天，不是“第 14 天以后”。",
         "累积 RR 依赖参照暴露和完整滞后窗口；换参照值或换窗口，数值会改变。",
         "滞后窗口、基函数自由度、时间趋势自由度都应在看主要结果前确定，不能挑选最显著的组合。",
       ],
@@ -53760,7 +53760,7 @@ window.RZH_ADVANCED_GUIDE_FUNCTIONS = [
     ["information-bias", "信息偏倚", "流行病学", "测量暴露或结局时产生系统误差，如回忆、诊断或仪器误差。", "像病例比对照更认真回忆过去的暴露。", "各组测量方法一致，是减少信息偏倚的基础。"],
     ["matching", "匹配", "流行病学", "按年龄、性别等变量为病例选择特征相近的对照，或在分析中保持匹配组结构。", "像先给每个病例找一个年龄相近的对照。", "匹配变量通常是已知混杂，不能把感兴趣暴露作为匹配变量。"],
     ["overmatching", "匹配过度", "流行病学", "匹配了不该匹配的变量，可能把真正的暴露信息一起匹配掉或降低研究效率。", "像把研究因素本身也配平了，最后当然看不出差别。", "中间变量和与疾病无关的变量不应随意匹配。"],
-    ["lag", "滞后", "统计建模", "暴露发生后到结局可能出现之间的时间延迟。", "像今天的污染可能影响随后几天的健康。", "DLNM 中的 lag=0:14 表示当天到第 14 天。"],
+    ["lag", "滞后", "统计建模", "暴露发生后到结局可能出现之间的时间延迟。", "像今天的污染可能影响随后几天的健康。", "dlnm 2.4.10 中 lag=c(0,14) 表示当天到第 14 天。"],
     ["cross-basis", "交叉基", "统计建模", "同时描述暴露非线性和滞后形态的矩阵，是 DLNM 的核心输入。", "像一张暴露 × 滞后的关系网格。", "crossbasis() 生成矩阵，之后要放入具体回归模型。"],
   );
 })();
@@ -60801,6 +60801,8 @@ anova(
       hero: "同时描述暴露强度、非线性形状和滞后累积",
       audience: "研究温度、空气污染、药物暴露等因素在当天及随后多天对健康结局的影响，并需要处理非线性和延迟。",
       overview: "DLNM 不是一个单独的回归模型，而是一套把暴露与滞后两个维度同时纳入模型的方法。crossbasis() 分别用基函数描述暴露-反应和滞后-反应，再组合成矩阵放进 GLM、GAM、Cox 或条件 Logistic。结果必须围绕参照暴露、滞后窗口和自由度解释。DLM 是暴露-反应假定为线性时的特例。",
+      imageKey: "model-dlnm",
+      imageCaption: "使用 dlnm 2.4.10 内置芝加哥数据生成：累积暴露-反应、30°C 的滞后-反应和暴露-滞后-反应等高线图。参考温度为 22°C，仅用于教学。",
       features: [
         "描述暴露-反应与滞后-反应两个维度。",
         "估计特定滞后、累积效应和总体效应。",
@@ -60827,7 +60829,7 @@ anova(
         headers: ["问题", "常用做法", "回答什么", "注意"],
         rows: [
           ["暴露关系是否线性", "lin / poly / ns / bs / strata", "怎样描述暴露-反应", "先有机制和文献依据"],
-          ["效应持续多久", "lag = 0:L", "从当天到第 L 天", "窗口过短会截断，过长会增加噪声"],
+          ["效应持续多久", "lag = c(0, L)", "从当天到第 L 天", "窗口过短会截断，过长会增加噪声"],
           ["滞后形状", "arglag + logknots", "效应怎样随时间延迟", "远端滞后常稀疏，需要简化"],
           ["核心回归", "GLM / GAM / Cox", "结合结局分布与设计", "时间序列常用准泊松"],
           ["离散程度", "Pearson 离散参数 / 准泊松 / 负二项", "方差是否大于均值", "quasi-Poisson 通常没有标准 AIC"],
@@ -60849,6 +60851,48 @@ anova(
       ],
       steps: [
         {
+          title: "完整可运行案例：温度与每日死亡",
+          text: "先使用 dlnm 自带芝加哥数据跑通完整流程。安装 dlnm 后，这段代码可以直接运行；结果用于说明方法，不作为新的流行病学结论。",
+          code: String.raw`library(dlnm)
+library(splines)
+
+data(chicagoNMMAPS, package = "dlnm")
+dat <- chicagoNMMAPS
+dat$dow <- factor(dat$dow)
+
+var_knots <- quantile(
+  dat$temp,
+  probs = c(0.10, 0.75, 0.90),
+  na.rm = TRUE
+)
+
+cb <- crossbasis(
+  dat$temp,
+  lag = c(0, 21),
+  argvar = list(fun = "ns", knots = var_knots),
+  arglag = list(fun = "ns", knots = logknots(21, 3))
+)
+
+model <- glm(
+  death ~ cb + ns(time, df = 8 * 14) + dow,
+  family = quasipoisson(),
+  data = dat
+)
+
+pred <- crosspred(
+  cb, model,
+  at = c(5, 22, 30),
+  cen = 22,
+  cumul = TRUE,
+  by = 0.5
+)
+
+pred$allRRfit
+pred$allRRlow
+pred$allRRhigh`,
+          explain: "lag=c(0,21) 表示包含当天到第21天。crossbasis() 生成的是矩阵型设计对象，不是结局模型；cb 必须进入 glm()。这里把22°C作为教学参照，因此5°C和30°C的累积RR都相对22°C解释。按当前 dlnm 2.4.10 与内置数据运行，累积RR约为1.115和1.098，仅用于核对代码是否跑通。",
+        },
+        {
           title: "从 DLM 与 DLNM 的关系开始",
           text: "先把暴露维度写成线性项，就是 DLM；把 lin 换成样条或分层函数后，才允许非线性。滞后窗口仍然独立设置。",
           code: String.raw`library(dlnm)
@@ -60856,7 +60900,7 @@ anova(
 # DLM：暴露维度为线性
 cb_lin <- crossbasis(
   dat$temp,
-  lag = 0:14,
+  lag = c(0, 14),
   argvar = list(fun = "lin"),
   arglag = list(fun = "ns", df = 3)
 )
@@ -60864,11 +60908,11 @@ cb_lin <- crossbasis(
 # DLNM：允许暴露-反应非线性
 cb_ns <- crossbasis(
   dat$temp,
-  lag = 0:14,
+  lag = c(0, 14),
   argvar = list(fun = "ns", df = 3),
   arglag = list(fun = "ns", df = 3)
 )`,
-          explain: "argvar 描述暴露维度，arglag 描述滞后维度。lag=0:14 明确包括当天到第14天；换成 ns 后模型才有非线性暴露-反应。",
+          explain: "argvar 描述暴露维度，arglag 描述滞后维度。dlnm 2.4.10 应写 lag=c(0,14)，明确包括当天到第14天；写成 0:14 会被拒绝。换成 ns 后模型才有非线性暴露-反应。",
         },
         {
           title: "根据分布和数据定义节点与滞后窗口",
@@ -60881,7 +60925,7 @@ cb_ns <- crossbasis(
 
 cb <- crossbasis(
   dat$temp,
-  lag = 0:21,
+  lag = c(0, 21),
   argvar = list(fun = "ns", knots = temp_knots),
   arglag = list(fun = "ns", knots = logknots(21, 3))
 )`,
@@ -61137,7 +61181,7 @@ exp(fit$coefficients)`,
   fun = "ns",
   knots = logknots(21, 3)
 )`,
-      output: "为 lag=0:21 生成三个滞后节点的位置。",
+      output: "为 0 到 21 天的滞后范围生成三个滞后节点位置。",
       params: [
         ["x", "最大滞后或滞后范围。", "必填"],
         ["nk", "节点数。", "与 df 二选一"],
@@ -103276,7 +103320,8 @@ function renderGuide(type, id) {
   const comparison = guide.comparison;
   const readingNotes = guide.readingNotes || [];
   const references = guide.references || [];
-  const exampleImage = type === "plot" ? chartImageSource(guide.id) : "";
+  const exampleImageKey = guide.imageKey || (type === "plot" ? guide.id : "");
+  const exampleImage = exampleImageKey ? chartImageSource(exampleImageKey) : "";
   const relatedGuides = (guide.related || []).map((relatedId) => learningGuides.find((item) => item.id === relatedId)).filter(Boolean);
   app.innerHTML = `
     <div class="page">
@@ -103332,8 +103377,8 @@ function renderGuide(type, id) {
         <figure class="guide-chart-example">
           <img src="${exampleImage}" alt="${escapeHtml(guide.title)}示例图">
           <figcaption>
-            <span>${icon("scale")} 图形示例</span>
-            <p>图为使用模拟数据生成的 ${escapeHtml(guide.title)}，用于说明图形结构和读图方法，不代表真实研究结果。</p>
+            <span>${icon("scale")} ${type === "plot" ? "图形示例" : "模型结果示意"}</span>
+            <p>${escapeHtml(guide.imageCaption || `图为使用示例数据生成的 ${guide.title}，用于说明结构、参数和读图方法，不代表新的研究结论。`)}</p>
           </figcaption>
         </figure>
       ` : ""}
