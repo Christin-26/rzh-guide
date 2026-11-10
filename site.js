@@ -57054,6 +57054,85 @@ window.RZH_GLOSSARY.push(
   const guideById = (id) => guides.find((item) => item.id === id);
   const unique = (items) => [...new Set(items)];
 
+  const stringBasics = guideById("string-basics");
+  if (stringBasics) {
+    stringBasics.concepts.push(
+      { term: "字符编码", explain: "文字在计算机内部需要映射成编码。UTF-8 适合保存含中文的数据，但读取文件时仍要明确文件实际编码，不能只凭文件名判断。" },
+      { term: "全角与半角", explain: "中文标点、数字和英文字母可能以全角或半角出现。冒号、括号、逗号和空格的全半角差异会让筛选与正则意外漏掉记录。" },
+      { term: "字符一对一翻译", explain: "chartr() 按 old 与 new 中字符的位置逐一替换。它适合统一少量固定字符，不适合整段词义替换。" },
+    );
+    stringBasics.comparison.rows.push(
+      ["字符数", "nchar(type = \"chars\")", "str_length()", "中文字段先确认按字符而非字节计数"],
+      ["字符一对一翻译", "chartr()", "str_replace_all() 按明确规则", "chartr 不是整词替换"],
+      ["连接多个片段", "paste() / paste0()", "str_c()", "sep 控制单条拼接，collapse 控制折叠为一条"],
+      ["折叠成一条", "paste(collapse = ...)", "str_flatten()", "str_flatten 可单独设置最后两个元素的分隔符"],
+      ["拆分多条文字", "strsplit()", "str_split()", "两者通常都返回列表"],
+      ["拆分单独一条", "strsplit(x)[[1]]", "str_split_1()", "str_split_1 的输入必须恰好是一条文字"],
+    );
+    stringBasics.steps.push(
+      {
+        title: "先看清字符数与字符翻译",
+        text: "中文字段应优先按字符计数。需要在少量固定字符之间逐一替换时，chartr() 比写复杂正则更直接。",
+        code: String.raw`x <- c("We are epidemiologists", "公共卫生")
+nchar(x, type = "chars")
+stringr::str_length(x)
+
+chartr("iXs", "why", "MiXeD cAsE 123")`,
+        explain: "两种长度函数都返回每条文字的字符数。chartr() 中 i→w、X→h、s→y，按位置一一对应，不会按整段单词替换。",
+      },
+      {
+        title: "区分逐元素连接与折叠为一条",
+        text: "paste()/str_c() 可以按元素生成多个结果；collapse 或 str_flatten() 则把整个向量收成一条文字。",
+        code: String.raw`paste0("input", 1:3, ".csv")
+stringr::str_c("input", 1:3, ".csv")
+stringr::str_flatten(LETTERS[1:3], collapse = ", ")
+
+paste(c("A", "B"), collapse = " | ")`,
+        explain: "前两种写法分别生成 input1.csv、input2.csv、input3.csv；str_flatten() 和 collapse 返回长度 1 的字符串，适合生成标签或提示文字。",
+      },
+      {
+        title: "列表拆分与单字符串拆分",
+        text: "多条字符串拆分会得到长度不确定的列表；确定只有一条输入时，可使用 str_split_1() 直接得到字符向量。",
+        code: String.raw`dates <- c("2020/7/14", "2023/7/21")
+strsplit(dates, split = "/")
+stringr::str_split(dates, pattern = "/")
+stringr::str_split_1("I love R", pattern = " ")
+
+strsplit("input1.csv", split = ".", fixed = TRUE)`,
+        explain: "前两次拆分返回列表。str_split_1() 直接返回 c(\"I\", \"love\", \"R\")。按真正的点号拆分时设置 fixed = TRUE，避免点号被当成“任意字符”。",
+      },
+    );
+    stringBasics.functions = unique([
+      ...(stringBasics.functions || []),
+      "chartr", "strsplit", "str_split_1", "str_flatten",
+    ]);
+    stringBasics.related = ["stringr-operations", "regex-patterns"];
+  }
+
+  const stringOperations = guideById("stringr-operations");
+  if (stringOperations) {
+    stringOperations.concepts.push(
+      { term: "合并与拆分互为逆过程", explain: "拆分把一条复合文字变成多个值，合并把多个值重新接到一起。拆分后应检查是否有缺失字段、顺序是否稳定。" },
+      { term: "str_split_1", explain: "str_split_1() 用于确定只有一条输入字符串的情况，直接返回字符向量；输入多于一条时会报错。" },
+    );
+    stringOperations.steps.push({
+      title: "拆分后检查字段数量与连接结果",
+      text: "拆分不是终点。每条记录应拆成多少段、缺失段如何表示，以及重新连接后是否与原值一致，都需要检查。",
+      code: String.raw`parts <- str_split_fixed(
+  c("北京市|海淀区|中关村", "上海市|浦东新区"),
+  "\\|",
+  n = 3
+)
+parts
+str_flatten(parts[1, ], collapse = "|")`,
+      explain: "第二条地址不足三段，会产生空字段。重新连接第一条后应与原值一致；如果不一致，说明拆分规则或字段结构需要调整。",
+    });
+    stringOperations.functions = unique([
+      ...(stringOperations.functions || []),
+      "str_split_1", "strsplit", "chartr",
+    ]);
+  }
+
   const patterns = guideById("regex-patterns");
   if (patterns) {
     Object.assign(patterns, {
@@ -57580,6 +57659,19 @@ tibble::tibble(
         level: "应用",
       });
     }
+    const learningOrder = [
+      "#guide/text/string-basics",
+      "#guide/text/stringr-operations",
+      "#guide/text/regex-patterns",
+      "#guide/text/regex-groups",
+      "#guide/text/regex-cookbook",
+      "#guide/text/text-cleaning-workflow",
+    ];
+    items.sort((a, b) => {
+      const ai = learningOrder.indexOf(a.href);
+      const bi = learningOrder.indexOf(b.href);
+      return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+    });
   }
 
   const courseText = (window.RZH_COURSE_MODULES || []).find((item) => item.id === "r-text");
@@ -60430,6 +60522,764 @@ substring(x, first = c(1, 6), last = c(4, 8))`,
     ["amstar2", "AMSTAR 2", "证据综合", "评价系统综述方法质量和可信度的工具。", "像先检查一项综述是否值得作为证据来源。", "关注关键领域，不产生简单总分。"],
     ["grade", "GRADE", "证据综合", "对一组证据的确定性进行评级，考虑偏倚、不一致、间接性、不精确和发表偏倚。", "像给整个证据体系评定可信程度，而不是只给单个 p 值。", "证据等级会因研究质量问题降低。"],
   );
+})();
+
+;
+(() => {
+  const guides = window.RZH_GUIDES || [];
+  const guideById = (id) => guides.find((item) => item.id === id);
+  const unique = (items) => [...new Set(items)];
+
+  const logistic = guideById("logistic");
+  if (logistic) {
+    logistic.minutes = 34;
+    logistic.features = [
+      "区分二分类结局的概率、优势与 OR。",
+      "按独立资料或配对资料选择普通 Logistic 与条件 Logistic。",
+      "把系数转换为 OR 和置信区间。",
+      "检查事件数、分离、共线性和校准。",
+    ];
+    logistic.concepts.push(
+      { term: "非条件 Logistic", explain: "普通 glm(... family = binomial()) 通常假设个体观测相互独立，适合非匹配的横断面、队列或病例对照数据。" },
+      { term: "条件 Logistic", explain: "在每个匹配组内部比较病例与对照，适合 1:1、1:M 配对病例对照或匹配队列。匹配组通过 strata() 进入模型。" },
+      { term: "为什么匹配资料不能直接忽略配对", explain: "如果匹配变量与暴露和结局都有关，普通 Logistic 忽略匹配结构会改变方差估计，并可能使 OR 产生偏倚。" },
+      { term: "条件似然", explain: "条件 Logistic 只利用同一匹配组内病例与对照之间的比较信息，因此不需要估计每个匹配组的截距。" },
+    );
+    logistic.comparison = {
+      title: "普通 Logistic、条件 Logistic 与效应尺度",
+      note: "先看抽样和匹配，再决定函数；OR、RR、HR 也不能互相替代。",
+      headers: ["方法 / 指标", "常见函数或模型", "适合的数据", "怎样解释"],
+      rows: [
+        ["非条件 Logistic", "glm(..., family = binomial())", "非匹配、个体近似独立", "调整后的 OR"],
+        ["条件 Logistic", "survival::clogit()", "1:1 或 1:M 匹配资料", "匹配组内部的调整 OR"],
+        ["轻量条件 Logistic", "Epi::clogistic()", "简单分层匹配资料", "系数仍为 log OR，通常要 exp()"],
+        ["OR", "Logistic / 条件 Logistic", "二分类结局", "优势之比，不是风险之比"],
+        ["RR", "队列研究风险比较", "可以直接估计各组风险", "风险之比"],
+        ["HR", "Cox 模型", "带随访时间的生存结局", "瞬时风险之比"],
+      ],
+    };
+    logistic.steps.push(
+      {
+        title: "先判断是不是匹配资料",
+        text: "如果每个病例按年龄、性别、医院或地区与一个或多个对照配成组，数据中应有稳定的匹配组编号。此时应进入条件 Logistic，而不是直接忽略组号。",
+        code: String.raw`table(dat$match_set, dat$case)
+
+library(dplyr)
+dat |>
+  count(match_set, case) |>
+  tidyr::pivot_wider(names_from = case, values_from = n)`,
+        explain: "交叉表可检查每个匹配组是否包含病例和对照，以及是否为 1:1 或 1:M。只有病例或只有对照的同质组通常不能提供条件比较信息。",
+      },
+      {
+        title: "条件 Logistic 的公式写法",
+        text: "strata() 不是普通协变量，而是告诉模型在哪些组内部进行比较。匹配变量通常不再作为固定效应估计。",
+        code: String.raw`library(survival)
+
+fit_cond <- clogit(
+  case ~ smoking + rubber + alcohol + strata(match_set),
+  data = dat,
+  method = "efron"
+)
+summary(fit_cond)`,
+        explain: "smoking、rubber、alcohol 是要估计的暴露或混杂因素；strata(match_set) 指定匹配组。method 控制并列事件时间的近似算法，应按设计和软件说明选择并报告。",
+      },
+      {
+        title: "报告匹配 OR 与置信区间",
+        text: "clogit() 的系数仍是 log OR，exp() 后才是 OR。不要报告个体绝对风险或 ROC，因为条件模型通常不估计截距。",
+        code: String.raw`exp(cbind(
+  OR = coef(fit_cond),
+  confint(fit_cond)
+))
+
+fit_cond$n
+fit_cond$nevent`,
+        explain: "OR=1 表示该变量与结局优势无关联。还要同时报告匹配组数、病例数、调整变量和缺失处理，而不是只报告 p 值。",
+      },
+      {
+        title: "不要把普通 Logistic 当成条件 Logistic",
+        text: "下面的普通模型可用于展示差异，但不应因为某个结果“更显著”就选它。模型必须服从研究设计。",
+        code: String.raw`fit_plain <- glm(
+  case ~ smoking + rubber + alcohol,
+  data = dat,
+  family = binomial()
+)
+
+exp(coef(fit_plain))
+exp(coef(fit_cond))`,
+        explain: "两者回答的比较范围不同。匹配资料中的普通 Logistic 没有保留匹配组内部比较，方差和 OR 都可能不同；分析前应由设计决定主模型。",
+      },
+    );
+    logistic.functions = unique([
+      ...(logistic.functions || []),
+      "clogit", "clogistic", "strata", "stepAIC",
+    ]);
+    logistic.conditions.push(
+      "匹配资料必须保留匹配组标识，并在分析前确认 1:1 或 1:M 结构。",
+      "事件数和匹配组数足以支持当前协变量数量。",
+      "条件 Logistic 用于估计相对 OR，不以个体绝对概率预测为主要目标。",
+    );
+    logistic.readingNotes.push(
+      "clogit() 返回 log OR；exp(coef()) 后才是 OR。",
+      "条件 Logistic 通常不估计截距，因此不能直接绘制个体风险 ROC 或做依赖绝对概率的 Hosmer-Lemeshow 检验。",
+      "匹配变量在匹配组内通常没有变异，不能在条件模型中作为普通固定效应估计。",
+    );
+    logistic.pitfalls.push(
+      "匹配资料直接使用 glm()，完全忽略匹配组。",
+      "把条件 Logistic 的 OR 解释成个体的绝对患病概率。",
+      "匹配过度后仍把被匹配变量作为主要效应估计。",
+    );
+    logistic.related = ["conditional-logistic", "case-control", "dlnm", "cox"];
+  }
+
+  const conditionalLogistic = {
+    type: "model",
+    id: "conditional-logistic",
+    title: "条件 Logistic 回归",
+    aliases: ["conditional logistic", "配对 Logistic", "匹配病例对照", "clogit", "clogistic"],
+    hero: "在每一个匹配组内部比较病例与对照",
+    audience: "研究采用 1:1 或 1:M 配对病例对照、巢式病例对照、倾向评分匹配或匹配队列，并需要保留匹配结构估计 OR。",
+    overview: "条件 Logistic 回归用于匹配资料。它不把所有个体混在一起估计截距，而是在每个匹配组内部比较病例与对照，因此可以消除匹配组中未测量的稳定特征。常见输入包括匹配组编号、病例状态、主要暴露和需要调整的协变量。核心效应量仍是 OR，但模型通常不能预测个体绝对风险。",
+    features: [
+      "保留 1:1 或 1:M 匹配组结构。",
+      "消除匹配变量和部分组内固定混杂。",
+      "估计主要暴露和协变量的条件 OR。",
+      "与普通 Logistic 明确区分适用设计和结果解释。",
+    ],
+    concepts: [
+      { term: "匹配组", explain: "同一组内的病例和对照按年龄、性别、地区等规则配对。组号必须稳定且唯一。" },
+      { term: "条件似然", explain: "在每个匹配组内，根据谁是病例、谁是参照计算相对概率；组间基线风险被条件化掉。" },
+      { term: "截距不估计", explain: "条件模型不提供每个组或个体的基线风险，因此不能直接预测绝对事件概率。" },
+      { term: "条件 OR", explain: "在同一匹配组内部比较暴露优势，exp(系数) 得到条件 OR。" },
+      { term: "1:M 匹配", explain: "一个病例可以匹配多个对照。匹配组人数可变，但病例和对照的角色必须清楚。" },
+      { term: "不提供信息的匹配组", explain: "组内成员在结局或关键解释变量上完全相同时，无法贡献条件比较信息，软件可能自动排除。" },
+      { term: "匹配过度", explain: "把可能受暴露影响的中间变量或强相关因素拿去匹配，会使暴露差异被削弱。" },
+      { term: "方法差异", explain: "clogit() 基于 Cox 部分似然实现条件 Logistic；clogistic() 直接最大化条件似然。函数不同，但系数都是 log OR。" },
+    ],
+    comparison: {
+      title: "普通 Logistic 与条件 Logistic",
+      note: "选择主模型时看研究设计，不比较哪个 p 值更小。",
+      headers: ["方面", "普通 Logistic", "条件 Logistic"],
+      rows: [
+        ["典型数据", "非匹配、个体近似独立", "1:1 或 1:M 匹配资料"],
+        ["常用函数", "glm(..., family = binomial())", "clogit() / clogistic()"],
+        ["匹配组", "不进入模型", "通过 strata 或 strata 参数指定"],
+        ["截距", "通常估计", "不估计"],
+        ["主要输出", "调整 OR", "匹配组内部条件 OR"],
+        ["绝对风险预测", "可以进一步评估", "直接预测通常不可行"],
+        ["ROC / HL 检验", "在合适设计和验证下可讨论", "不能直接照搬依赖绝对概率的方法"],
+      ],
+    },
+    whenUse: [
+      "每个病例与一个或多个对照按规则配成匹配组。",
+      "研究设计来自配对病例对照、巢式病例对照或倾向评分匹配。",
+      "主要目标是估计暴露与结局的条件 OR。",
+    ],
+    dataShape: [
+      "一行通常代表一个研究对象，并包含 match_set、case 和主要暴露。",
+      "每个匹配组至少有一个病例和一个对照；1:M 结构要能看出组内人数。",
+      "匹配变量、分组编号和缺失规则必须在建模前核对。",
+    ],
+    steps: [
+      {
+        title: "创建并检查 1:1 匹配组",
+        text: "先构造一个完全虚构的小数据，确认每个匹配组有一个病例和一个对照。真实研究应直接使用原始匹配组编号。",
+        code: String.raw`set.seed(2026)
+n_set <- 36
+
+dat <- data.frame(
+  match_set = rep(1:n_set, each = 2),
+  case = rep(c(1, 0), times = n_set)
+)
+
+dat$smoking <- rbinom(nrow(dat), 1, 0.55)
+dat$rubber <- rbinom(nrow(dat), 1, 0.48)
+dat$alcohol <- rbinom(nrow(dat), 1, 0.52)
+
+table(dat$match_set, dat$case)`,
+        explain: "这是为教学构造的 36 组 1:1 数据，暴露变量独立随机生成，因此不应把系数大小解释成真实医学效应。真实数据中若某组只有病例或只有对照，应进一步判断该组是否提供条件比较信息。",
+      },
+      {
+        title: "使用 clogit() 拟合",
+        text: "公式中的 strata(match_set) 指定在匹配组内部比较，不能省掉。",
+        code: String.raw`library(survival)
+
+fit_cond <- clogit(
+  case ~ smoking + rubber + alcohol + strata(match_set),
+  data = dat,
+  method = "efron"
+)
+summary(fit_cond)`,
+        explain: "三个解释变量的系数是 log OR。summary() 给出标准误和 Wald 检验，应和 OR、置信区间一起报告。",
+      },
+      {
+        title: "把 log OR 转换为 OR",
+        text: "clogit() 不直接输出 OR。exp() 只改变尺度，不改变模型和显著性。",
+        code: String.raw`exp(cbind(
+  OR = coef(fit_cond),
+  confint(fit_cond)
+))`,
+        explain: "置信区间包含 1 表示数据与“无关联”并不冲突。报告时还要写明匹配组数、病例数和调整变量。",
+      },
+      {
+        title: "使用 clogistic() 作为另一种实现",
+        text: "clogistic() 通过 strata 参数指定匹配组。它的公式中通常不再写 strata()，系数仍是 log OR。",
+        code: String.raw`library(Epi)
+
+fit_epi <- clogistic(
+  case ~ smoking + rubber + alcohol,
+  strata = match_set,
+  data = dat
+)
+
+exp(fit_epi$coefficients)`,
+        explain: "clogistic() 直接最大化条件似然，输出结构与 clogit() 不同。不要因函数名不同就改变 OR 的解释。",
+      },
+      {
+        title: "比较普通模型的错误用法",
+        text: "普通 Logistic 可用于教学对照，但不能因为结果更“好看”就替换主分析。",
+        code: String.raw`fit_plain <- glm(
+  case ~ smoking + rubber + alcohol,
+  data = dat,
+  family = binomial()
+)
+
+exp(cbind(
+  OR_unmatched = coef(fit_plain),
+  confint(fit_plain)
+))`,
+        explain: "普通 Logistic 没有在匹配组内部比较。主分析必须由原始设计决定，不能用数据结果反向选择。",
+      },
+      {
+        title: "用嵌套模型比较变量贡献",
+        text: "若研究问题允许减少变量，可预先规定候选模型，再用似然比检验比较嵌套模型。不要机械依赖逐步 P 值筛选。",
+        code: String.raw`fit_reduced <- update(fit_cond, . ~ . - rubber)
+
+anova(
+  fit_cond,
+  fit_reduced,
+  test = "LRT"
+)`,
+        explain: "嵌套模型必须有明确研究含义。似然比检验回答删除该变量后模型是否显著变差，不等同于证明该变量不重要。",
+      },
+    ],
+    functions: ["clogit", "clogistic", "strata", "coef", "confint", "anova", "stepAIC", "glm"],
+    conditions: [
+      "匹配组编号可靠，且每个组内的病例和对照来自同一匹配规则。",
+      "主要暴露和协变量在组内存在足够变化。",
+      "模型参数数量与匹配组数、病例数相匹配。",
+      "研究目标是条件 OR 和关联估计，不是个体绝对风险预测。",
+    ],
+    interpret: "条件 OR=1.5 表示在匹配组内部、调整其他变量后，暴露者的结局优势约为非暴露者的 1.5 倍。它不能写成“患病风险增加 50%”，也不能从条件模型直接得到个体的绝对风险。",
+    readingNotes: [
+      "clogit() 和 clogistic() 的系数都是 log OR，通常都需要 exp()。",
+      "软件可能自动排除没有条件比较信息的匹配组，应检查最终使用的组数和观测数。",
+      "条件 Logistic 关注匹配组内部比较，匹配变量本身通常不再作为普通协变量估计。",
+      "若匹配比例很高或匹配变量过多，要考虑匹配过度和可解释性。",
+    ],
+    pitfalls: [
+      "忽略 match_set，直接把所有病例和对照混在同一 glm 中。",
+      "把条件 OR 解释成绝对患病概率或风险比。",
+      "为了追求显著性反复改匹配结构或选择模型。",
+      "clogistic() 输出系数后忘记 exp()。",
+    ],
+    practice: "构造 10 个 1:1 匹配组，使用 clogit() 和 clogistic() 分别拟合同一模型，比较两种函数的系数、OR 和最终用于分析的匹配组数量。",
+    related: ["logistic", "case-control", "cox"],
+    references: [
+      { title: "survival::clogit 文档", url: "https://stat.ethz.ch/R-manual/R-devel/library/survival/html/clogit.html", note: "条件 Logistic 的公式、strata 用法和模型对象说明。" },
+      { title: "Epi::clogistic 文档", url: "https://search.r-project.org/CRAN/refmans/Epi/html/clogistic.html", note: "直接最大化条件似然，系数为 log-odds ratio 参数。" },
+    ],
+  };
+
+  if (!guideById(conditionalLogistic.id)) guides.push(conditionalLogistic);
+
+  const dlnm = guideById("dlnm");
+  if (dlnm) {
+    Object.assign(dlnm, {
+      minutes: 52,
+      title: "DLNM 分布滞后非线性模型",
+      aliases: ["DLMN", "distributed lag nonlinear model", "分布滞后非线性模型", "crossbasis", "暴露滞后反应"],
+      hero: "同时描述暴露强度、非线性形状和滞后累积",
+      audience: "研究温度、空气污染、药物暴露等因素在当天及随后多天对健康结局的影响，并需要处理非线性和延迟。",
+      overview: "DLNM 不是一个单独的回归模型，而是一套把暴露与滞后两个维度同时纳入模型的方法。crossbasis() 分别用基函数描述暴露-反应和滞后-反应，再组合成矩阵放进 GLM、GAM、Cox 或条件 Logistic。结果必须围绕参照暴露、滞后窗口和自由度解释。DLM 是暴露-反应假定为线性时的特例。",
+      features: [
+        "描述暴露-反应与滞后-反应两个维度。",
+        "估计特定滞后、累积效应和总体效应。",
+        "可与 Poisson、Logistic、Cox 等核心模型结合。",
+        "通过诊断和敏感性分析检查自由度与窗口选择。",
+      ],
+      concepts: [
+        { term: "DLM", explain: "分布滞后线性模型，允许暴露效应分布在多个滞后天，但通常假定暴露-反应为线性。" },
+        { term: "DLNM", explain: "在 DLM 基础上同时允许暴露-反应非线性，通过 cross-basis 描述暴露、滞后与结局的关系。" },
+        { term: "交叉基", explain: "把暴露维度的基矩阵与滞后维度的基矩阵组合起来，作为一组模型变量。" },
+        { term: "暴露-反应", explain: "固定某个滞后或整个累积窗口后，不同暴露水平相对参照暴露的效应。" },
+        { term: "滞后-反应", explain: "固定一次暴露水平后，效应随 lag 0、lag 1、lag 2 等时间间隔怎样变化。" },
+        { term: "累积效应", explain: "整个预设滞后窗口内各天贡献按模型组合后的总效应，不是把每天的 RR 直接相加。" },
+        { term: "参照暴露", explain: "RR=1 的基准暴露值。温度、污染等研究常用最小死亡温度或指定分位数作为参照。" },
+        { term: "自由度", explain: "样条自由度越高，曲线越灵活，也越容易过拟合。暴露和滞后维度各有自己的自由度。" },
+        { term: "节点", explain: "样条曲线在哪些位置允许改变弯曲程度。节点应覆盖有数据的范围，不能放到极端空白区。" },
+        { term: "过离散", explain: "计数结局的方差大于均值。准泊松或负二项常用于处理，但解释和模型比较方法不同。" },
+        { term: "自相关", explain: "相邻日期的结局或残差仍相关。需用 ACF/PACF 和敏感性分析检查。" },
+        { term: "基础模型", explain: "GLM/GAM 中除 crossbasis 外的长期趋势、季节、星期和人口 offset 等结构。" },
+      ],
+      comparison: {
+        title: "DLNM 建模中的选择与检查",
+        note: "自由度、滞后窗口和参照值不能根据最显著结果反向选择。",
+        headers: ["问题", "常用做法", "回答什么", "注意"],
+        rows: [
+          ["暴露关系是否线性", "lin / poly / ns / bs / strata", "怎样描述暴露-反应", "先有机制和文献依据"],
+          ["效应持续多久", "lag = 0:L", "从当天到第 L 天", "窗口过短会截断，过长会增加噪声"],
+          ["滞后形状", "arglag + logknots", "效应怎样随时间延迟", "远端滞后常稀疏，需要简化"],
+          ["核心回归", "GLM / GAM / Cox", "结合结局分布与设计", "时间序列常用准泊松"],
+          ["离散程度", "Pearson 离散参数 / 准泊松 / 负二项", "方差是否大于均值", "quasi-Poisson 通常没有标准 AIC"],
+          ["时间相关", "ACF、PACF、敏感性分析", "残差是否仍相邻相关", "必要时加入滞后结局或改用更合适模型"],
+          ["结果展示", "总体、切片、滞后、等高线、3D", "从不同角度看二维关系", "至少给出可核对的二维图"],
+        ],
+      },
+      whenUse: [
+        "暴露可能具有多天延迟效应。",
+        "暴露-反应可能呈 U、V、J 形或其他非线性。",
+        "需要在预先定义的滞后窗口内报告累积效应。",
+        "核心数据是等间隔时间序列，或可以把每个观测整理成暴露史矩阵。",
+      ],
+      dataShape: [
+        "时间序列通常一行代表一天，并按日期排序。",
+        "包含每日暴露、结局、时间趋势、星期/季节和人口 offset 等变量。",
+        "暴露与滞后期望单位清楚，缺失和极端值已核查。",
+        "crossbasis 的 lag 定义与数据时间方向一致。",
+      ],
+      steps: [
+        {
+          title: "从 DLM 与 DLNM 的关系开始",
+          text: "先把暴露维度写成线性项，就是 DLM；把 lin 换成样条或分层函数后，才允许非线性。滞后窗口仍然独立设置。",
+          code: String.raw`library(dlnm)
+
+# DLM：暴露维度为线性
+cb_lin <- crossbasis(
+  dat$temp,
+  lag = 0:14,
+  argvar = list(fun = "lin"),
+  arglag = list(fun = "ns", df = 3)
+)
+
+# DLNM：允许暴露-反应非线性
+cb_ns <- crossbasis(
+  dat$temp,
+  lag = 0:14,
+  argvar = list(fun = "ns", df = 3),
+  arglag = list(fun = "ns", df = 3)
+)`,
+          explain: "argvar 描述暴露维度，arglag 描述滞后维度。lag=0:14 明确包括当天到第14天；换成 ns 后模型才有非线性暴露-反应。",
+        },
+        {
+          title: "根据分布和数据定义节点与滞后窗口",
+          text: "温度研究常用分位数定义暴露节点，用 logknots() 在滞后维度设置更接近相等间隔的节点，尤其适合远端效应逐渐变缓的情形。",
+          code: String.raw`temp_knots <- quantile(
+  dat$temp,
+  probs = c(0.10, 0.75, 0.90),
+  na.rm = TRUE
+)
+
+cb <- crossbasis(
+  dat$temp,
+  lag = 0:21,
+  argvar = list(fun = "ns", knots = temp_knots),
+  arglag = list(fun = "ns", knots = logknots(21, 3))
+)`,
+          explain: "节点位置应有机制、文献和分布依据。0.10、0.75、0.90 只是示例，不是所有研究固定的标准；应避免节点落在几乎没有观测的极端范围。",
+        },
+        {
+          title: "选择核心模型并控制时间趋势",
+          text: "每日死亡数通常是计数结局，时间序列又存在长期趋势和季节。可以用准泊松处理过离散，但要把趋势控制与暴露效应同时考虑。",
+          code: String.raw`library(splines)
+
+model <- glm(
+  death ~ cb +
+    ns(time, df = 7 * 14) +
+    factor(dow),
+  family = quasipoisson(),
+  data = dat
+)
+
+summary(model)`,
+          explain: "ns(time, df=7*14) 用样条控制长期趋势和季节，factor(dow) 控制星期效应。自由度较大时可能吸收部分暴露变化，必须做敏感性分析。",
+        },
+        {
+          title: "计算特定暴露与累积效应",
+          text: "crosspred() 把 crossbasis 与模型连接起来。at 指定要比较的暴露值，cen 指定参照值，cumul=TRUE 给出整个滞后窗口的累积结果。",
+          code: String.raw`pred <- crosspred(
+  cb, model,
+  at = c(5, 22.5, 35),
+  cen = 22.5,
+  cumul = TRUE,
+  by = 0.5
+)
+
+pred$allRRfit
+pred$allRRlow
+pred$allRRhigh`,
+          explain: "RR 都相对于 cen=22.5。5℃、35℃处的累积 RR 回答“整个滞后窗口合计的风险”，应连同置信区间和参照值报告。",
+        },
+        {
+          title: "分别提取暴露、滞后和总体效应",
+          text: "crossreduce() 可以把二维 crossbasis 缩减成一维总体效应、特定暴露的滞后效应，或特定滞后的暴露-反应。",
+          code: String.raw`overall <- crossreduce(
+  cb, model,
+  type = "overall",
+  cen = 22.5
+)
+
+lag_at_35 <- crossreduce(
+  cb, model,
+  type = "lag",
+  value = 35,
+  cen = 22.5
+)
+
+effect_at_lag0 <- crossreduce(
+  cb, model,
+  type = "var",
+  value = 0,
+  cen = 22.5
+)`,
+          explain: "type='overall' 汇总整个滞后窗口；type='lag' 固定暴露值看滞后变化；type='var' 固定某个 lag 看暴露-反应。降维后更容易放进论文表格。",
+        },
+        {
+          title: "画总体、切片和滞后曲线",
+          text: "三维图直观，但二维切片更适合核对数值和放入论文。图形必须标明暴露单位、滞后单位和参照值。",
+          code: String.raw`plot(
+  pred, "overall",
+  xlab = "Temperature (°C)",
+  ylab = "Cumulative RR",
+  main = "Overall exposure-response"
+)
+
+plot(
+  pred, "slices",
+  var = 35,
+  lag = c(0, 7, 14, 21),
+  main = "Lag-response at 35°C"
+)
+
+plot(
+  pred, "contour",
+  xlab = "Temperature (°C)",
+  ylab = "Lag (days)"
+)`,
+          explain: "overall 图展示整个窗口的累积暴露-反应；slices 图固定暴露值看不同 lag；contour 图用颜色显示二维关系。不要把三维图本身当作完整统计结果。",
+        },
+        {
+          title: "检查过离散和相关结构",
+          text: "泊松模型默认方差与均值相近。若方差明显更大，可用准泊松或负二项；若残差仍随时间相关，应进一步处理。",
+          code: String.raw`pearson_dispersion <- sum(
+  residuals(model, type = "pearson")^2
+) / df.residual(model)
+
+pearson_dispersion
+
+res <- residuals(model, type = "deviance")
+acf(res, na.action = na.pass)
+pacf(res, na.action = na.pass)`,
+          explain: "离散参数明显大于1提示过离散。ACF/PACF 中仍有系统性的相邻相关时，要考虑加入合适的滞后项、改变基础模型或做稳健敏感性分析。",
+        },
+        {
+          title: "按预设方案做敏感性分析",
+          text: "真正的稳健性检验要比较不同滞后窗口、暴露/滞后自由度、趋势自由度和暴露指标，而不是只报告最好看的结果。",
+          code: String.raw`sensitivity <- expand.grid(
+  max_lag = c(14, 21),
+  var_df = c(3, 4),
+  lag_df = c(3, 4)
+)
+sensitivity
+
+# 对每一种组合重复 crossbasis() 和 glm()，
+# 使用同一参照暴露和同一暴露值整理结果。`,
+          explain: "组合数量应由预先方案控制。结果表应展示主要效应在不同设置下的方向和区间，而不是只挑选最小 p 值。",
+        },
+      ],
+      functions: ["crossbasis", "crosspred", "crossreduce", "logknots", "ns", "glm", "gam", "acf", "pacf", "glm.nb"],
+      conditions: [
+        "暴露与结局按时间对齐，滞后方向和单位定义清楚。",
+        "核心模型与结局分布匹配，并控制主要时间混杂。",
+        "滞后窗口、节点、自由度和参照暴露有机制、文献或预先方案依据。",
+        "报告累积效应时必须同时说明参照值和滞后窗口。",
+        "过离散与自相关要检查，并做预设的敏感性分析。",
+      ],
+      interpret: "DLNM 的 RR 是相对参照暴露的预测。lag 0 的 RR 描述当天效应，lag 7 描述第7天效应，累积 RR 描述整个窗口的合计。三者不能互相替代，也不能把某一天的 RR 当作个体绝对风险。",
+      readingNotes: [
+        "crossbasis() 只生成设计矩阵，不包含结局分布；必须再放入 glm、gam、coxph 或 clogit。",
+        "准泊松常被用于过离散计数资料，但标准 quasi-Poisson glm 通常没有可用于常规比较的 AIC。",
+        "AIC、GCV 和残差图只能辅助模型选择，不能替代机制、滞后窗口和混杂结构的判断。",
+        "三维图、等高线图和二维切片应使用同一参照暴露与效应尺度。",
+      ],
+      pitfalls: [
+        "把 DLNM 当作一个可以直接拟合的 glm 函数。",
+        "未预先定义滞后窗口，按显著结果反复修改。",
+        "只看某一天最显著的效应，不报告累积效应和不确定性。",
+        "使用 quasi-Poisson 后仍机械比较 AIC。",
+        "忽略长期趋势、季节、星期、过离散或残差自相关。",
+        "地址或气温单位不一致，参照值解释错误。",
+      ],
+      practice: "用同一份模拟时间序列分别拟合线性 DLM 和自然样条 DLNM。报告 lag 0、lag 7、lag 14 和累积 RR，并用另一个滞后窗口检查结论是否稳定。",
+      related: ["logistic", "poisson", "dose-response", "time-series"],
+      references: [
+        { title: "dlnm 包官方文档", url: "https://cran.r-project.org/web/packages/dlnm/dlnm.pdf", note: "crossbasis、crosspred、crossreduce、logknots 和绘图函数说明。" },
+        { title: "Gasparrini 等：Distributed lag non-linear models", url: "https://doi.org/10.1002/sim.3940", note: "DLNM 方法学论文，解释暴露-滞后-反应框架。" },
+      ],
+    });
+  }
+
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const modelsCategory = categories.find((item) => item.id === "models");
+  if (modelsCategory) {
+    modelsCategory.detail = "覆盖多重线性回归、Logistic、条件 Logistic、Poisson、Cox、LMM、DLNM、分类预测和降维。每个专题说明用途、数据结构、函数参数、使用条件、诊断与结果解释，并把示例代码整理成可直接比较的结构。";
+    const items = modelsCategory.items || [];
+    if (!items.some((item) => item.href === "#guide/model/conditional-logistic")) {
+      const logisticIndex = items.findIndex((item) => item.href === "#guide/model/logistic");
+      items.splice(logisticIndex + 1 || items.length, 0, {
+        title: "条件 Logistic 回归",
+        note: "配对病例对照、1:1/1:M 匹配与条件 OR",
+        href: "#guide/model/conditional-logistic",
+        level: "进阶",
+      });
+    }
+  }
+
+  const baseModelFunction = (item) => ({
+    category: "统计建模",
+    level: "中级",
+    tips: [],
+    related: [],
+    ...item,
+  });
+  window.RZH_EXTRA_FUNCTIONS_5 = [
+    ...(window.RZH_EXTRA_FUNCTIONS_5 || []),
+    baseModelFunction({
+      id: "clogistic",
+      name: "clogistic()",
+      package: "Epi",
+      aliases: ["条件logistic", "条件逻辑回归", "条件似然", "配对病例对照"],
+      summary: "通过直接最大化条件似然拟合条件 Logistic 回归，匹配组由 strata 参数指定。",
+      syntax: "clogistic(formula, strata, data, subset, na.action, init, model = TRUE, x = FALSE, y = TRUE, contrasts = NULL, ...)",
+      returns: "返回 clogistic 对象；coefficients 为 log-odds ratio 参数，通常需要 exp() 转换为 OR。",
+      example: String.raw`library(Epi)
+fit <- clogistic(
+  case ~ smoking + rubber,
+  strata = match_set,
+  data = dat
+)
+exp(fit$coefficients)`,
+      output: "返回条件 Logistic 的 log OR；exp() 后为条件 OR。",
+      params: [
+        ["formula", "结局 ~ 暴露 + 协变量；通常不写 strata()。", "必填"],
+        ["strata", "匹配组变量。", "必填"],
+        ["data", "数据框。", "推荐填写"],
+        ["subset", "用于限定分析记录。", "可选"],
+        ["na.action", "缺失值处理方式。", "按项目规则"],
+        ["model", "是否保留模型框架。", "默认 TRUE"],
+      ],
+      tips: ["系数仍是 log OR，别忘了 exp()。", "与 clogit() 的实现不同，但解释的原则相同。"],
+      related: ["clogit", "glm"],
+    }),
+    baseModelFunction({
+      id: "strata",
+      name: "strata()",
+      package: "survival",
+      aliases: ["分层项", "匹配组", "conditional strata"],
+      summary: "在模型公式中声明分层或匹配组，使比较发生在组内。条件 Logistic 和分层 Cox 常使用。",
+      syntax: "strata(...)",
+      returns: "作为公式中的特殊项使用，本身不是普通向量函数。",
+      example: String.raw`survival::clogit(
+  case ~ exposure + strata(match_set),
+  data = dat
+)`,
+      output: "模型在每个 match_set 内部进行比较。",
+      params: [
+        ["...", "一个或多个分层变量。", "必填"],
+      ],
+      tips: ["普通回归公式中引入 strata() 会改变比较方式，并非普通协变量调整。", "匹配组变量必须在建模前确认可靠。"],
+      related: ["clogit", "clogistic"],
+      level: "进阶",
+    }),
+    baseModelFunction({
+      id: "stepAIC",
+      name: "stepAIC()",
+      package: "MASS",
+      aliases: ["逐步回归", "AIC筛选", "stepwise"],
+      summary: "按 AIC 逐步增加或删除变量。它是预测模型筛选工具，不等同于因果变量选择。",
+      syntax: "stepAIC(object, scope, direction = c(\"both\", \"backward\", \"forward\"), trace = 1, ...)",
+      returns: "返回按指定准则搜索后的模型对象。",
+      example: String.raw`fit_small <- MASS::stepAIC(
+  fit,
+  direction = "backward",
+  trace = FALSE
+)`,
+      output: "返回 AIC 意义下搜索到的模型；仍需检查变量含义和稳定性。",
+      params: [
+        ["object", "初始模型对象。", "必填"],
+        ["scope", "允许增加或删除的变量范围。", "按模型需要"],
+        ["direction", "both、backward 或 forward。", "默认 both"],
+        ["trace", "是否打印搜索过程。", "默认 1"],
+        ["...", "继续传给底层方法。", "可选"],
+      ],
+      tips: ["基于 AIC 的自动筛选不能替代研究问题、临床知识或外部验证。", "不要用逐步筛选后的 p 值假装完成了多重比较校正。"],
+      related: ["glm", "clogit"],
+      level: "进阶",
+    }),
+    baseModelFunction({
+      id: "logknots",
+      name: "logknots()",
+      package: "dlnm",
+      aliases: ["滞后节点", "log knot", "DLNM knots"],
+      summary: "在等距对数值上为滞后维度生成节点，常用于滞后-反应样条。",
+      syntax: "logknots(x, nk = NULL, fun = \"ns\", df = 1, degree = 3, intercept = TRUE)",
+      returns: "返回适合放入 arglag$knots 的节点位置。",
+      example: String.raw`arglag <- list(
+  fun = "ns",
+  knots = logknots(21, 3)
+)`,
+      output: "为 lag=0:21 生成三个滞后节点的位置。",
+      params: [
+        ["x", "最大滞后或滞后范围。", "必填"],
+        ["nk", "节点数。", "与 df 二选一"],
+        ["fun", "节点所服务的基函数，常用 ns 或 bs。", '默认 "ns"'],
+        ["df", "自由度。", "默认 1"],
+        ["degree", "bs 的多项式次数。", "默认 3"],
+      ],
+      tips: ["节点数要高时，远端滞后可能缺少数据。", "最终节点和自由度应由机制、样本量和敏感性分析决定。"],
+      related: ["crossbasis", "crosspred"],
+      level: "进阶",
+    }),
+    baseModelFunction({
+      id: "acf",
+      name: "acf()",
+      package: "stats",
+      aliases: ["自相关函数", "residual acf", "时间相关"],
+      summary: "计算并绘制序列的自相关函数，用于检查当前值是否与之前不同滞后相关。",
+      syntax: "acf(x, lag.max = NULL, type = c(\"correlation\", \"covariance\", \"partial\"), plot = TRUE, na.action = na.fail, ...)",
+      returns: "返回 acf 对象；plot=TRUE 时同时绘图。",
+      example: String.raw`res <- residuals(model, type = "deviance")
+acf(res, na.action = na.pass)`,
+      output: "显示不同滞后长度下的自相关及其参考范围。",
+      params: [
+        ["x", "数值序列或残差。", "必填"],
+        ["lag.max", "最大滞后。", "自动"],
+        ["type", "相关、协方差或偏相关。", "correlation"],
+        ["plot", "是否直接绘图。", "TRUE"],
+        ["na.action", "缺失处理。", "na.fail"],
+      ],
+      tips: ["相关不等于因果。", "时间序列残差仍有明显自相关时，标准误和模型结构需要重新考虑。"],
+      related: ["pacf"],
+      level: "进阶",
+    }),
+    baseModelFunction({
+      id: "pacf",
+      name: "pacf()",
+      package: "stats",
+      aliases: ["偏自相关函数", "partial autocorrelation", "时间相关诊断"],
+      summary: "计算偏自相关函数，用于查看控制了中间滞后之后，当前值与某个滞后的剩余相关。",
+      syntax: "pacf(x, lag.max = NULL, plot = TRUE, na.action = na.fail, ...)",
+      returns: "返回 pacf 对象；plot=TRUE 时同时绘图。",
+      example: String.raw`pacf(
+  residuals(model, type = "deviance"),
+  na.action = na.pass
+)`,
+      output: "显示控制中间滞后后的偏自相关。",
+      params: [
+        ["x", "数值序列或残差。", "必填"],
+        ["lag.max", "最大滞后。", "自动"],
+        ["plot", "是否绘图。", "TRUE"],
+        ["na.action", "缺失处理。", "na.fail"],
+      ],
+      tips: ["ACF 和 PACF 应结合看，单张图不足以决定模型。", "大量滞后同时比较时，要避免只挑最大的一个。"],
+      related: ["acf"],
+      level: "进阶",
+    }),
+    baseModelFunction({
+      id: "glm.nb",
+      name: "glm.nb()",
+      package: "MASS",
+      aliases: ["负二项回归", "过离散计数", "negative binomial glm"],
+      summary: "拟合负二项广义线性模型，通过额外的离散参数处理计数结局的过离散。",
+      syntax: "glm.nb(formula, data, weights, subset, na.action, link = log, init.theta, ...)",
+      returns: "返回负二项 GLM 模型对象，包含离散参数 theta。",
+      example: String.raw`library(MASS)
+fit_nb <- glm.nb(
+  death ~ exposure + ns(time, df = 70),
+  data = dat
+)`,
+      output: "返回负二项回归模型；可用 AIC 与同尺度模型比较。",
+      params: [
+        ["formula", "计数结局与解释变量。", "必填"],
+        ["data", "数据框。", "推荐填写"],
+        ["link", "均值与线性预测值的连接函数。", '默认 "log"'],
+        ["init.theta", "离散参数初始值。", "通常自动"],
+      ],
+      tips: ["负二项与准泊松都能处理过离散，但似然和模型比较方式不同。", "计数结局是否适合负二项仍要检查均值-方差关系和残差。"],
+      related: ["glm", "crossbasis"],
+      level: "进阶",
+    }),
+    baseModelFunction({
+      id: "qcc.overdispersion.test",
+      name: "qcc.overdispersion.test()",
+      package: "qcc",
+      aliases: ["过离散检验", "Poisson dispersion", "overdispersion test"],
+      summary: "检验计数数据相对泊松模型的过离散程度。",
+      syntax: "qcc.overdispersion.test(x, type = c(\"poisson\", \"binomial\", \"nbinomial\"), size)",
+      returns: "返回指定分布的过离散检验结果。",
+      example: String.raw`library(qcc)
+qcc.overdispersion.test(
+  dat$death,
+  type = "poisson"
+)`,
+      output: "p 值较小提示泊松方差假设可能不合适。",
+      params: [
+        ["x", "计数数据。", "必填"],
+        ["type", "分布类型。", '"poisson"'],
+        ["size", "二项或其他分布所需试验数。", "按分布"],
+      ],
+      tips: ["检验显著性只是诊断线索，还要结合 Pearson 离散参数和残差。", "过离散处理会改变标准误，不等于自动修正所有模型问题。"],
+      related: ["glm", "glm.nb"],
+      level: "进阶",
+    }),
+  ];
+
+  const glossary = window.RZH_GLOSSARY ||= [];
+  const ids = new Set(glossary.map((item) => item[0]));
+  const addTerm = (item) => {
+    if (!ids.has(item[0])) {
+      glossary.push(item);
+      ids.add(item[0]);
+    }
+  };
+
+  [
+    ["conditional-logistic", "条件 Logistic 回归", "统计建模", "条件 Logistic 回归又称条件逻辑回归或配对 Logistic 回归，在匹配组内部比较病例与对照，通过条件似然消除组间基线差异。", "像每个配对组内部单独比较，再把所有组的信息汇总。", "clogit(case ~ exposure + strata(match_set), data = dat)"],
+    ["unconditional-logistic", "非条件 Logistic 回归", "统计建模", "把所有个体放在同一模型中的普通 Logistic 回归，通常用于非匹配资料。", "像把所有研究对象放在同一张表里比较。", "glm(case ~ exposure, family = binomial(), data = dat)"],
+    ["matched-set", "匹配组", "流行病学", "按年龄、性别、地区等规则配成的一组病例和对照。", "像一场固定对手和条件的配对比赛。", "1:1 匹配每组一个病例一个对照；1:M 每组一个病例多个对照。"],
+    ["conditional-likelihood", "条件似然", "统计建模", "只利用匹配组内部相对关系构造的似然，不需要估计每个组的截距。", "像每组只关心组内谁更可能成为病例。", "条件 Logistic 通过条件似然估计 OR。"],
+    ["distributed-lag-model", "分布滞后线性模型", "统计建模", "允许暴露效应分布到当天和多个滞后天，但暴露-反应通常假定为线性。", "像把一次暴露的影响分摊到随后几天的账本上。", "DLM 是 DLNM 在线性暴露-反应下的特例。"],
+    ["exposure-response", "暴露-反应关系", "流行病学", "不同暴露水平相对参照暴露的结局风险变化。", "像横轴调高温度，纵轴看风险怎样改变。", "DLNM 可给出非线性暴露-反应曲线。"],
+    ["lag-response", "滞后-反应关系", "流行病学", "固定一次暴露水平后，效应随滞后天数怎样变化。", "像观察一次冷空气影响在随后几天怎样消退。", "lag 0 是当天，lag 1 是前一天。"],
+    ["cumulative-effect", "累积效应", "统计建模", "预设滞后窗口内各天贡献按模型组合后的总体效应。", "像把连续几天的延迟影响汇总成一张总账单。", "crosspred(..., cumul = TRUE) 给出累积 RR。"],
+    ["reference-exposure", "参照暴露", "统计建模", "计算相对风险时作为 RR=1 基准的暴露值。", "像温度曲线上的零点刻度。", "DLNM 的温度曲线可能以最低死亡温度作为 cen。"],
+    ["natural-cubic-spline", "自然三次样条", "统计建模", "一种受边界约束的平滑曲线函数，常在 ns() 中用于表示非线性关系。", "像用有弹性的尺子画曲线，两端保持平稳。", "crossbasis(..., argvar = list(fun = \"ns\", knots = ...))"],
+    ["knot", "节点", "统计建模", "样条曲线中允许改变弯曲方式的内部位置。", "像折线图上可以转弯的固定支点。", "节点位置应覆盖数据范围和关键暴露区间。"],
+    ["model-df", "模型自由度", "统计建模", "控制模型弯曲和复杂程度的参数数量。自由度越高，曲线越灵活，也越容易过拟合。", "像相机镜头可调的自由度，越灵活越要防止噪声被放大。", "DLNM 的暴露和滞后维度分别设置自由度。"],
+    ["overdispersion", "过离散", "统计建模", "计数结局的实际方差大于理论均值时出现的现象。", "像普通泊松模型给出的误差条太窄。", "可用 Pearson 离散参数判断每日死亡计数是否过离散。"],
+    ["quasi-poisson", "准泊松回归", "统计建模", "保留泊松均值结构，同时估计额外离散尺度的计数回归。", "像泊松模型加了一层更宽的不确定性。", "glm(death ~ exposure, family = quasipoisson())"],
+    ["negative-binomial", "负二项回归", "统计建模", "带额外离散参数的计数模型，常用于过离散数据。", "像允许不同个体的计数波动比泊松更大。", "MASS::glm.nb() 可拟合负二项 GLM。"],
+    ["autocorrelation", "自相关", "统计建模", "同一个序列中，相邻或相隔若干时间的观测仍彼此相关。", "像昨天的死亡数会影响今天模型的残差。", "可用 ACF 图和 Durbin-Watson 等方法检查。"],
+    ["partial-autocorrelation", "偏自相关", "统计建模", "控制中间滞后之后，当前值与某个滞后值的剩余相关。", "像排除中间传话人后，看两个时间点是否仍直接相关。", "PACF 常与 ACF 一起用于时间序列诊断。"],
+    ["aic", "赤池信息准则", "模型评估", "在拟合优度和参数复杂度之间权衡的模型比较指标，越小通常表示相对更优。", "像同时奖励解释得好、又惩罚模型过度复杂。", "AIC 只能在相同结局、相同数据范围和可比似然方法的模型间比较。"],
+    ["gcv", "广义交叉验证", "模型评估", "在平滑模型中估计预测误差并辅助选择复杂度的准则。", "像在不反复留出测试集的情况下估计模型的新数据表现。", "GCV 常与样条和平滑模型相关，不能和 AIC 随意混比。"],
+    ["sensitivity-analysis", "敏感性分析", "模型评估", "改变合理假设、窗口、自由度或模型设置，检查主要结论是否稳定。", "像换几种同样合理的镜头看结论会不会变。", "DLNM 常比较 lag、暴露 df、滞后 df 和趋势 df。"],
+    ["model-selection", "模型选择", "模型评估", "在研究问题、数据结构、诊断和预测表现之间选择合理模型的过程。", "像从几张地图中选一张既准确又能指导路线的。", "不能只按 p 值或 AIC 选模型。"],
+    ["propensity-score", "倾向评分", "因果推断", "根据协变量估计个体接受某暴露或治疗的概率，常用于匹配、加权或分层。", "像先给每个人算一份“接受该治疗的相似程度”。", "倾向评分不能自动控制未测量混杂。"],
+    ["event-per-variable", "每变量事件数", "统计建模", "结局事件数与模型参数数量的比例，用于判断模型是否过度拟合。", "像每个待估计参数背后有多少真实事件可供支撑。", "事件越少，越应减少参数并使用惩罚或验证方法。"],
+    ["separation", "完全分离", "统计建模", "某个预测变量或组合能完美区分结局，导致 Logistic 系数和标准误异常。", "像一条线把所有病例与对照完全分开。", "出现极大系数、巨大标准误时要检查分离。"],
+    ["discrimination-slope", "区分度斜率", "模型评估", "把模型预测风险作为预测因子再拟合时得到的斜率，用于检查过拟合和区分能力收缩。", "像用模型自己的预测去接受一次校准考试。", "斜率明显小于1提示开发样本中的区分能力可能高估。"],
+    ["decision-curve", "决策曲线分析", "模型评估", "比较不同预测策略在不同阈值概率下的临床净获益。", "像不仅问模型准不准，还问使用它是否比不用更有净收益。", "不能用来替代校准和外部验证。"],
+  ].forEach(addTerm);
 })();
 
 ;
@@ -100529,7 +101379,7 @@ const globalParameterNotes = window.RZH_GLOBAL_PARAMETER_NOTES || {};
 const parameterOverrides = window.RZH_PARAMETER_OVERRIDES || { functions: {}, names: {} };
 
 function chartImageSource(id) {
-  return chartImages[`plot/${id}`] || `assets/chart-webp/${encodeURIComponent(id)}.webp`;
+  return chartImages[`plot/${id}`] || `assets/chart-webp/${encodeURIComponent(id)}.webp?v=2`;
 }
 
 function themeImageSource(image) {
@@ -101842,6 +102692,31 @@ const glossaryFunctionMap = {
   "regex-validation": ["str_detect", "str_match"],
   "machine-learning": ["initial_split", "vfold_cv"],
   validation: ["vfold_cv", "last_fit"],
+  "conditional-logistic": ["clogit", "clogistic"],
+  "unconditional-logistic": ["glm"],
+  "matched-set": ["clogit", "strata"],
+  "conditional-likelihood": ["clogit", "clogistic"],
+  "distributed-lag-model": ["crossbasis", "crosspred"],
+  "exposure-response": ["crosspred", "crossreduce"],
+  "lag-response": ["crosspred", "crossreduce"],
+  "cumulative-effect": ["crosspred", "crossreduce"],
+  "reference-exposure": ["crosspred"],
+  "natural-cubic-spline": ["ns", "crossbasis"],
+  knot: ["crossbasis"],
+  "model-df": ["crossbasis", "gam"],
+  overdispersion: ["glm.nb", "qcc.overdispersion.test"],
+  "quasi-poisson": ["glm"],
+  "negative-binomial": ["glm.nb"],
+  autocorrelation: ["acf", "pacf"],
+  "partial-autocorrelation": ["pacf"],
+  aic: ["stepAIC"],
+  gcv: ["gam"],
+  "sensitivity-analysis": ["crosspred", "crossreduce"],
+  "model-selection": ["stepAIC"],
+  "event-per-variable": ["glm"],
+  separation: ["glm"],
+  "discrimination-slope": ["roc"],
+  "decision-curve": ["roc"],
   "control-flow": ["if", "for-loop", "while-loop"],
   conditional: ["if", "ifelse", "case_when"],
   iteration: ["for-loop", "lapply"],
