@@ -57050,6 +57050,750 @@ window.RZH_GLOSSARY.push(
 
 ;
 (() => {
+  const guides = window.RZH_GUIDES || [];
+  const guideById = (id) => guides.find((item) => item.id === id);
+  const unique = (items) => [...new Set(items)];
+
+  const patterns = guideById("regex-patterns");
+  if (patterns) {
+    Object.assign(patterns, {
+      minutes: 40,
+      title: "正则表达式语法全解",
+      aliases: ["regex", "正则语法", "模式匹配", "元字符", "量词", "正则转义"],
+      hero: "把一长串符号拆成位置、字符、次数和边界四层来读",
+      audience: "知道正则可以查数字、日期或编码，却分不清元字符、字符类、量词、转义和定位符分别负责什么。",
+      overview: "读正则时不要从左到右死记每个符号。先找括号，确定哪些内容作为一个整体；再看量词，判断前面的元素重复几次；然后检查字符类、转义和定位符；最后确认要匹配整条字符串还是只匹配其中一段。按这个顺序拆解，长模式也能逐层读懂。",
+      features: [
+        "区分字面字符、元字符和特殊字符组。",
+        "用字符类描述允许出现的字符范围。",
+        "用定位符限定开头、结尾和单词边界。",
+        "正确处理 R 字符串与正则表达式之间的双层反斜杠。",
+        "用 str_view() 查看实际匹配范围，而不是只看 TRUE/FALSE。",
+      ],
+      concepts: [
+        { term: "字面字符", explain: "大多数汉字、字母和数字只匹配自身。连续写 ABC，表示这三个字符按顺序出现。" },
+        { term: "元字符", explain: "正则语法保留给特殊用途的字符，例如 . ^ $ | ( ) [ ] { } * + ? 和反斜杠。要按字面查找它们时，通常需要转义，或使用 fixed()。" },
+        { term: "字符类 []", explain: "方括号表示里面的任意一个字符。[abc] 匹配 a、b 或 c；[0-9] 匹配一个数字；[^0-9] 匹配一个非数字字符。" },
+        { term: "简写字符组", explain: "\\d 表示数字，\\D 表示非数字；\\w 表示字母、数字和下划线，\\W 表示相反；\\s 表示空白，\\S 表示非空白。不同语言对 \\w 的 Unicode 范围可能不同，中文数据应实际测试。" },
+        { term: "量词", explain: "?、*、+ 和 {n,m} 修饰前面的一个字符、字符类或括号组，表示允许重复的次数。" },
+        { term: "运算顺序", explain: "括号组优先；其次是紧跟在元素后的量词；再次是相邻元素连接；最后才解释竖线或分支。拿不准时主动加括号，不依赖记忆。" },
+        { term: "定位符", explain: "^ 和 $ 限定字符串开头和结尾；\\b 和 \\B 检查单词边界。它们只判断位置，不匹配可见字符。" },
+        { term: "正则转义", explain: "R 字符串先解释一层反斜杠，正则引擎再解释一层。想交给正则一个反斜杠，普通 R 字符串里通常要写两个，例如模式 \\\\d 常写作 \"\\\\d\"。" },
+        { term: "字符串特殊转义", explain: String.raw`普通 R 字符串中的 \n 表示换行，\t 表示制表符，\\ 表示一个反斜杠。这些转义先由 R 解释；若结果还要交给正则引擎，再发生第二层解释。` },
+        { term: "整条匹配与局部匹配", explain: "^[0-9]+$ 要求整个值都是数字；[0-9]+ 只要求任意位置至少出现一个数字。数据校验与内容提取的目标不同。" },
+        { term: "正则方言", explain: "stringr 默认使用 ICU 正则；Base R 某些函数可选用 TRE 或 PCRE。环视、命名分组等语法并非所有工具完全一致，最终要在当前 R 环境中测试。" },
+      ],
+      comparison: {
+        title: "按功能认识的常用正则写法",
+        note: "先判断这段符号是在描述“哪一个字符”“出现几次”“出现在哪里”还是“作为一个整体”。",
+        headers: ["功能", "写法", "含义", "最小示例与提醒"],
+        rows: [
+          ["字面匹配", "ABC", "按顺序匹配 ABC", "只匹配固定文本，不代表任意字母"],
+          ["任意字符", ".", "匹配一个非换行字符", "A.C 可匹配 ABC 或 A1C；真正的点号要转义"],
+          ["字符集", "[abc] / [a-z] / [0-9]", "匹配集合中的任意一个字符", "[ABC] 不是匹配整段 ABC"],
+          ["排除字符", "[^0-9]", "匹配一个不是数字的字符", "^ 在方括号内改变含义"],
+          ["数字与空白", "\\d / \\D / \\s / \\S", "数字或非数字；空白或非空白", "在 R 字符串中常写成 \"\\\\d\"、\"\\\\s\""],
+          ["单词字符", "\\w / \\W", "字母、数字、下划线及其反向", "中文是否算 \\w 取决于正则引擎和选项"],
+          ["可选与重复", "? / * / +", "0 或 1 次；0 次以上；1 次以上", "量词只修饰紧挨着它的前一个元素"],
+          ["指定次数", "{n} / {n,} / {n,m}", "恰好 n 次；至少 n 次；n 到 m 次", "[0-9]{11} 表示连续 11 个数字"],
+          ["懒惰量词", "*? / +? / {n,m}?", "在满足条件时尽量少重复", "只用于需要控制结束位置的地方"],
+          ["字符串边界", "^ / $", "字符串或每行文本的开头和结尾", "不加锚点时可能只匹配值中的一小段"],
+          ["单词边界", "\\b / \\B", "单词与非单词字符之间；非边界位置", "中文文本的边界效果需要单独验证"],
+          ["分组", "( ) / (?: )", "把多个元素作为一个整体", "圆括号也决定优先级和捕获行为"],
+          ["或", "|", "匹配左右任一分支", "gr(a|e)y 匹配 gray 或 grey"],
+          ["环视", "(?=) / (?!) / (?<=) / (?<!)", "只检查前后条件，不消耗字符", "详见“分组、断言与贪婪模式”"],
+          ["R 字符串特殊转义", String.raw`\n / \t / \\`, "换行、制表符和反斜杠", "先由 R 字符串解释，再交给正则引擎"],
+          ["字面转义", "\\\\. / \\\\+ / \\\\(", "取消元字符的特殊含义", "R 代码中通常还要再写一层反斜杠"],
+          ["固定文字", "fixed(\".\")", "让 stringr 完全按普通文字查找", "搜索点号、括号和竖线时更安全"],
+        ],
+      },
+      readingNotes: [
+        "str_view() 是正则调试入口，可把匹配片段高亮出来。",
+        "str_view(x, pattern, match = NA) 会保留未匹配项一起查看，更适合发现反例。",
+        "fixed() 用于字面文字，regex() 用于给正则模式附加忽略大小写、多行或 dotall 等选项。",
+        "在线正则测试器可能采用 JavaScript、PCRE 或 ICU 方言，结果不能直接替代 R 中的测试。",
+      ],
+      pitfalls: [
+        "把点号 . 当成真正的句号，未使用转义或 fixed()。",
+        "把量词理解为“整个字符串重复”，而它通常只修饰前一个元素。",
+        "在 R 字符串中少写一层反斜杠，导致 \\d 被当成普通字符或产生转义错误。",
+        "忘记 ^ 和 $，把“包含符合格式的片段”误当成“整条值符合格式”。",
+      ],
+      practice: "分别写出三个模式：整条值恰好 11 位数字；值以 CTRL 开头；值中包含至少一个数字。再用正例和反例解释三者为什么不能混用。",
+      related: ["regex-groups", "regex-cookbook", "stringr-operations"],
+      references: [
+        { title: "stringr 正则表达式指南", url: "https://stringr.tidyverse.org/articles/regular-expressions.html", note: "系统介绍 stringr 常用正则语法、分组、量词和匹配选项。" },
+        { title: "R 的 regex 帮助页", url: "https://stat.ethz.ch/R-manual/R-devel/library/base/html/regex.html", note: "说明 Base R 的正则函数、固定匹配和不同正则方言。" },
+      ],
+    });
+
+    patterns.steps.push(
+      {
+        title: "先用 str_view() 看见匹配范围",
+        text: "只返回 TRUE/FALSE 无法看出究竟匹配了哪一段。先用高亮视图确认位置，再决定使用检测、提取还是替换。",
+        code: String.raw`library(stringr)
+words <- c("apple", "fruit", "cherry")
+
+str_view(words, "a")
+str_view(words, "a", match = NA)`,
+        explain: "match = TRUE 时主要查看命中的行；match = NA 会把未命中的词也列出来，便于确认规则没有碰到哪些值。",
+      },
+      {
+        title: "区分元字符与普通标点",
+        text: "点号在正则中表示任意一个字符。若数据里真的存着句点，应转义或改用 fixed()。",
+        code: String.raw`text <- c("a.b", "axb", "a+b", "a|b")
+
+str_detect(text, ".")
+str_detect(text, fixed("."))
+str_detect(text, "\\+")`,
+        explain: "第一行几乎都会命中，因为每个位置都能被点号解释；fixed(\".\") 只查找真正的点号。加号本身是量词，按字面查找时要写成 \\+。",
+      },
+      {
+        title: "先理解 R 字符串，再理解正则表达式",
+        text: "普通 R 字符串本身就有换行、制表和反斜杠转义。正则模式通常先作为 R 字符串保存，因此同一串反斜杠可能经历两次解释。",
+        code: String.raw`single <- "line1\nline2"
+tabbed <- "A\tB"
+slash <- "\\"
+pattern <- "\\d+"
+
+writeLines(single)
+cat(tabbed)
+slash
+pattern`,
+        explain: "\\n 和 \\t 在这一层已经变成换行与制表符；pattern 中的 \\\\d 才把“反斜杠加 d”交给正则引擎。若模式来自文件或 regex(..., comments = TRUE)，也要重新确认反斜杠处理。",
+      },
+      {
+        title: "用简写字符组描述重复结构",
+        text: "字符组适合表达“这里允许出现哪一类字符”，量词再接在后面说明重复次数。",
+        code: String.raw`records <- c("Phone number: 13723458899", "Phone: 12345")
+
+str_view(records, "\\d{11}")
+str_detect(records, "\\d{11}")
+str_extract(records, "\\d{11}")`,
+        explain: "\\d{11} 表示连续 11 个数字。它只说明数字个数，不等于该号码一定合法、存在或属于某个地区。",
+      },
+      {
+        title: "看清量词和括号的优先级",
+        text: "量词只作用于紧挨着的前一个元素。括号可以把多个字符或分支组合成一个整体。",
+        code: String.raw`str_view(c("gray color", "grey color"), "gr(a|e)y")
+str_view("banana", "(an)+")
+str_view("banana", "an+")`,
+        explain: "gr(a|e)y 把 a 或 e 作为一个分组；(an)+ 重复整个 an；an+ 只重复 n。同样的字母顺序，匹配范围并不相同。",
+      },
+      {
+        title: "定位符检查开头、结尾和词边界",
+        text: "定位符只判断匹配发生在哪里，不占用字符。比较同一条规则在有无锚点时的结果，可以避免误把局部命中当作整条验证。",
+        code: String.raw`words <- c("sum", "rowsum", "summary", "presume")
+
+str_view(words, "^sum")
+str_view(words, "sum$")
+str_view(words, "\\bsum\\b")
+str_view(words, "\\bsum\\B")`,
+        explain: "^sum 看开头；sum$ 看结尾；\\bsum\\b 要求 sum 前后都是边界；\\bsum\\B 则要求末尾后面仍是非边界位置，因此可命中 summary。",
+      },
+      {
+        title: "用选项处理多行和换行",
+        text: "默认点号通常不匹配换行，^ 和 $ 也只针对整条字符串。确有多行需求时，用 regex() 明确打开相应选项。",
+        code: String.raw`text <- "first line\nsecond line"
+
+str_detect(text, regex("^second"))
+str_detect(text, regex("^second", multiline = TRUE))
+str_detect("a\nb", regex("a.b", dotall = TRUE))`,
+        explain: "multiline 让 ^ 和 $ 能识别每一行；dotall 让点号跨过换行。选项改变的是正则规则本身，不能凭函数默认识记。",
+      },
+    );
+
+    patterns.functions = unique([
+      ...(patterns.functions || []),
+      "str_view", "fixed", "regex", "str_detect", "str_extract", "str_replace_all", "grep", "grepl", "sub", "gsub",
+    ]);
+  }
+
+  const groups = guideById("regex-groups");
+  if (groups) {
+    Object.assign(groups, {
+      minutes: 44,
+      title: "分组、断言与贪婪模式",
+      aliases: ["捕获分组", "非捕获分组", "零宽断言", "先行断言", "后行断言", "贪婪模式", "懒惰模式", "named capture"],
+      hero: "只取出真正需要的那一块，并控制它在何处停下",
+      audience: "已经能写基础正则，但面对复合编码、医学标记、网页标签或重复文本时，经常抓到过多、过少或带上了前后标记。",
+      overview: "分组负责把多个元素组织成整体，捕获分组还能把子结果单独返回。断言负责检查当前位置前后是否满足条件，却不会把条件本身取走。贪婪与懒惰量词决定重复匹配在什么时候停下。三者经常一起使用，但每一层都应先在少量正例和反例上验证。",
+      features: [
+        "区分捕获分组与只分组、不捕获的写法。",
+        "使用命名分组，让提取结果具有可读列名。",
+        "掌握正向、负向、先行和后行四类零宽断言。",
+        "解释并控制贪婪与懒惰匹配。",
+        "通过 str_view() 和 str_match() 同时检查范围与分组。",
+      ],
+      concepts: [
+        { term: "分组", explain: "圆括号把多个字符、字符类或分支组成一个整体，也提高该部分的运算优先级。" },
+        { term: "捕获分组", explain: "普通圆括号 ( ) 在分组的同时保存匹配内容。str_match() 会先返回整段匹配，再依次返回各捕获分组。" },
+        { term: "非捕获分组", explain: "(?:...) 只负责分组和优先级，不单独保存内容，也不会占用一个捕获编号。" },
+        { term: "命名分组", explain: "(?<year>...) 给捕获分组命名，str_match() 的结果可直接按 year 取值，不必依赖第几个括号。" },
+        { term: "反向引用", explain: "模式中的 \\\\1 引用前面的第 1 个捕获分组，可检查重复出现的同一段文字；替换字符串中也可用分组重排内容。" },
+        { term: "正向前行断言", explain: "(?=...) 要求当前位置后面能满足某个条件，但该条件不进入最终匹配。" },
+        { term: "负向前行断言", explain: "(?!...) 要求当前位置后面不能满足某个条件。排除百分比时还要防止数字只匹配前一部分，常写成 (?![\\\\d%])。" },
+        { term: "正向后行断言", explain: "(?<=...) 要求当前位置前面满足某个条件，常用于只提取标签后面的值。" },
+        { term: "负向后行断言", explain: "(?<!...) 要求当前位置前面不满足某个条件，用于排除带有特定前缀的记录。" },
+        { term: "零宽", explain: "断言只检查当前位置，不消耗字符。因此它前后仍可继续匹配，也不会出现在 str_extract() 的返回文字中。" },
+        { term: "贪婪模式", explain: "?、*、+ 和 {n,m} 默认尽量多重复，只要后续模式还能匹配，就继续向后尝试。" },
+        { term: "懒惰模式", explain: "在量词后加 ?，例如 *?、+?，表示尽量少重复。它常用于第一个结束标记处就停止。" },
+      ],
+      comparison: {
+        title: "分组、断言和量词的行为对照",
+        note: "先问自己：这段圆括号需要返回吗？前后标记需要进入结果吗？重复应该在哪一处停止？",
+        headers: ["需求", "写法", "是否进入结果", "常见用途"],
+        rows: [
+          ["保存一个子字段", "(\\\\d{4})", "整段和分组都返回", "str_match() 提取年份"],
+          ["只分组不保存", "(?:19|20)", "只返回外层匹配", "限制年份前缀但不增加分组"],
+          ["给分组命名", "(?<year>\\\\d{4})", "可按 year 列取值", "结构化提取多个字段"],
+          ["引用前面的分组", "(\\\\w+)\\\\s+\\\\1", "返回重复词整段", "识别连续重复单词"],
+          ["要求后面有某内容", "\\\\d+(?= mg)", "返回数字，不返回 mg", "提取带固定单位的剂量"],
+          ["要求后面没有某内容", "\\\\d+(?![\\\\d%])", "返回完整非百分比数字", "防止从 80% 中退回并只取 8"],
+          ["要求前面有某内容", "(?<=SBP: )\\\\d+", "只返回数字", "提取标签后的测量值"],
+          ["要求前面没有某内容", "(?<!ID-)\\\\d{3}", "只返回数字", "排除特定前缀后的编码"],
+          ["尽量多匹配", "<div>.*</div>", "可能跨越多个结束标记", "只有字段范围确实很长时才用"],
+          ["尽量少匹配", "<div>.*?</div>", "在第一个结束标记处停止", "逐段提取标签或分隔内容"],
+          ["可选一次", "colou?r", "匹配 color 或 colour", "允许常见拼写差异"],
+          ["至少一次但尽早停", ".+?", "最短可满足片段", "常与后续结束条件配合"],
+        ],
+      },
+      readingNotes: [
+        "str_match() 的第一列 name 是整段匹配，后续列才是括号分组。",
+        "命名分组在结果矩阵中保留名称；未匹配行的分组值为 NA。",
+        "环视不消耗字符，所以 str_extract() 返回的只是断言之外真正被匹配的部分。",
+        "环视在不同 R 函数和不同正则方言中的支持情况可能不同，尤其是前文长度变化时。",
+      ],
+      pitfalls: [
+        "为了减少列数把需要的捕获分组也改成非捕获分组。",
+        "把环视条件误认为返回内容，结果发现标签、单位或符号不见了。",
+        "所有量词都加 ?，导致本来应完整保留的内容被过早截断。",
+        "长模式同时包含多个分组和断言，出错时没有拆成小步骤定位。",
+      ],
+      related: ["regex-patterns", "regex-cookbook", "stringr-operations"],
+      practice: "用同一段“SBP: 135 mg”分别写出四种规则：提取 135；确认 135 后面是 mg；确认 135 后面不是百分号；确认 135 前面是 SBP: 加空格。逐条说明最终返回哪一段文字。",
+      references: [
+        { title: "stringr 正则表达式指南", url: "https://stringr.tidyverse.org/articles/regular-expressions.html", note: "包含分组、命名分组、环视和高亮调试示例。" },
+        { title: "ICU 正则表达式语法", url: "https://unicode-org.github.io/icu/userguide/strings/regexp.html", note: "stringr 使用 ICU 正则；可查阅环视、分组和量词语法。" },
+      ],
+    });
+
+    groups.steps.push(
+      {
+        title: "捕获与非捕获分组不要混用",
+        text: "需要返回的子字段用捕获分组；只用来限定范围或写分支的括号可以改成非捕获分组。",
+        code: String.raw`library(stringr)
+text <- "PMID-2026-001"
+
+captured <- str_match(text, "^([A-Z]+)-(?:[0-9]{4})-([0-9]{3})$")
+captured`,
+        explain: "年份部分的括号写成 (?:...)，因此只作为结构条件；结果矩阵保留整段、前缀 PMID 和编号 001，不会多出一个年份列。",
+      },
+      {
+        title: "四种零宽断言放在一起比较",
+        text: "先行看目标后面，后行看目标前面；正向要求满足，负向要求不满足。",
+        code: String.raw`samples <- c("dose 120 mg", "rate 80%", "SBP: 135", "ID-001")
+
+str_extract(samples, "\\d+(?= mg)")
+str_extract(samples, "\\d+(?![\\d%])")
+str_extract(samples, "(?<=SBP: )\\d+")
+str_extract(samples, "(?<!ID-)\\d{3}")`,
+        explain: "(?= mg) 只检查单位；(?![\\d%]) 防止数字在百分号前只匹配一部分；(?<=SBP: ) 只取标签后的值；(?<!ID-) 排除紧跟在 ID- 后面的三位数字。四个条件都不会出现在返回文字里。",
+      },
+      {
+        title: "观察先行断言是否消耗字符",
+        text: "断言宽度为零，因此同一个后续字符仍可以被点号继续匹配。下面的结果会把断言本身和下一个字符放在一起观察。",
+        code: String.raw`str_view("regular", "re(?=gular)")
+str_view("regular", "re(?=gular).")
+str_view("regular", "(?<=re)gular")`,
+        explain: "re(?=gular) 只返回 re；再加一个点号后，点号会继续匹配 g，所以返回 reg；(?<=re)gular 则从 g 开始，返回 gular。",
+      },
+      {
+        title: "贪婪与懒惰让匹配在不同位置停下",
+        text: "量词后的问号不是“更严格”，而是要求它在当前规则下尽量少重复。",
+        code: String.raw`str_view("Google", "o+")
+str_view("Google", "o+?")
+
+text <- "<p>First</p><p>Second</p>"
+str_extract(text, "<p>.*</p>")
+str_extract(text, "<p>.*?</p>")
+str_extract_all(text, "<p>.*?</p>")`,
+        explain: "o+ 一次匹配两个 o；o+? 每次只取一个 o，再继续寻找下一处。贪婪标签模式会跨到最后一个 </p>，懒惰模式则在第一个结束标签处停下。",
+      },
+      {
+        title: "在替换中重排捕获内容",
+        text: "替换字符串可以引用捕获分组，把一种日期顺序改成另一种顺序。",
+        code: String.raw`dates <- c("15/01/2025", "31/12/2026")
+
+str_replace(dates, "^([0-9]{2})/([0-9]{2})/([0-9]{4})$", "\\3-\\2-\\1")`,
+        explain: "三个括号分别捕获日、月、年；替换中的 \\3、\\2、\\1 按年、月、日重排。转换后仍要用真正的日期函数检查日期是否存在。",
+      },
+    );
+
+    groups.functions = unique([
+      ...(groups.functions || []),
+      "str_view", "str_match", "str_match_all", "str_extract", "str_extract_all", "str_replace", "str_replace_all", "regex",
+    ]);
+  }
+
+  const cookbook = {
+    type: "text",
+    id: "regex-cookbook",
+    typeLabel: "正则实战",
+    minutes: 46,
+    title: "常用正则表达式库",
+    aliases: ["身份证正则", "手机号正则", "邮箱正则", "中国地址正则", "正则表达式大全", "regex cookbook"],
+    hero: "先拿到可用模板，再逐段读懂、验证并保留失败记录",
+    audience: "需要识别身份证、手机号、邮箱、中文地址、日期、ICD 编码或医学记录，希望直接得到 R 代码，同时不愿把“格式看起来像”误当成真实有效。",
+    overview: "下面每一条表达式都说明它检查什么、拆出了什么，以及它不能替你判断什么。使用时先统一空格和大小写，再检查整条格式；涉及身份证、邮箱、电话和行政区真实性时，还要继续做范围、校验码或外部核验。原始值、解析结果和失败标记应同时保留。",
+    features: [
+      "识别中国大陆 18 位居民身份证的字符结构。",
+      "校验身份证日期与末位校验码。",
+      "识别大陆手机号和常见邮箱格式。",
+      "尝试拆分中国地址中的省、市、区和详细地址。",
+      "识别日期、ICD-10、血压和剂量等研究常见文本。",
+      "为每条表达式保留正例、反例和失败说明。",
+    ],
+    concepts: [
+      { term: "形态识别", explain: "正则首先判断一串文字的外形是否符合模板。外形正确不等于内容真实。" },
+      { term: "分层校验", explain: "先做整条格式检查，再检查日期、校验码、数值范围或外部数据源。不要试图让一条超长正则承担全部验证。" },
+      { term: "标准化与识别分开", explain: "先用 str_trim()、str_remove_all()、str_to_upper() 处理空格、连字符和大小写，再运行模式；同时保留标准化前后的对应关系。" },
+      { term: "命名分组", explain: "用 (?<name>...) 给地址、日期或剂量字段命名，str_match() 的结果可直接按名称取出。" },
+      { term: "失败记录", explain: "未匹配、日期非法、校验码错误和重复记录是不同问题，应使用不同标记，不要只输出一个 TRUE/FALSE。" },
+      { term: "隐私边界", explain: "身份证号和手机号属于敏感个人信息。示例应使用虚构号码，正式数据不应上传到不明正则测试网站。" },
+    ],
+    comparison: {
+      title: "实用表达式能判断什么",
+      note: "模式用于格式筛查和字段解析；真实性验证需要额外规则或权威数据源。",
+      headers: ["目标", "核心模式", "能判断", "不能判断"],
+      rows: [
+        ["18 位身份证", "^[1-9][0-9]{5}[0-9]{8}[0-9]{3}[0-9Xx]$", "长度、数字位置和末位 X", "地区真实性、日期合法性、校验码是否正确"],
+        ["大陆手机号", "^1[3-9][0-9]{9}$", "11 位数字和常用号段外形", "号码是否真实、启用或属于本人"],
+        ["邮箱", "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\\\.[A-Za-z]{2,}$", "常见 ASCII 邮箱外形", "邮箱是否存在、能否收信、国际化域名"],
+        ["中文地址", "省/市/区后缀组成的分组模式", "常见行政区后缀和层次", "行政区名称、代码和层级是否真实"],
+        ["日期", "^[0-9]{4}-[0-9]{2}-[0-9]{2}$ + 日期解析", "日期外形和真实日历日期", "日期是否符合研究时间窗"],
+        ["ICD-10", "^[A-Z][0-9]{2}(?:\\\\.[0-9A-Z]{1,4})?$", "常见类目与亚目外形", "编码版本、临床含义和病历真实性"],
+        ["血压记录", "(?i)(?:SBP|收缩压) 后的数值分组", "带有哪些标签和值", "单位统一、测量质量和医学合理性"],
+        ["剂量", "数字加 mg/g/mcg/IU 等单位", "数值和单位外形", "剂量是否正确、是否按体重或频次给药"],
+      ],
+    },
+    whenUse: [
+      "问卷或数据库导出的文本需要做格式检查和字段提取。",
+      "同一字段混有空格、连字符、全角符号或大小写差异。",
+      "希望先生成可解释的初筛变量，再由人工或外部规则复核。",
+      "教学或软件开发中需要一个可直接测试的基础模板。",
+    ],
+    dataShape: [
+      "先确认一条记录是否应只包含一个身份证号、电话或邮箱。",
+      "保留原始列，标准化值和解析字段另建新列。",
+      "至少准备格式正确、格式错误、边界和缺失四类测试样例。",
+      "所有敏感字段只使用虚构示例，并按研究伦理要求保存。",
+    ],
+    steps: [
+      {
+        title: "18 位身份证：先识别外形，再拆出字段",
+        text: "身份证前 6 位是地区码，第 7 至 14 位是出生日期，第 15 至 17 位是顺序码，第 18 位是校验码。先用分组得到各段，再做日期和校验码检查。",
+        code: String.raw`library(stringr)
+
+id <- c("11010519491231002X", "12345", NA)
+id_shape <- "^[1-9][0-9]{5}[0-9]{8}[0-9]{3}[0-9Xx]$"
+id_parts_pattern <- "^(?<region>[1-9][0-9]{5})(?<birth>[0-9]{8})(?<sequence>[0-9]{3})(?<check>[0-9Xx])$"
+
+shape_ok <- str_detect(id, id_shape)
+parts <- str_match(id, id_parts_pattern)
+parts`,
+        explain: "第一条只检查 18 个字符的总体结构；第二条把地区、出生日期、顺序码和校验码拆成命名分组。12345 和 NA 不应被当成合法身份证。",
+      },
+      {
+        title: "身份证：继续检查真实日期和末位校验码",
+        text: "仅凭正则无法确认 2 月 30 日不存在，也无法验证末位校验码。把结构、日期和校验码分成三项检查，发现失败后才能知道问题在哪。",
+        code: String.raw`library(stringr)
+library(lubridate)
+
+valid_cn_id <- function(id) {
+  id <- str_to_upper(str_trim(id))
+  shape <- str_detect(id, "^[1-9][0-9]{5}[0-9]{8}[0-9]{3}[0-9X]$") %in% TRUE
+
+  birth_text <- str_sub(id, 7, 14)
+  birth_date <- ymd(birth_text, quiet = TRUE)
+  date_ok <- !is.na(birth_date) &
+    format(birth_date, "%Y%m%d") == birth_text
+
+  weights <- c(7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2)
+  check_codes <- c("1", "0", "X", "9", "8", "7", "6", "5", "4", "3", "2")
+
+  checksum_ok <- vapply(seq_along(id), function(i) {
+    if (is.na(shape[i]) || !shape[i]) return(FALSE)
+    digits <- as.integer(str_split_1(str_sub(id[i], 1, 17), ""))
+    expected <- check_codes[(sum(digits * weights) %% 11) + 1]
+    str_sub(id[i], 18, 18) == expected
+  }, logical(1))
+
+  shape & date_ok & checksum_ok
+}
+
+ids <- c("11010519491231002X", "110105194902310021", NA)
+tibble::tibble(id = ids, valid = valid_cn_id(ids))`,
+        explain: "shape 检查外形，date_ok 检查出生日期真实存在，checksum_ok 按国家标准权重计算末位。即使三项都通过，也只说明编码结构合法，仍需遵守数据伦理和最小必要原则。",
+      },
+      {
+        title: "大陆手机号：先标准化，再检查 11 位结构",
+        text: "常见录入会加入空格、连字符或 +86。是否删除这些字符属于业务规则，应保留原值并明确记录。",
+        code: String.raw`phone_raw <- c("138 0013 8000", "+86-13900139000", "12345678901")
+phone <- phone_raw |>
+  str_remove_all("[ -]") |>
+  str_remove("^\\+?86")
+
+phone_pattern <- "^1[3-9][0-9]{9}$"
+tibble::tibble(
+  raw = phone_raw,
+  normalized = phone,
+  plausible_shape = str_detect(phone, phone_pattern)
+)`,
+        explain: "1[3-9] 表示第二位为 3 至 9，后面还有 9 位数字。该模式覆盖常见大陆手机号外形，但不检查号码是否真实存在，也不能替代短信验证。",
+      },
+      {
+        title: "邮箱：校验常见 ASCII 格式",
+        text: "邮箱标准非常复杂，研究数据通常只需要筛查常见录入错误。这个模板要求有本地部分、@、域名和至少两位字母的顶级域。",
+        code: String.raw`email <- c("student@example.com", "bad@example", "name@sub.example.cn")
+email_pattern <- "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+
+normalized_email <- str_to_lower(str_trim(email))
+email_shape_ok <- str_detect(normalized_email, email_pattern)
+tibble::tibble(raw = email, normalized = normalized_email, shape_ok = email_shape_ok)`,
+        explain: "模式能发现缺少 @、缺少顶级域等明显问题。邮箱地址是否存在、能否收信、是否允许中文域名，需要邮件验证服务或实际发送确认。",
+      },
+      {
+        title: "中国地址：按省、市、区后缀分层拆分",
+        text: "地址写法并不完全统一。下面的模板适合常见“省/自治区 + 市/州 + 区/县 + 详细地址”和直辖市形式，结果必须抽样核对。",
+        code: String.raw`extract_cn_address <- function(address) {
+  pattern <- paste0(
+    "^(?<province>[^省市县]{2,15}?(?:省|自治区|特别行政区))?",
+    "(?<city>[^市县]{2,15}?(?:市|自治州|地区|盟))?",
+    "(?<district>[^区县旗]{1,15}?(?:区|县|旗|市))?",
+    "(?<detail>.*)$"
+  )
+  parts <- str_match(address, pattern)
+  tibble::tibble(
+    address = address,
+    province = parts[, "province"],
+    city = parts[, "city"],
+    district = parts[, "district"],
+    detail = parts[, "detail"]
+  )
+}
+
+extract_cn_address(c(
+  "广东省广州市天河区体育西路",
+  "北京市海淀区中关村大街",
+  "内蒙古自治区呼和浩特市新城区"
+))`,
+        explain: "非贪婪的 .+? 先让省市区分组在最近的后缀处停下，剩余内容进入 detail。北京市这类直辖市没有省级分组。该模板不能验证“天河区”是否真实存在，也不能处理所有历史名称、开发区和异常写法；科研数据最好结合行政区划代码表核对。",
+      },
+      {
+        title: "日期：格式正则与日历校验要配合",
+        text: "日期外形正确不代表日期存在。先用正则限制年月日位数，再用 ymd() 或 as.Date() 检查真实日历。",
+        code: String.raw`date_text <- c("2025-01-15", "2025-02-30", "2025/01/15")
+date_pattern <- "^[0-9]{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12][0-9]|3[01])$"
+shape_ok <- str_detect(date_text, date_pattern)
+parsed <- lubridate::ymd(date_text, quiet = TRUE)
+
+parsed_ok <- !is.na(parsed)
+tibble::tibble(date_text, shape_ok, parsed, parsed_ok)`,
+        explain: "日期模式把月份限制在 01 至 12、日期限制在 01 至 31，但 2 月 30 日仍能通过外形检查。parsed 为 NA 才能进一步发现日历上不存在的日期。",
+      },
+      {
+        title: "ICD-10：识别类目、亚目和明细",
+        text: "常见 ICD-10 外形是字母加两位数字，后面可带小数点和 1 至 4 位数字或字母。编码外形正确不等于版本和临床含义正确。",
+        code: String.raw`codes <- c("I10", "E11.9", "J45.0", "I10; E11.9")
+icd_pattern <- "^[A-Z][0-9]{2}(?:\\.[0-9A-Z]{1,4})?$"
+parts_pattern <- "^(?<chapter>[A-Z])(?<block>[0-9]{2})(?:\\.(?<detail>[0-9A-Z]{1,4}))?$"
+
+shape_ok <- str_detect(codes, icd_pattern)
+parts <- str_match(codes, parts_pattern)
+tibble::tibble(code = codes, shape_ok, parts[, "chapter"], parts[, "block"], parts[, "detail"])`,
+        explain: "I10; E11.9 包含两个编码，不能当作单条编码通过。若原始字段允许列表，应先用 str_extract_all() 拆分，再逐条验证；同时应注明使用的 ICD-10 版本。",
+      },
+      {
+        title: "医学文本：用标签定位血压和剂量",
+        text: "研究记录可能写成 SBP、收缩压、BP 120/80 或药名加剂量。标签和后缀可能变化，正则只能提取明确见过的写法。",
+        code: String.raw`records <- c("SBP: 135; HR 78", "收缩压=125，舒张压=82", "Metformin 500 mg", "Aspirin 100mg")
+
+sbp <- str_match(records, "(?i)(?:SBP|收缩压)\\s*[:=：]?\\s*([0-9]{2,3})")
+dose <- str_match(records, "(?i)^[A-Za-z ]+?\\s+([0-9]+(?:\\.[0-9]+)?)\\s*(mg|g|mcg|IU)$")
+
+tibble::tibble(
+  raw = records,
+  sbp = as.numeric(sbp[, 2]),
+  dose = as.numeric(dose[, 2]),
+  dose_unit = dose[, 3]
+)`,
+        explain: "血压模式允许 SBP 或收缩压、可选分隔符和空白；剂量模式保留数值和单位两个分组。提取后仍需检查阈值、单位是否统一，以及未能匹配的记录。",
+      },
+    ],
+    functions: ["str_detect", "str_match", "str_extract", "str_extract_all", "str_remove_all", "str_sub", "str_split_1", "str_view", "regex", "fixed", "ymd", "as.numeric"],
+    conditions: [
+      "正则结果只作为格式筛查或字段提取，不直接代表事实真实性。",
+      "身份证、手机号和邮箱应先标准化，再保留原值与解析结果。",
+      "日期、校验码、数值范围和单位必须另行验证。",
+      "地址拆分必须抽样核对，科研数据应尽量使用权威行政区划代码。",
+    ],
+    interpret: "一个值通过正则，说明它符合当前模板；没有通过，也不一定是录入错误，可能是模板尚未覆盖的合法写法。报告时应同时给出规则、正例、反例、未匹配数量和人工复核结果。",
+    readingNotes: [
+      "示例均为虚构值，不应把真实敏感数据粘贴到在线正则网站。",
+      "地址和医学记录常存在多个合法写法，必要时采用多分支规则或分步清洗。",
+      "N/A、未知、拒答、空字符串和真正缺失应分别处理。",
+      "模式升级后保留版本号，才能比较新旧提取结果。",
+    ],
+    pitfalls: [
+      "把“18 位且像身份证”当成身份证已通过国家校验。",
+      "用一条邮箱正则宣称邮箱真实有效。",
+      "地址正则成功拆分后不检查行政区名称和代码。",
+      "删除所有非数字后把剩余数字直接当成手机号、身份证或剂量。",
+    ],
+    practice: "为手机号、邮箱和日期各准备五个正例与五个反例，并为每条反例写出失败原因。再选择身份证和地址各十条记录，人工核对解析结果。",
+  };
+
+  if (!guideById(cookbook.id)) guides.push(cookbook);
+
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const textCategory = categories.find((item) => item.id === "regex");
+  if (textCategory) {
+    textCategory.detail = "从字符串基础开始，依次学习元字符、字符类、量词、转义、定位符、分组、四类零宽断言、贪婪与懒惰匹配，最后用实用表达式库处理身份证、电话、邮箱、地址和医学记录。";
+    const items = textCategory.items || [];
+    const patternItem = items.find((item) => item.href === "#guide/text/regex-patterns");
+    const groupItem = items.find((item) => item.href === "#guide/text/regex-groups");
+    if (patternItem) {
+      patternItem.title = "正则语法全解";
+      patternItem.note = "元字符、字符类、量词、转义、定位符与优先级";
+    }
+    if (groupItem) {
+      groupItem.title = "分组、断言与贪婪模式";
+      groupItem.note = "捕获/非捕获分组、四类零宽断言与懒惰匹配";
+    }
+    if (!items.some((item) => item.href === "#guide/text/regex-cookbook")) {
+      const cleaningIndex = items.findIndex((item) => item.href === "#guide/text/text-cleaning-workflow");
+      items.splice(cleaningIndex >= 0 ? cleaningIndex : items.length, 0, {
+        title: "常用正则表达式库",
+        note: "身份证、手机号、邮箱、地址、日期与医学文本解析",
+        href: "#guide/text/regex-cookbook",
+        level: "应用",
+      });
+    }
+  }
+
+  const courseText = (window.RZH_COURSE_MODULES || []).find((item) => item.id === "r-text");
+  if (courseText) {
+    courseText.subtitle = "清理文字、识别模式并转换日期";
+    courseText.minutes = 28;
+    courseText.outcome = "能按字符、次数、边界和分组逐层读懂正则，并完成常见格式识别、字段提取和日期转换。";
+    courseText.sections = [
+      ...(courseText.sections || []),
+      {
+        heading: "元字符、字符类与转义",
+        text: "元字符具有特殊语法含义；方括号描述一个位置上允许出现的字符；R 字符串与正则引擎各解释一层反斜杠，所以 \\\\d 在普通 R 字符串中通常写成 \"\\\\d\"。",
+      },
+      {
+        heading: "量词与运算顺序",
+        text: "问号、星号、加号和花括号控制前一个元素重复几次。括号优先于量词，量词优先于相邻连接，竖线分支最后解释；复杂模式先用括号写清优先级。",
+      },
+      {
+        heading: "定位符与整条验证",
+        text: "^ 与 $ 限定开头和结尾，\\\\b 检查单词边界。校验整条值时保留 ^...$；只提取局部内容时不要误把局部命中当成整条符合。",
+      },
+      {
+        heading: "捕获、非捕获与命名分组",
+        text: "普通圆括号在分组的同时保存内容；(?:...) 只分组不保存；(?<name>...) 给结果命名。str_match() 可同时返回整段匹配和各分组。",
+      },
+      {
+        heading: "先行、后行、贪婪与懒惰",
+        text: "零宽断言只检查目标前后条件，不把条件取走；.* 默认尽量多匹配，.*? 尽量少匹配。四类断言和懒惰量词都应在正例与反例上调试。",
+      },
+      {
+        heading: "实用模式与真实性边界",
+        text: "身份证、手机、邮箱和地址模板能筛查格式或拆分字段，但不能单独证明内容真实。身份证继续查日期与校验码，地址结合行政区代码，邮箱与电话按研究需要做外部确认。",
+      },
+    ];
+    courseText.code = String.raw`library(stringr)
+
+text <- c("SBP: 135", "SBP: 88%", "ID: A-102")
+samples <- str_view(text, "\\d+(?![\\d%])")
+parts <- str_match("PMID-2026-001", "^([A-Z]+)-(?:[0-9]{4})-([0-9]{3})$")
+d <- lubridate::ymd(c("2026-01-01", "2026-02-30"), quiet = TRUE)
+
+samples
+parts
+d`;
+    courseText.functions = unique([
+      ...(courseText.functions || []),
+      "str_view", "str_match", "str_extract", "str_replace_all", "regex", "fixed", "str_split_1", "chartr", "substring",
+    ]);
+    courseText.practice = "从一个包含身份证、电话、邮箱或医学标签的小样本出发，分别写出整条格式检查、字段提取和真实性校验，并保留不匹配记录。";
+  }
+
+  window.RZH_EXTRA_REGEX = [
+    ...(window.RZH_EXTRA_REGEX || []),
+    ["^\\\\d+$", "整条值都是数字", "str_detect(x, \"^\\\\d+$\")"],
+    ["\\\\d{11}", "连续 11 个数字", "str_view(phone, \"\\\\d{11}\")"],
+    ["\\\\w+", "连续的单词字符", "str_extract(x, \"\\\\w+\")"],
+    ["\\\\s+", "一个或多个空白", "str_squish(text)"],
+    ["[A-Z]{2}\\\\d{3}", "两个大写字母加三个数字", "str_detect(code, \"^[A-Z]{2}\\\\d{3}$\")"],
+    ["^\\\\s+|\\\\s+$", "开头或结尾空白", "str_trim(text)"],
+    ["(?:abc)+", "非捕获分组重复", "str_detect(x, \"(?:ab)+\")"],
+    ["(?=pattern)", "正向前行断言", "str_extract(x, \"\\\\d+(?= mg)\")"],
+    ["(?!pattern)", "负向前行断言", "str_extract(x, \"\\\\d+(?![\\\\d%])\")"],
+    ["(?<=pattern)", "正向后行断言", "str_extract(x, \"(?<=SBP: )\\\\d+\")"],
+    ["(?<!pattern)", "负向后行断言", "str_extract(x, \"(?<!ID-)\\\\d{3}\")"],
+    [".*?", "尽量少匹配任意字符", "str_extract(x, \"<p>.*?</p>\")"],
+    ["fixed(\".\")", "按字面查找点号", "str_detect(x, fixed(\".\"))"],
+  ];
+
+  const baseTextFunction = (item) => ({
+    category: "文本处理",
+    level: "入门",
+    tips: [],
+    related: [],
+    ...item,
+  });
+  window.RZH_EXTRA_FUNCTIONS_5 = [
+    ...(window.RZH_EXTRA_FUNCTIONS_5 || []),
+    baseTextFunction({
+      id: "chartr",
+      name: "chartr()",
+      package: "base",
+      aliases: ["字符翻译", "字符一一对应替换", "character translate"],
+      summary: "按字符一一对应的关系翻译字符串，old 与 new 的字符按位置配对。",
+      syntax: "chartr(old, new, x)",
+      returns: "返回字符向量；old 中对应位置的字符会替换为 new 中同位置的字符。",
+      example: String.raw`x <- "MiXeD cAsE 123"
+chartr("iXs", "why", x)
+chartr("a-cX", "D-Fw", x)`,
+      output: '[1] "MwheD cAyE 123"\n[1] "MiweD FAsE 123"',
+      params: [
+        ["old", "要被替换的字符集合，可写范围如 a-c。", "必填"],
+        ["new", "替换后的字符集合，其长度必须与 old 展开后的长度一致。", "必填"],
+        ["x", "要翻译的字符向量。", "必填"],
+      ],
+      tips: ["它按单个字符翻译，不是按整段词语替换。", "范围写法先展开再一一对应，中文数据要先测试。"],
+      related: ["gsub", "str_replace_all"],
+    }),
+    baseTextFunction({
+      id: "strsplit",
+      name: "strsplit()",
+      package: "base",
+      aliases: ["拆分字符串", "Base R split", "分隔文字"],
+      summary: "按分隔模式拆分字符向量，默认返回列表，因为每个元素可以拆出不同数量的片段。",
+      syntax: "strsplit(x, split, fixed = FALSE, perl = FALSE, useBytes = FALSE)",
+      returns: "返回字符向量列表，每个输入元素对应一个列表元素。",
+      example: String.raw`x <- c("2020/7/14", "2023/7/21")
+strsplit(x, split = "/")
+strsplit("input1.csv", split = ".", fixed = TRUE)`,
+      output: '[[1]]\n[1] "2020" "7"  "14"\n\n[[2]]\n[1] "2023" "7"  "21"',
+      params: [
+        ["x", "要拆分的字符向量。", "必填"],
+        ["split", "分隔文字或正则模式。", "必填"],
+        ["fixed", "TRUE 时按普通文字分隔，不解释正则元字符。", "默认 FALSE"],
+        ["perl", "是否启用 Perl 兼容正则。", "默认 FALSE"],
+        ["useBytes", "是否按字节处理。", "默认 FALSE"],
+      ],
+      tips: ["点号在正则中表示任意字符；按真正点号拆分要设置 fixed = TRUE。", "列表结果不能直接当成一列普通字符。"],
+      related: ["str_split", "str_split_fixed"],
+    }),
+    baseTextFunction({
+      id: "str_split_1",
+      name: "str_split_1()",
+      package: "stringr",
+      aliases: ["拆分单个字符串", "返回向量", "one string split"],
+      summary: "拆分单个字符串并直接返回字符向量，适合确定输入只有一条文字的场合。",
+      syntax: "str_split_1(string, pattern)",
+      returns: "返回字符向量，而不是列表。",
+      example: String.raw`str_split_1("I love R", pattern = " ")
+str_split_1("input1.csv", pattern = fixed("."))`,
+      output: '[1] "I"    "love" "R"\n[1] "input1" "csv"',
+      params: [
+        ["string", "必须是一条长度为 1 的字符。", "必填"],
+        ["pattern", "分隔文字或正则模式。", "必填"],
+      ],
+      tips: ["输入必须恰好只有一个字符串；多条输入应使用 str_split()。", "分隔符是正则特殊字符时可用 fixed()。"],
+      related: ["str_split", "strsplit"],
+    }),
+    baseTextFunction({
+      id: "sub",
+      name: "sub()",
+      package: "base",
+      aliases: ["替换第一个匹配", "Base R replace", "单次替换"],
+      summary: "在每条字符串中只替换第一个匹配片段，是 gsub() 的单次版本。",
+      syntax: "sub(pattern, replacement, x, ignore.case = FALSE, perl = FALSE, fixed = FALSE, useBytes = FALSE)",
+      returns: "返回替换后的字符向量。",
+      example: String.raw`sub("cat", "dog", "cat and cat")
+sub("[aeiou]", "-", c("apple", "banana"))`,
+      output: '[1] "dog and cat"\n[1] "-pple" "b-nana"',
+      params: [
+        ["pattern", "要匹配的文字或正则模式。", "必填"],
+        ["replacement", "替换内容，可引用捕获分组。", "必填"],
+        ["x", "要修改的字符向量。", "必填"],
+        ["ignore.case", "是否忽略大小写。", "默认 FALSE"],
+        ["perl", "是否启用 Perl 兼容正则。", "默认 FALSE"],
+        ["fixed", "是否按普通文字匹配。", "默认 FALSE"],
+      ],
+      tips: ["只替换第一个匹配；需要全部替换时用 gsub()。", "修改正式数据前保留原列。"],
+      related: ["gsub", "str_replace", "str_replace_all"],
+    }),
+    baseTextFunction({
+      id: "substring",
+      name: "substring()",
+      package: "base",
+      aliases: ["按位置提取", "截取文字", "substring text"],
+      summary: "按开始和结束位置提取子字符串，参数可向量化，适合同时测试多组起止位置。",
+      syntax: "substring(text, first, last = 1000000L)",
+      returns: "返回截取后的字符向量。",
+      example: String.raw`x <- c("2020/7/14", "2023/7/21")
+substring(x, 1, 4)
+substring(x, first = c(1, 6), last = c(4, 8))`,
+      output: '[1] "2020" "2023"\n[1] "2020" "7/21"',
+      params: [
+        ["text", "要截取的字符向量。", "必填"],
+        ["first", "开始位置，第一个字符为 1。", "必填"],
+        ["last", "结束位置；默认取到足够远的位置。", "默认 1000000L"],
+      ],
+      tips: ["substr() 与 substring() 相似，后者更容易传入多个起止位置。", "中英文混排时应先确认字符位置。"],
+      related: ["substr", "str_sub"],
+    }),
+  ];
+
+  const glossary = window.RZH_GLOSSARY ||= [];
+  const existingIds = new Set(glossary.map((item) => item[0]));
+  const addTerm = (item) => {
+    if (!existingIds.has(item[0])) {
+      glossary.push(item);
+      existingIds.add(item[0]);
+    }
+  };
+
+  [
+    ["regex", "正则表达式", "文本处理", "用字符和特殊符号描述文本模式的规则字符串，可用于检测、提取、替换和拆分。", "像一张写明了文字外形、次数和边界的检索模板。", "str_detect(x, \"^[A-Z]-[0-9]{3}$\")"],
+    ["metacharacter", "元字符", "文本处理", "在正则语法中具有特殊用途的字符，例如点号、星号、方括号和反斜杠。", "像普通键盘上被临时赋予快捷功能的按键。", "点号 . 表示任意字符，真正的点号要转义。"],
+    ["character-class", "字符类", "文本处理", "用方括号描述一个位置上允许出现的字符集合。", "像一道单选题的候选答案范围。", "[A-Z0-9] 表示一个大写字母或数字。"],
+    ["quantifier", "量词", "文本处理", "规定前一个字符、字符类或分组允许重复多少次的正则符号。", "像在模板上注明某一格至少写几次、最多写几次。", "[0-9]{11} 表示连续 11 个数字。"],
+    ["greedy-mode", "贪婪模式", "文本处理", "量词默认尽量多匹配，只要后续模式仍能成立就继续向后扩展。", "像一个尽量把桌上东西都装进袋子的人。", ".* 在多个结束标签之间会尽量匹配到更远处。"],
+    ["lazy-mode", "懒惰模式", "文本处理", "在量词后加问号，使匹配尽量少重复，常与结束标记配合确定停止位置。", "像拿够最低要求就停止。", ".*? 会在第一个可结束的位置停下。"],
+    ["noncapture-group", "非捕获分组", "文本处理", "使用 (?:...) 只组合元素和限定优先级，不把该分组单独保存为结果。", "像用括号圈出一个整体，但不给它单独贴标签。", "(?:19|20)\\\\d{2} 限制年份前缀但不增加分组列。"],
+    ["lookahead", "先行断言", "文本处理", "零宽检查当前位置后面是否满足某条件，条件本身不进入匹配结果。", "像检查门外是否有指定标记，但不把门牌带走。", "\\\\d+(?= mg) 只取单位前面的数字。"],
+    ["lookbehind", "后行断言", "文本处理", "零宽检查当前位置前面是否满足某条件，条件本身不进入匹配结果。", "像先核对左边的标签，再只抄写右边的值。", "(?<=SBP: )\\\\d+ 只取标签后的数字。"],
+    ["positive-lookaround", "正向断言", "文本处理", "要求目标前后存在某个模式，通常写作 (?=...) 或 (?<=...)。", "像必须有某种入场凭证才能继续。", "(?=mg) 要求后面出现 mg。"],
+    ["negative-lookaround", "负向断言", "文本处理", "要求目标前后不存在某个模式，通常写作 (?!...) 或 (?<!...)。", "像看到某个禁用标记就直接排除。", "\\\\d+(?![\\\\d%]) 不会把 80% 中的一部分数字当作目标。"],
+    ["zero-width-assertion", "零宽断言", "文本处理", "只判断匹配位置是否满足条件，不消耗字符，因此不会出现在返回文字中。", "像在文字之间放一个检查站，不占用纸张位置。", "边界、先行和后行断言都属于零宽判断。"],
+    ["named-capture", "命名捕获分组", "文本处理", "使用 (?<name>...) 给捕获分组命名，便于按字段名称读取结果。", "像给拆开的每个格子贴上可读标签。", "str_match(x, \"(?<year>[0-9]{4})-(?<month>[0-9]{2})\")"],
+    ["backreference", "反向引用", "文本处理", "在模式或替换中引用之前捕获到的分组，用于识别重复内容或重排字段。", "像让后面的位置回头调用前面已经圈出的材料。", "(\\\\w+)\\\\s+\\\\1 可识别连续重复单词。"],
+    ["regex-flavor", "正则方言", "文本处理", "不同软件或函数实现正则语法时的具体规则和支持范围。", "像同一种语言在不同地区有不同口音和用法。", "stringr 使用 ICU；JavaScript 和 PCRE 工具可能表现不同。"],
+    ["regex-validation", "正则校验", "文本处理", "用模式检查字符串外形，而不是证明内容真实、合法或有临床意义。", "像先检查证件格式，再另行确认证件真伪。", "手机号外形正确不代表号码存在。"],
+    ["machine-learning", "机器学习", "机器学习", "让计算机从数据中学习预测、分类或分组规则，并在未参与训练的数据上评价表现的方法。", "像从大量例题中总结规律，再用新题检查是否会做。", "关键是训练、验证和测试的边界，训练集分数高不代表新数据表现好。"],
+    ["validation", "验证", "机器学习", "用没有参与模型拟合或调参的数据检查模型在新样本上的表现。", "像学完后参加一场没见过原题的考试。", "交叉验证用于训练阶段评估，外部验证用于更独立地检验推广性。"],
+  ].forEach(addTerm);
+})();
+
+;
+(() => {
   const categories = window.RZH_TEACHING_CATEGORIES || [];
   const categoryMap = new Map(categories.map((item) => [item.id, item]));
 
@@ -101080,6 +101824,24 @@ const glossaryFunctionMap = {
   "model-object": ["summary"],
   "model-matrix": ["model.matrix", "lm"],
   "reference-level": ["levels", "relevel"],
+  regex: ["str_detect", "str_extract", "str_match"],
+  metacharacter: ["str_view", "fixed"],
+  "character-class": ["str_detect", "str_extract"],
+  quantifier: ["str_count", "str_detect"],
+  "greedy-mode": ["str_extract", "str_extract_all"],
+  "lazy-mode": ["str_extract", "str_extract_all"],
+  "noncapture-group": ["str_match", "str_replace"],
+  lookahead: ["str_extract", "str_detect"],
+  lookbehind: ["str_extract", "str_match"],
+  "positive-lookaround": ["str_extract", "str_detect"],
+  "negative-lookaround": ["str_extract", "str_detect"],
+  "zero-width-assertion": ["str_extract", "str_view"],
+  "named-capture": ["str_match", "str_match_all"],
+  backreference: ["str_replace", "str_match"],
+  "regex-flavor": ["regex", "fixed"],
+  "regex-validation": ["str_detect", "str_match"],
+  "machine-learning": ["initial_split", "vfold_cv"],
+  validation: ["vfold_cv", "last_fit"],
   "control-flow": ["if", "for-loop", "while-loop"],
   conditional: ["if", "ifelse", "case_when"],
   iteration: ["for-loop", "lapply"],
@@ -103299,8 +104061,9 @@ function renderSymbols() {
         <div class="section-title-row">
           <div>
             <h2 class="section-title">正则表达式速查</h2>
-            <p class="section-copy">先明确要匹配的是“整条值”还是“值中的一部分”。</p>
+            <p class="section-copy">先明确要匹配的是“整条值”还是“值中的一部分”；需要系统学习和实用模板时，可继续进入正则表达式的教学分类。</p>
           </div>
+          <a class="button" href="#guide/text/regex-cookbook">打开实用表达式库 ${icon("arrow-right")}</a>
         </div>
         <div class="panel detail-section">
           <div class="operator-table-wrap">
