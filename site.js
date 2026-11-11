@@ -61327,6 +61327,1824 @@ qcc.overdispersion.test(
 })();
 
 ;
+(() => {
+  const guides = window.RZH_GUIDES || [];
+  const guideById = (id) => guides.find((item) => item.id === id);
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const visualCategory = categories.find((item) => item.id === "visualization");
+  const unique = (items) => [...new Set(items)];
+
+  const visualGuides = [
+    {
+      type: "visual",
+      id: "ggplot-workflow",
+      typeLabel: "ggplot2 基础",
+      level: "入门",
+      minutes: 28,
+      title: "ggplot2 图层语法：从空白画布到一张图",
+      aliases: ["ggplot2入门", "图层语法", "图形语法", "grammar of graphics"],
+      hero: "先搭坐标骨架，再一层一层把点、线、文字和主题加上去",
+      audience: "刚接触 ggplot2，看到很多函数会写，却不知道它们在一张图里各自负责什么。",
+      overview: "ggplot2 把统计图形拆成可以单独修改的部件。ggplot() 先声明数据和变量映射，geom_*() 决定用什么图形显示，scale_*() 决定属性和坐标轴怎样取值，coord_*() 和 facet_*() 负责坐标与分面，theme() 负责字体、网格、图例和背景。加号表示把这些部件叠在一起。",
+      features: [
+        "理解数据、映射、几何对象和图层的关系。",
+        "区分代码里的“变量映射”和“固定外观值”。",
+        "用对象保存图形，再逐层增加或删除部件。",
+        "避免把标度、坐标和主题混为一谈。",
+      ],
+      concepts: [
+        { term: "数据 Data", explain: "ggplot2 主要接收数据框。每一行通常是一个观测，每一列是一个变量。" },
+        { term: "映射 Mapping", explain: "aes() 说明数据中的哪一列对应 x 轴、y 轴、颜色、形状、填充或分组。" },
+        { term: "图形属性 Aesthetic", explain: "位置、颜色、填充、形状、大小、透明度和线型等读者能看到的属性。" },
+        { term: "几何对象 Geom", explain: "点、线、柱、箱体、色块、误差线等最终画出来的对象，由 geom_*() 指定。" },
+        { term: "图层 Layer", explain: "一份数据、映射、统计变换和几何对象组成的作图层。多个图层用加号连接。" },
+        { term: "统计变换 Stat", explain: "在画图前对数据做计数、平滑、密度或求和等转换，例如 geom_bar() 默认统计类别频数。" },
+        { term: "标度 Scale", explain: "决定变量怎样变成坐标位置、颜色、形状和大小，也控制坐标轴刻度与图例。" },
+        { term: "坐标与分面", explain: "coord_*() 改变坐标系，facet_*() 把数据拆成多个子图。两者解决的问题不同。" },
+        { term: "主题 Theme", explain: "只改变背景、网格、字体、图例和标题外观，不改变数据与统计结果。" },
+      ],
+      comparison: {
+        title: "一张 ggplot2 图的组成",
+        note: "读代码时先识别每一段在补哪个部件，不必从第一个字符背到最后。",
+        headers: ["代码部件", "常见函数", "负责什么", "最小例子"],
+        rows: [
+          ["数据与映射", "ggplot() + aes()", "声明画谁、横纵轴是什么", "ggplot(dat, aes(x, y))"],
+          ["几何对象", "geom_point() 等", "决定点、线、柱或色块", "+ geom_point()"],
+          ["统计变换", "geom_smooth()、geom_bar()", "先平滑、计数或汇总", "+ geom_smooth()"],
+          ["位置调整", "position_dodge()、position_jitter()", "避免柱或点互相遮挡", "position = position_dodge(.8)"],
+          ["标度", "scale_*()", "设置范围、刻度、颜色和图例", "+ scale_y_continuous()"],
+          ["坐标系", "coord_*()", "笛卡尔、翻转、固定比例或极坐标", "+ coord_flip()"],
+          ["分面", "facet_wrap()、facet_grid()", "按子集拆成多个小图", "+ facet_wrap(~ group)"],
+          ["主题", "theme_*()、theme()", "设置字体、网格、背景和图例位置", "+ theme_bw()"],
+        ],
+      },
+      whenUse: [
+        "第一次学习 ggplot2，想建立稳定的读代码顺序。",
+        "已经能照抄图，却不知道换数据或换图形时该改哪一段。",
+        "想把一张复杂图拆成可以逐层检查的部件。",
+      ],
+      dataShape: [
+        "图形数据优先整理成数据框。",
+        "确认 x、y、分组和结局变量的类型。",
+        "先抽取少量数据试画，再使用完整数据。",
+      ],
+      steps: [
+        {
+          title: "先准备一份可重复的小数据",
+          text: "从 ggplot2 自带 diamonds 数据中固定随机抽取 800 行，后面的图都围绕同一份数据修改，便于看出每一层带来的变化。",
+          code: String.raw`library(ggplot2)
+set.seed(2026)
+d <- diamonds[sample(nrow(diamonds), 800), ]
+
+head(d[, c("carat", "price", "cut", "clarity")])`,
+          explain: "先固定随机种子，之后每次运行得到的样本相同。示例只用于说明图形语法，不代表真实市场结论。",
+        },
+        {
+          title: "只画空白画布",
+          text: "ggplot() 只声明数据和映射，不会自动出现几何图形。先运行空白对象，可以确认变量名没有写错。",
+          code: String.raw`p <- ggplot(d, aes(x = carat, y = price))
+p`,
+          explain: "这时只有坐标轴和范围，没有点。看到空白图不是代码失败，而是还没有添加几何对象。",
+        },
+        {
+          title: "添加第一层点",
+          text: "几何对象决定“用什么形状表达数据”。点图适合观察两个连续变量的关系。",
+          code: String.raw`p +
+  geom_point()`,
+          explain: "顶层的 data 和 aes 被 geom_point() 继承。点重叠明显时，可以降低透明度而不是删除数据。",
+        },
+        {
+          title: "再叠一层平滑趋势",
+          text: "同一张图可以叠加不同几何对象。平滑层帮助看总体趋势，原始点仍保留。",
+          code: String.raw`p +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "loess", se = TRUE)`,
+          explain: "geom_point() 显示原始观测，geom_smooth() 增加趋势和不确定性。loess 是灵活平滑，不等于因果模型。",
+        },
+        {
+          title: "最后补标签和主题",
+          text: "图形主体形成后再处理可读性。标签写清变量单位，主题控制背景、网格和字体。",
+          code: String.raw`p +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "loess", se = TRUE) +
+  labs(
+    title = "钻石重量与价格",
+    x = "克拉",
+    y = "价格（美元）"
+  ) +
+  theme_bw(base_size = 13)`,
+          explain: "labs() 只改文字，theme_bw() 只改外观；它们都没有改变数据映射或统计结果。",
+        },
+      ],
+      functions: ["ggplot", "aes", "geom_point", "geom_smooth", "labs", "theme_bw"],
+      conditions: [
+        "数据和变量映射先正确，再增加装饰层。",
+        "每个图层只承担清楚的任务。",
+        "改变图层顺序时重新检查覆盖关系。",
+      ],
+      interpret: "图的统计含义来自数据、几何对象和统计变换；颜色、主题和导出格式只是后续表达方式。先保证图形正确，再追求漂亮。",
+      readingNotes: [
+        "加号通常放在上一行末尾，便于继续添加图层。",
+        "ggplot() 的对象可以保存，再逐步增加图层。",
+        "同一位置添加多个同类型图层时，后添加的图层会覆盖前面的可见结果。",
+      ],
+      pitfalls: [
+        "只添加 ggplot() 就以为应该出现数据点。",
+        "把颜色变量写在 aes() 内和 aes() 外混为一谈。",
+        "图还没检查就花大量时间改主题。",
+        "为了追求复杂而在同一张图叠加太多几何对象。",
+      ],
+      practice: "用同一份 diamonds 样本分别画：仅点图；点图加平滑；点图按 cut 着色并分面。每次只增加一个部件，观察图形多了什么。",
+      related: ["ggplot-aesthetics", "ggplot-geoms", "scatter"],
+      imageKey: "scatter",
+      imageCaption: "从数据映射到几何对象形成最小图形。后续的标度、坐标、分面、主题和导出都在这张基本图之上继续叠加。",
+    },
+    {
+      type: "visual",
+      id: "ggplot-aesthetics",
+      typeLabel: "ggplot2 基础",
+      level: "入门",
+      minutes: 32,
+      title: "数据映射与图形属性",
+      aliases: ["aes", "图形属性", "颜色映射", "shape", "fill", "group"],
+      hero: "让变量对应颜色、形状和分组，而不是随手指定一个好看的值",
+      audience: "能画出点图，但经常分不清 color、fill、shape、group，以及 aes() 内外写法的差别。",
+      overview: "aes() 里写的是“变量怎样变成视觉属性”，属于数据映射；aes() 外写的是“所有观测统一使用某个外观值”。同一列既决定位置又决定颜色时，ggplot2 会自动形成分组和图例。颜色与填充、折线与分组、抖动与并排位置各有适用对象。",
+      features: [
+        "区分变量映射和固定外观。",
+        "正确选择 color、fill、shape、alpha 和 group。",
+        "用分组画线、箱式图和误差线。",
+        "减少不必要的图例和视觉噪声。",
+      ],
+      concepts: [
+        { term: "aes 内外的区别", explain: "aes(color = cut) 表示不同 cut 使用不同颜色；aes(color = \"red\") 会错误地把字符串当成变量。color = \"red\" 放在 aes() 外才是全图统一红色。" },
+        { term: "color 与 fill", explain: "点、线和文字使用 color；面积型对象常用 fill。某些形状同时支持颜色和填充，例如空心点。" },
+        { term: "group", explain: "告诉 ggplot2 哪些观测属于同一条线或同一个组。分类 x 轴上画多条纵向轨迹时通常需要。" },
+        { term: "shape", explain: "点的形状适合少量分类。类别太多时形状难辨，而且部分形状不支持 fill。" },
+        { term: "alpha", explain: "透明度用于处理点重叠。过低会看不清，过高会显得脏乱。" },
+        { term: "position", explain: "position_dodge() 把同组对象并排，position_jitter() 轻微散开重叠点。" },
+      ],
+      comparison: {
+        title: "常用图形属性怎么选",
+        note: "先看对象类型，再看变量是否分类，最后才选择颜色和形状。",
+        headers: ["属性", "适合表达", "常见错误", "示例"],
+        rows: [
+          ["x / y", "位置和数量关系", "把分类和连续变量的刻度混用", "aes(carat, price)"],
+          ["color", "点、线、边框或文字类别", "用在实心面积上以为是在填色", "aes(color = cut)"],
+          ["fill", "柱、箱体、面积和色块内部", "因子类别太多造成颜色拥堵", "aes(fill = clarity)"],
+          ["shape", "少量分类的点", "超过 5 至 6 类仍用形状", "aes(shape = cut)"],
+          ["alpha", "点或区域重叠程度", "同时既表变量又用于固定透明", "geom_point(alpha = .35)"],
+          ["group", "同一对象或同一条线的连接", "分组变量放错层导致线乱连", "aes(group = subject)"],
+        ],
+      },
+      whenUse: [
+        "不同组的数据要在一张图里比较。",
+        "点重叠严重，需要透明度或位置错开。",
+        "同一份数据中既有分类变量又有连续变量。",
+      ],
+      dataShape: [
+        "分类变量优先转成有明确顺序的 factor。",
+        "检查每一组样本量，组太小不宜用过度丰富的视觉编码。",
+        "同一图不要用太多颜色、形状和填充同时编码不同变量。",
+      ],
+      steps: [
+        {
+          title: "先映射位置",
+          text: "位置是最重要的图形属性。先让 x、y 正确，再考虑颜色和形状。",
+          code: String.raw`ggplot(d, aes(carat, price)) +
+  geom_point()`,
+          explain: "这一层只回答重量和价格怎样共同变化，不承担分类比较。",
+        },
+        {
+          title: "把分类变量映射到颜色",
+          text: "颜色写在 aes() 内，才会根据 cut 的类别自动分配颜色并生成图例。",
+          code: String.raw`ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.5)`,
+          explain: "颜色不是手动固定的，而是由 cut 映射出来。图例名称直接来自变量。",
+        },
+        {
+          title: "比较固定颜色和错误写法",
+          text: "所有点都要同一种颜色时，把颜色写在 geom_*() 外面。",
+          code: String.raw`ggplot(d, aes(carat, price)) +
+  geom_point(color = "#d97b59", alpha = 0.45)
+
+# 不要写成 aes(color = "red")，
+# 那会把字符串当作映射内容。`,
+          explain: "固定颜色适合强调单一群体。只要出现图例，往往说明你把它误写进了 aes()。",
+        },
+        {
+          title: "分组画同一对象的轨迹",
+          text: "折线图连接的是同一组内相邻的点。没有 group 时，分类 x 轴上的不同对象可能被错误连在一起。",
+          code: String.raw`ggplot(Orange,
+       aes(age, circumference, group = Tree, color = Tree)) +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 1.8) +
+  theme_minimal()`,
+          explain: "group = Tree 保证每棵树各自连成一条线；color = Tree 再把组别显示成不同颜色。",
+        },
+        {
+          title: "用位置错开重叠对象",
+          text: "箱式图或误差线按性别并排时使用 position_dodge，而不是手工改 x 数值。",
+          code: String.raw`ggplot(d,
+       aes(x = cut, y = price, fill = color)) +
+  geom_boxplot(
+    width = 0.65,
+    position = position_dodge(width = 0.75),
+    outlier.shape = NA
+  ) +
+  coord_cartesian(ylim = c(0, 10000)) +
+  theme_minimal()`,
+          explain: "position_dodge() 统一控制同组箱体的并排距离。用 coord_cartesian() 限制显示范围，不删除范围外数据。",
+        },
+      ],
+      functions: ["aes", "geom_point", "geom_line", "geom_boxplot", "position_dodge"],
+      conditions: [
+        "变量类型与图形属性匹配。",
+        "类别数量适合颜色或形状编码。",
+        "固定外观和变量映射没有混写。",
+      ],
+      interpret: "映射产生图例和分组，固定外观不产生图例。看到一个不期望的图例时，先检查是否误把固定值写进了 aes()。",
+      readingNotes: [
+        "实心点通常只用 color；柱和箱体的边框与内部可分别由 color 和 fill 控制。",
+        "因子水平决定颜色和并排顺序，分析前应先设置。",
+        "透明度是处理重叠的工具，不能修复错误的数据范围。",
+      ],
+      pitfalls: [
+        "把 aes(color = \"red\") 当成固定红色。",
+        "分类变量直接按字符首字母排序，破坏专业顺序。",
+        "用太多 shape 和颜色导致图例难读。",
+        "折线图忘记 group，导致不同对象交叉连线。",
+      ],
+      practice: "用 diamonds 画两幅点图：一幅所有点同色；一幅按 cut 着色。解释为什么只有后者出现图例，并尝试把图例标题改成“切工”。",
+      related: ["ggplot-workflow", "ggplot-scales-legend", "scatter"],
+      imageKey: "line",
+      imageCaption: "分组映射让同一画布中的对象拥有不同颜色和连接关系。折线图尤其需要明确 group，否则不同对象会被错误连接。",
+    },
+    {
+      type: "visual",
+      id: "ggplot-geoms",
+      typeLabel: "ggplot2 基础",
+      level: "入门",
+      minutes: 34,
+      title: "几何对象与统计变换",
+      aliases: ["geom", "几何对象", "stat", "geom_bar", "geom_col"],
+      hero: "先问数据要回答什么问题，再决定点、线、柱还是色块",
+      audience: "知道常见函数名，但容易混淆 geom_bar() 与 geom_col()、原始点与平滑线、误差条与箱式图。",
+      overview: "几何对象决定图长什么样，统计变换决定画之前数据怎样处理。geom_bar() 默认按类别计数，geom_col() 直接使用已计算好的高度；geom_smooth() 拟合平滑趋势；geom_errorbar() 需要下限和上限；geom_tile() 用色块表达二维网格。",
+      features: [
+        "按任务选择常见 geom。",
+        "区分原始数据图层和汇总数据图层。",
+        "理解 geom 与 stat 的关系。",
+        "用多个图层补充信息而不是互相遮挡。",
+      ],
+      concepts: [
+        { term: "geom_*()", explain: "指定一种图形对象。函数名后半部分通常直接说明图形，例如 point、line、bar、tile、errorbar。" },
+        { term: "stat_*()", explain: "描述画图前要进行的统计转换，例如 count、bin、smooth、density。" },
+        { term: "identity", explain: "直接使用数据中的值，不再重新计数或汇总。" },
+        { term: "必需参数", explain: "geom_rect() 需要 xmin、xmax、ymin、ymax；geom_errorbar() 需要 ymin、ymax。帮助页中的必需 aesthetic 最值得先看。" },
+      ],
+      comparison: {
+        title: "研究问题与常见几何对象",
+        note: "图形选择由变量类型和任务决定，不由哪个函数更花哨决定。",
+        headers: ["要回答的问题", "常用 geom", "数据准备", "主要风险"],
+        rows: [
+          ["两个连续变量关系", "geom_point()", "一行一个观测", "点重叠"],
+          ["时间或顺序变化", "geom_line()、geom_step()", "x 轴有合理顺序", "把无序类别连线"],
+          ["单变量分布", "geom_histogram()、geom_density()", "一列连续值", "分箱或带宽改变外观"],
+          ["类别频数", "geom_bar()", "一行一个观测", "误以为柱子是均值"],
+          ["已计算柱高", "geom_col()", "数据中已有 y 值", "与计数柱混用"],
+          ["估计值及不确定性", "geom_pointrange()、geom_errorbar()", "已有估计和上下限", "误标 SD、SE、CI"],
+          ["二维网格数值", "geom_tile()、geom_raster()", "x、y、fill 三列", "类别排序和色阶误导"],
+          ["平滑趋势与区间", "geom_smooth()", "x、y 连续", "把探索平滑当成因果模型"],
+        ],
+      },
+      whenUse: [
+        "不确定某个图形应该用哪个 geom。",
+        "想把原始点、平滑和误差信息放在同一图。",
+        "需要把汇总表直接画成柱或误差图。",
+      ],
+      dataShape: [
+        "原始数据、汇总数据的每行含义不同。",
+        "柱高、误差上下限和色块 fill 必须在数据表中明确存在。",
+        "图层可以继承顶层数据，也可以各自指定数据。",
+      ],
+      steps: [
+        {
+          title: "原始点与平滑层",
+          text: "散点负责展示原始观测，平滑层负责展示趋势。两层叠加时先弱化原始点。",
+          code: String.raw`ggplot(d, aes(carat, price)) +
+  geom_point(alpha = 0.3, size = 1.5) +
+  geom_smooth(method = "loess", se = TRUE) +
+  theme_minimal()`,
+          explain: "点层保留每个样本，平滑层显示总体趋势。平滑的自由度由方法自动决定，不应直接解释为因果效应。",
+        },
+        {
+          title: "计数柱与固定柱高",
+          text: "geom_bar() 默认统计行数；已有 n、mean、rate 等高度时用 geom_col()。",
+          code: String.raw`count_dat <- as.data.frame(table(d$cut))
+names(count_dat) <- c("cut", "n")
+
+ggplot(count_dat, aes(cut, n)) +
+  geom_col(fill = "#2f6b5b") +
+  labs(x = "切工", y = "颗数") +
+  theme_minimal()`,
+          explain: "count_dat 已经是汇总表，所以用 geom_col() 直接画 n。若数据一行一颗钻石，则 geom_bar() 会自动计数。",
+        },
+        {
+          title: "二维数据用色块",
+          text: "热图至少需要 x、y 和 fill 三个映射。分类轴的顺序应先转换为因子。",
+          code: String.raw`heat <- aggregate(
+  price ~ cut + clarity,
+  data = d,
+  FUN = median
+)
+
+ggplot(heat, aes(cut, clarity, fill = price)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  scale_fill_gradient(low = "#edf5f1", high = "#2f6b5b") +
+  theme_minimal()`,
+          explain: "每个 cut × clarity 单元格的颜色代表该组价格中位数。色块图显示的是汇总值，不是 800 颗钻石的原始点。",
+        },
+        {
+          title: "误差条需要上下限",
+          text: "误差条不是只给一个均值就会自动出现，必须先算出 ymin 和 ymax。",
+          code: String.raw`sum_dat <- aggregate(
+  price ~ cut,
+  data = d,
+  FUN = function(x) {
+    m <- mean(x, na.rm = TRUE)
+    se <- sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x)))
+    c(mean = m, low = m - 1.96 * se, high = m + 1.96 * se)
+  }
+)
+
+ggplot(sum_dat, aes(cut, mean)) +
+  geom_errorbar(aes(ymin = low, ymax = high), width = 0.18) +
+  geom_point(size = 2.5) +
+  labs(y = "价格均数及 95% CI") +
+  theme_minimal()`,
+          explain: "这里把标准误换成 95% 置信区间。误差条的含义必须写进图注，不能只用“误差线”三个字。",
+        },
+      ],
+      functions: ["geom_point", "geom_smooth", "geom_histogram", "geom_bar", "geom_col", "geom_tile", "geom_errorbar"],
+      conditions: [
+        "原始数据和汇总数据的每行含义清楚。",
+        "geom 所需映射字段完整。",
+        "多个图层的视觉强度有主次。",
+      ],
+      interpret: "geom 决定你能看到什么形状，stat 决定这个形状由原始数据还是汇总值产生。解释图形前必须知道自己画的是原始观测还是统计摘要。",
+      readingNotes: [
+        "帮助页的 Required aesthetics 是查参数最快的入口。",
+        "geom_bar() 与 geom_col() 的区别在于是否重新统计频数。",
+        "误差条、密度和直方图都很容易被参数改变外观，需要做参数敏感性检查。",
+      ],
+      pitfalls: [
+        "已有均值仍用 geom_bar()，导致画出的不是均值。",
+        "热图分类轴没有设置因子顺序。",
+        "误差条上下限与柱子来自不同数据。",
+        "在一张图上叠加过多 geom，主次无法辨认。",
+      ],
+      practice: "分别用 geom_bar() 和 geom_col() 画同一批 cut 数据，确认两张图一致。再把 diamonds 按 cut 汇总价格中位数，用 geom_point() 与 geom_errorbar() 画出估计和区间。",
+      related: ["ggplot-workflow", "heatmap", "errorbar"],
+      imageKey: "heatmap",
+      imageCaption: "热图示例：每个 cut × clarity 单元格的颜色代表价格中位数。分类顺序经过因子设置，颜色尺度同时给出图例。",
+    },
+    {
+      type: "visual",
+      id: "plot-selection",
+      typeLabel: "图形选择",
+      level: "入门",
+      minutes: 20,
+      title: "按研究问题选择图形",
+      aliases: ["怎么选图", "图形选择", "plot selection", "数据可视化路线"],
+      hero: "先确定变量角色与比较方式，再选图形",
+      audience: "面对数据表不知道先画什么，或者希望论文图、汇报图和探索图各司其职。",
+      overview: "选图时依次问四件事：要展示分布、关系、组间比较、随时间变化还是多变量结构；变量是连续、分类、计数还是生存时间；比较对象是谁；读者需要精确数值还是总体形状。图形选择错误通常来自研究问题没有说清，而不是代码不会写。",
+      features: [
+        "把研究问题翻译成变量角色。",
+        "区分探索图与最终论文图。",
+        "避免用饼图、三维图或双 Y 轴掩盖问题。",
+        "知道每组图形应同时报告哪些数字。",
+      ],
+      concepts: [
+        { term: "变量角色", explain: "分清结局、暴露、分组和时间变量，决定谁放横轴、纵轴、颜色和分面。" },
+        { term: "探索图", explain: "优先发现异常、缺失和关系形状，允许暂时杂乱。" },
+        { term: "论文图", explain: "只保留回答问题所需的图层，清楚标注单位、样本量、效应尺度和不确定性。" },
+      ],
+      comparison: {
+        title: "常见研究任务与首选图形",
+        note: "同一任务可能有多个可用图，优先选择读者最容易准确读取的图形。",
+        headers: ["任务", "首选图形", "也可以考虑", "同时报告"],
+        rows: [
+          ["单个连续变量分布", "直方图或密度图", "箱式图、小提琴图", "n、中位数、四分位距"],
+          ["多个组分布比较", "箱式图 + 散点", "小提琴图 + 箱体", "每组 n 和缺失数"],
+          ["两个连续变量关系", "散点图", "六边形密度图", "趋势、异常点、分组"],
+          ["组间均值及不确定性", "点 + 误差条", "柱 + 误差条", "误差条是 SD、SE 还是 CI"],
+          ["分类频数或比例", "条形图", "点图", "分母和百分比"],
+          ["时间趋势", "折线图", "阶梯图", "时间单位、聚合规则"],
+          ["二维汇总值", "热图", "等高线图", "fill 代表的统计量"],
+          ["多变量相关结构", "相关矩阵", "散点矩阵", "相关方法和缺失处理"],
+          ["生存过程", "Kaplan-Meier 曲线", "累积发生率曲线", "风险人数和删失"],
+        ],
+      },
+      whenUse: ["面对一份新数据不知从哪画起。", "论文审稿人要求更换或补充图形。", "图形很多但无法回答核心问题。"],
+      dataShape: ["先做数据字典，标注变量类型和单位。", "确定分析单位和比较组。", "检查缺失、极端值和样本量。"],
+      steps: [
+        {
+          title: "先写一句图形要回答的问题",
+          text: "把问题写成“比较谁的什么指标，在什么单位上与谁有什么差异”。问题越具体，图形越容易选。",
+          code: String.raw`# 示例问题：
+# 不同切工类别的钻石价格分布是否不同？
+# 变量角色：cut = 分类分组，price = 连续结局`,
+          explain: "这不是代码，而是作图前的任务约定。若连比较对象和指标都说不清，继续加图层只会更混乱。",
+        },
+        {
+          title: "先画探索版，再画论文版",
+          text: "探索图允许点很多、标注多；论文图必须压缩到核心信息和不确定性。",
+          code: String.raw`p_explore <- ggplot(d, aes(cut, price)) +
+  geom_jitter(width = 0.15, alpha = 0.18, size = 1) +
+  geom_boxplot(width = 0.45, fill = NA, outlier.shape = NA)
+
+p_explore`,
+          explain: "散点让异常值和样本量可见，箱体概括中位数和四分位数。探索阶段应保留极端点，而不是先删掉。",
+        },
+      ],
+      functions: ["ggplot", "geom_point", "geom_boxplot", "geom_line", "geom_tile"],
+      conditions: ["比较对象和分析单位明确。", "图形不替代样本量、缺失和统计摘要。"],
+      interpret: "好的图形让读者不查正文也能看出比较对象、变量尺度和主要趋势；复杂图形只有在解决具体阅读问题时才值得加入。",
+      readingNotes: ["同一数据可以有多张图，不必强求一张图回答全部问题。", "论文主图优先二维和可精确读取的图形。"],
+      pitfalls: ["只因为流行就选复杂图形。", "图里没有单位、样本量或不确定性。", "探索阶段过早删除所谓异常值。"],
+      practice: "从自己的数据中写出三个问题，分别为每个问题选择一种图，并说明为什么不选另外两种。",
+      related: ["ggplot-workflow", "histogram", "scatter", "line"],
+      imageKey: "scatter",
+      imageCaption: "二维散点适合关系探索。若研究问题改为组间分布比较，应改用箱式图、小提琴图或点加误差条。",
+    },
+    {
+      type: "visual",
+      id: "ggplot-scales-legend",
+      typeLabel: "ggplot2 基础",
+      level: "进阶",
+      minutes: 38,
+      title: "标度、坐标轴与图例",
+      aliases: ["scale", "标度", "图例", "legend", "坐标轴刻度"],
+      hero: "把变量映射成读者能准确读取的范围、刻度和颜色",
+      audience: "能按组着色，但图例标题、颜色顺序、坐标范围和日期刻度总是不受控制。",
+      overview: "标度函数统一采用 scale_属性_类型 的命名方式。位置标度控制坐标轴范围、刻度和转换，颜色标度控制类别颜色或连续梯度，guide/legend 控制图例是否显示、标题和布局。limits 会移除范围外数据，coord_cartesian() 只裁剪显示区域，两者不能混用。",
+      features: [
+        "设置连续轴和日期轴。",
+        "控制分类颜色、连续渐变和因子顺序。",
+        "修改图例标题、位置、方向与显示内容。",
+        "区分坐标转换与显示范围裁剪。",
+      ],
+      concepts: [
+        { term: "标度", explain: "把数据值转换成图形属性的函数，包括位置、颜色、大小、形状和透明度。" },
+        { term: "limits 与 breaks", explain: "limits 规定可显示的数据范围，breaks 规定坐标轴上出现哪些刻度。" },
+        { term: "颜色标度", explain: "离散变量常用 manual、brewer；连续变量常用 gradient、gradient2、gradientn。" },
+        { term: "图例合并", explain: "多个图层映射同一变量时，ggplot2 会尝试合并图例，减少重复。" },
+        { term: "guide", explain: "控制图例和颜色条的外观。guides(shape = \"none\") 可隐藏不需要的图例。" },
+      ],
+      comparison: {
+        title: "常用标度与图例函数",
+        note: "先判断变量是连续还是离散，再选择位置、颜色或其他标度。",
+        headers: ["任务", "常用函数", "关键参数", "注意"],
+        rows: [
+          ["连续 x/y 轴", "scale_x_continuous()", "limits、breaks、labels", "limits 会丢弃范围外数据"],
+          ["日期轴", "scale_x_date()", "date_breaks、date_labels", "格式遵循日期格式符"],
+          ["分类颜色", "scale_color_manual()", "values、labels", "values 按因子水平顺序匹配"],
+          ["分类填充", "scale_fill_manual()", "values、labels", "柱、箱体或区域使用 fill"],
+          ["连续双色渐变", "scale_fill_gradient()", "low、high", "适合单一方向强弱"],
+          ["连续三色渐变", "scale_fill_gradient2()", "low、mid、high", "适合相关或有中心值的指标"],
+          ["图例隐藏", "guides()", "shape = \"none\"", "不要把信息图例全删光"],
+          ["图例布局", "guide_legend()", "direction、nrow", "图例位置要与图形留白配合"],
+        ],
+      },
+      whenUse: ["坐标轴范围或刻度不合适。", "颜色与分类顺序不符合研究含义。", "图例标题、标签、方向需要定制。"],
+      dataShape: ["分类顺序在 factor levels 中先固定。", "明确连续变量是否需要变换。", "确认 limits 是否会排除合法数据。"],
+      steps: [
+        {
+          title: "设置坐标轴标题、范围和刻度",
+          text: "先用 scale_x/y_continuous() 明确单位和刻度。若只想放大局部，不要用 limits 删除数据，应使用 coord_cartesian()。",
+          code: String.raw`ggplot(d, aes(carat, price)) +
+  geom_point(alpha = 0.3) +
+  scale_x_continuous(
+    name = "克拉",
+    breaks = seq(0.5, 2.5, 0.5)
+  ) +
+  scale_y_continuous(
+    name = "价格（美元）",
+    breaks = seq(0, 20000, 5000)
+  ) +
+  coord_cartesian(ylim = c(0, 15000))`,
+          explain: "刻度和标题由标度控制，显示范围由 coord_cartesian() 放大。范围外数据仍参与后续统计和平滑。",
+        },
+        {
+          title: "固定分类颜色顺序",
+          text: "分类颜色先按因子水平对应，再写 values。不能只看图例颜色猜顺序。",
+          code: String.raw`d$cut <- factor(
+  d$cut,
+  levels = c("Fair", "Good", "Very Good", "Premium", "Ideal")
+)
+
+ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.35) +
+  scale_color_manual(
+    name = "切工",
+    values = c(
+      "#b7c9c1", "#82a89a", "#5c8d7e",
+      "#d97b59", "#8f3f35"
+    )
+  )`,
+          explain: "颜色顺序与 levels 一一对应。改变因子水平会同步改变颜色和并排顺序。",
+        },
+        {
+          title: "设置连续色阶",
+          text: "连续变量用 gradient 系列。热图中应让最小值、中间值和最大值有清楚的颜色意义。",
+          code: String.raw`ggplot(heat, aes(cut, clarity, fill = price)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient2(
+    name = "价格中位数",
+    low = "#58789f",
+    mid = "#fffdf9",
+    high = "#d97b59",
+    midpoint = median(heat$price)
+  ) +
+  theme_minimal()`,
+          explain: "midpoint 把中性色放在指定数值上。颜色两端应对应读者能理解的低值和高值。",
+        },
+        {
+          title: "定制与隐藏图例",
+          text: "同一变量映射到颜色和形状时，可以合并图例，也可以隐藏多余的形状图例。",
+          code: String.raw`ggplot(d, aes(carat, price, color = cut, shape = cut)) +
+  geom_point(size = 2, alpha = 0.45) +
+  guides(
+    color = guide_legend(
+      title = "切工",
+      direction = "horizontal",
+      nrow = 1
+    ),
+    shape = "none"
+  ) +
+  theme(legend.position = "top")`,
+          explain: "颜色图例保留，形状图例隐藏。图例横排后适合放在图上方，减少右侧占宽。",
+        },
+      ],
+      functions: ["scale_x_continuous", "scale_y_continuous", "scale_color_manual", "scale_fill_manual", "guides", "guide_legend"],
+      conditions: ["因子水平和颜色顺序已经明确。", "limits 与 coord_cartesian 的区别清楚。", "图例不会占据主要图形区域。"],
+      interpret: "坐标轴、颜色和图例不是装饰。它们决定读者怎样把视觉属性还原成数据值，因此单位和尺度必须准确。",
+      readingNotes: ["先设因子水平，再设 manual 颜色。", "连续色阶要避免彩虹色造成顺序错觉。", "不要同时用图例和直接标签重复所有信息。"],
+      pitfalls: ["用 limits 删除极端值却声称只改变了显示范围。", "颜色 values 与 levels 数量不一致。", "图例标题仍保留英文变量名。", "同一图使用太多离散颜色。"],
+      practice: "为 diamonds 的 cut 设置从浅到深的五色，并让图例横排置顶；再比较 coord_cartesian() 与 scale_y_continuous(limits=) 对平滑线的影响。",
+      related: ["ggplot-aesthetics", "ggplot-coordinates", "ggplot-themes"],
+      imageKey: "heatmap",
+      imageCaption: "热图的颜色是连续标度，分类轴顺序由因子水平控制。标度会同时影响图形颜色、图例和读者对数值顺序的判断。",
+    },
+    {
+      type: "visual",
+      id: "ggplot-coordinates",
+      typeLabel: "ggplot2 基础",
+      level: "进阶",
+      minutes: 24,
+      title: "坐标系统与尺度转换",
+      aliases: ["coord_cartesian", "coord_flip", "coord_fixed", "coord_trans", "坐标转换"],
+      hero: "坐标系统负责把已经映射的位置放到画布上",
+      audience: "不清楚 scale_y_log10()、coord_trans() 和 coord_cartesian() 为什么不完全一样。",
+      overview: "坐标系统定义 x、y 位置怎样在画布上呈现。scale_* 的转换发生在统计计算之前，coord_trans() 的转换发生在统计计算之后，coord_cartesian() 只改变可视范围。翻转、固定纵横比和极坐标都通过 coord_* 实现。",
+      features: [
+        "区分标度转换、坐标转换和范围裁剪。",
+        "根据标签长度选择横向条形图。",
+        "为相关矩阵和地图设置固定纵横比。",
+        "理解极坐标图和饼图的局限。",
+      ],
+      concepts: [
+        { term: "默认笛卡尔坐标", explain: "x、y 两个位置标度组成普通二维坐标，绝大多数图形使用它。" },
+        { term: "固定比例", explain: "coord_fixed(ratio) 固定 y 单位与 x 单位的显示长度，适合相关矩阵和空间图。" },
+        { term: "翻转坐标", explain: "coord_flip() 交换 x、y 轴显示，适合 x 轴类别标签很长。" },
+        { term: "转换坐标", explain: "coord_trans() 在统计变换之后转换显示位置，曲线和区间形状会变化。" },
+        { term: "极坐标", explain: "coord_polar() 把位置缠绕成角度和半径。它能做饼图，但通常不如条形图易读。" },
+      ],
+      comparison: {
+        title: "范围、标度转换与坐标转换",
+        note: "三者看起来都能“改变轴”，但发生顺序和统计含义不同。",
+        headers: ["写法", "发生什么", "是否改变统计计算", "适合"],
+        rows: [
+          ["coord_cartesian(ylim=...)", "放大或裁剪显示窗口", "不改数据或统计结果", "局部查看"],
+          ["scale_y_continuous(limits=...)", "移除范围外数据后再计算", "会改变平滑、求和等结果", "确实要限制分析范围"],
+          ["scale_y_log10()", "统计前对数值作对数转换", "会改变统计变换输入", "原始变量按对数尺度建模"],
+          ["coord_trans(y=\"log10\")", "统计后在显示层转换", "统计仍在原尺度完成", "只改变视觉坐标"],
+          ["coord_flip()", "交换横纵轴显示", "不改变数据", "长类别标签"],
+          ["coord_fixed(ratio=1)", "固定 x、y 单位显示比例", "不改变数据", "相关矩阵、空间几何"],
+        ],
+      },
+      whenUse: ["类别标签太长，横轴拥挤。", "需要比较对数尺度但不想改变模型计算。", "相关矩阵的格子应保持正方形。"],
+      dataShape: ["确认转换是否应在建模前完成。", "若坐标轴为日期或时间，优先使用日期标度。"],
+      steps: [
+        {
+          title: "放大显示范围而不是删除数据",
+          text: "先用 coord_cartesian() 放大局部，再检查平滑线是否仍由完整数据计算。",
+          code: String.raw`p <- ggplot(d, aes(carat, price)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "loess")
+
+p + coord_cartesian(ylim = c(0, 12000))`,
+          explain: "范围外点没有被删除，平滑趋势仍使用完整样本。这适合查看局部而不偷偷改变分析。",
+        },
+        {
+          title: "长标签时翻转坐标",
+          text: "类别名称很长时，横向条形图通常比把文字旋转 45 度更容易读。",
+          code: String.raw`count_cut <- as.data.frame(table(d$cut))
+names(count_cut) <- c("cut", "n")
+
+ggplot(count_cut, aes(cut, n)) +
+  geom_col(fill = "#2f6b5b") +
+  coord_flip()`,
+          explain: "coord_flip() 只交换显示方向，x/y 的映射关系没有重写。新版 ggplot2 也提供 orientation 参数，但 coord_flip() 仍适合快速调整。",
+        },
+        {
+          title: "固定相关矩阵比例",
+          text: "相关系数矩阵的每个格子应接近正方形，否则颜色区域会被拉伸。",
+          code: String.raw`num <- d[, c("carat", "depth", "table", "price")]
+cor_long <- as.data.frame(as.table(cor(num)))
+
+ggplot(cor_long, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_gradient2(low = "#58789f", mid = "white", high = "#d97b59")`,
+          explain: "coord_fixed() 保持格子纵横比例。相关矩阵更关注方向和模式，不需要把坐标轴拉满整个画布。",
+        },
+      ],
+      functions: ["coord_cartesian", "coord_flip", "coord_fixed", "coord_trans", "scale_y_continuous"],
+      conditions: ["先明确转换发生在统计前还是显示时。", "坐标轴变换后仍要标明原始单位和模型尺度。"],
+      interpret: "坐标系统改变读者看到的几何位置，不自动改变数据。涉及模型或平滑时，必须说明转换发生在哪一步。",
+      readingNotes: ["现代论文中饼图使用较少，条形图通常更准确。", "地图坐标与普通坐标规则不同，应使用专门空间包。"],
+      pitfalls: ["用 limits 删点后却解释说只是放大。", "把 log 轴当成线性轴读取等距差异。", "饼图类别太多，面积难以比较。"],
+      practice: "对同一幅散点图分别使用 coord_cartesian(ylim=...)、scale_y_continuous(limits=...) 和 coord_trans(y=\"log10\")，比较图形、平滑线和数据保留情况。",
+      related: ["ggplot-scales-legend", "correlation-matrix", "bar"],
+    },
+    {
+      type: "visual",
+      id: "ggplot-facets",
+      typeLabel: "ggplot2 基础",
+      level: "进阶",
+      minutes: 36,
+      title: "分组、分面与拼图",
+      aliases: ["facet_wrap", "facet_grid", "分面", "分组", "plot_grid", "拼图"],
+      hero: "同画布分组与拆成小图，是两种不同的信息组织方式",
+      audience: "经常把分面和分组混在一起，或者分面后各子图坐标范围不一致，导致误读。",
+      overview: "分组是在同一坐标系中通过颜色、形状或线型区分数据；分面是按变量水平拆成多个子图。facet_wrap() 适合一个多水平变量，facet_grid() 适合两个变量的行列组合。scales 决定子图是否共享坐标轴。完全独立的图可通过 cowplot::plot_grid() 或 patchwork 拼接。",
+      features: [
+        "区分分组与分面的用途。",
+        "选择 wrap 或 grid 分面。",
+        "根据比较目标决定固定还是自由的坐标轴。",
+        "把独立图形拼成多面板图。",
+      ],
+      concepts: [
+        { term: "分组", explain: "所有组仍在同一坐标系中，依靠颜色、形状、线型或位置区分。" },
+        { term: "分面", explain: "按变量水平拆成多个子图，每个子图只显示一个数据子集。" },
+        { term: "固定坐标", explain: "scales = \"fixed\" 让所有子图共享 x/y 范围，便于直接比较大小。" },
+        { term: "自由坐标", explain: "free_x、free_y 允许不同子图使用不同范围，适合各自分布差异很大，但不利于跨图比较。" },
+        { term: "拼图", explain: "plot_grid() 或 patchwork 拼接的是多个独立 ggplot 对象，不属于同一个分面。" },
+      ],
+      comparison: {
+        title: "分组、分面与拼图",
+        note: "先问要“同图比较”还是“分别展示”。",
+        headers: ["方式", "函数", "优点", "局限"],
+        rows: [
+          ["同图分组", "color、shape、group", "直接比较位置和趋势", "组多时重叠和颜色拥堵"],
+          ["单变量分面", "facet_wrap()", "每个水平有独立面板", "面板太多时尺寸变小"],
+          ["双变量网格", "facet_grid(行~列)", "行列交叉结构清楚", "空组合会产生空面板"],
+          ["独立拼图", "plot_grid() / wrap_plots()", "可组合不同数据或几何对象", "坐标对齐需手动检查"],
+        ],
+      },
+      whenUse: ["同一图中分组线过多，已经看不清。", "需要按地区、性别或年份分别展示。", "两个分类变量都有比较意义。"],
+      dataShape: ["分面变量应为有限水平 factor。", "先确认每个面板的样本量。", "分面后图表尺寸有限，标签不能过多。"],
+      steps: [
+        {
+          title: "先在同一图中分组",
+          text: "组数较少且趋势可区分时，优先放同一坐标系比较。",
+          code: String.raw`ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.25, size = 1.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()`,
+          explain: "分组便于看同一图里的相对位置。若线条密集到无法辨认，再考虑分面。",
+        },
+        {
+          title: "单变量分面",
+          text: "facet_wrap() 把一个多水平变量拆成多个子图。固定坐标更利于比较，自由坐标更适合观察各自形状。",
+          code: String.raw`mpg2 <- subset(mpg, class %in% c("compact", "midsize", "suv", "pickup"))
+
+ggplot(mpg2, aes(displ, hwy)) +
+  geom_point(alpha = 0.5) +
+  geom_smooth(method = "lm", se = FALSE) +
+  facet_wrap(~ class, ncol = 2, scales = "fixed") +
+  theme_bw()`,
+          explain: "四类车共享同样坐标轴，读者可以直接比较斜率和位置。scales='free' 会改变各子图轴范围。",
+        },
+        {
+          title: "两个变量形成行列面板",
+          text: "facet_grid() 的表达式直接决定行和列。只出现一行时，scales 只能对列方向自由。",
+          code: String.raw`ggplot(mpg2, aes(displ, hwy)) +
+  geom_point(alpha = 0.45) +
+  facet_grid(drv ~ class) +
+  theme_bw()`,
+          explain: "行和列的交叉会产生面板，没有数据的组合会留空。面板较多时应减少其他图层和文字。",
+        },
+        {
+          title: "拼合两张独立图",
+          text: "当两个子图的数据、几何对象或主题不同，使用单独作图和拼图函数更清楚。",
+          code: String.raw`p1 <- ggplot(mpg2, aes(displ, hwy, color = class)) +
+  geom_point(alpha = 0.5) + theme_bw()
+
+p2 <- ggplot(mpg2, aes(class, hwy, fill = class)) +
+  geom_boxplot(alpha = 0.6) + theme_bw()
+
+cowplot::plot_grid(
+  p1, p2,
+  nrow = 1,
+  labels = c("A", "B"),
+  rel_widths = c(1.2, 1)
+)`,
+          explain: "plot_grid() 把两个独立对象横向拼接，可设置面板标签和宽度比例。拼图前应检查两图字体、颜色和坐标尺度是否协调。",
+        },
+      ],
+      functions: ["facet_wrap", "facet_grid", "plot_grid", "coord_fixed"],
+      conditions: ["分面变量的水平数量和样本量合理。", "坐标固定或自由的选择与比较目标一致。", "拼图各子图使用一致的视觉系统。"],
+      interpret: "固定坐标看绝对差异，自由坐标看各自形状。报告分面图时一定要说明 scales 设置，否则读者可能误判跨面板比较。",
+      readingNotes: [
+        "分面不是自动筛除无数据组合，空面板仍可能出现。",
+        "面板越多，单个子图越小，文字和点应相应减少。",
+        "拼图与分面的统计含义不同，图注要写清。",
+      ],
+      pitfalls: ["所有子图自由坐标却直接比较高度。", "把分组和分面混称为“分组”。", "面板太多仍保留复杂图例。", "拼图后两个图的色板含义不同。"],
+      practice: "用 mpg 同一数据制作一幅同图分组图和一幅分面图，再解释各自更适合回答什么问题。最后用 plot_grid() 拼一张散点图和一张箱式图。",
+      related: ["ggplot-aesthetics", "ggplot-themes", "scatter"],
+      imageKey: "facet-wrap",
+      imageCaption: "分面图示例：各子图共享固定坐标，便于比较不同车型类别的水平与斜率。面板顺序和坐标设置都会影响阅读。",
+    },
+    {
+      type: "visual",
+      id: "ggplot-themes",
+      typeLabel: "ggplot2 基础",
+      level: "进阶",
+      minutes: 34,
+      title: "主题与论文风格",
+      aliases: ["theme", "theme_bw", "element_text", "element_line", "主题调整"],
+      hero: "主题只改外观，先把数据和几何层做对",
+      audience: "想让图更干净、更像论文图，却不知道该改 axis.text、panel.grid 还是 plot.background。",
+      overview: "完整主题函数负责整体风格，theme() 负责局部微调。文字用 element_text()，线条用 element_line()，矩形用 element_rect()，需要完全移除的元素用 element_blank()。好的论文主题强调数据、减少背景噪声，并保持字体、网格、图例和留白一致。",
+      features: [
+        "从现成主题快速建立基准。",
+        "理解 element_text、line、rect、blank 的用途。",
+        "减少网格、背景和图例造成的视觉噪声。",
+        "统一多张图的风格和字号。",
+      ],
+      concepts: [
+        { term: "完整主题", explain: "theme_bw()、theme_minimal() 等一次设置整套背景、网格、字体和轴线。" },
+        { term: "element_text", explain: "设置标题、坐标文字、图例文字和图面子标题的字体、大小、颜色、角度与对齐。" },
+        { term: "element_line", explain: "设置轴线、刻度线、网格线和边框线的颜色、粗细和线型。" },
+        { term: "element_rect", explain: "设置面板、图例和整幅图的背景填充与边框。" },
+        { term: "element_blank", explain: "完全移除元素，既不显示，也不占用空间。" },
+        { term: "theme_set", explain: "设置当前 R 会话后续图形的默认主题。" },
+      ],
+      comparison: {
+        title: "常见主题入口",
+        note: "先用完整主题，再用 theme() 做少量调整。",
+        headers: ["目标", "函数/参数", "改变什么", "建议"],
+        rows: [
+          ["白底深网格", "theme_bw()", "整套风格", "论文起步常用"],
+          ["极简留白", "theme_minimal()", "弱化背景", "避免删掉必要轴线"],
+          ["无背景无网格", "theme_void()", "只剩图层", "适合地图或拼图，不适合普通坐标图"],
+          ["坐标文字", "axis.text", "刻度标签", "用 element_text()"],
+          ["主网格", "panel.grid.major", "主参考线", "用 element_line() 或 element_blank()"],
+          ["面板背景", "panel.background", "绘图区底色", "用 element_rect()"],
+        ],
+      },
+      whenUse: ["需要统一多张论文图风格。", "图例或网格抢占数据空间。", "汇报图需要更大字号和更少背景。"],
+      dataShape: ["先确定最终输出尺寸和字体。", "颜色和主题应在所有图中一致。", "不要用主题遮盖数据问题。"],
+      steps: [
+        {
+          title: "先换完整主题",
+          text: "theme_bw() 提供白底和浅灰网格，适合大多数论文图。base_size 控制整体字号。",
+          code: String.raw`ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.35) +
+  theme_bw(base_size = 13)`,
+          explain: "完整主题先建立统一基线，比一开始逐项写十几个 theme 参数更容易维护。",
+        },
+        {
+          title: "只改需要的文字和线条",
+          text: "标题加粗、坐标文字变深、网格变淡，都是针对具体元素的小改动。",
+          code: String.raw`ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.35) +
+  labs(title = "钻石重量与价格", x = "克拉", y = "价格（美元）") +
+  theme_bw(base_size = 13) +
+  theme(
+    plot.title = element_text(face = "bold", size = 15),
+    axis.text = element_text(color = "#52645e"),
+    panel.grid.minor = element_blank(),
+    panel.grid.major = element_line(color = "#ebe8df", linewidth = 0.35),
+    legend.position = "top"
+  )`,
+          explain: "文字用 element_text()，网格用 element_line()，图例位置直接写字符串。每个参数只修改一个明确部件。",
+        },
+        {
+          title: "建立可复用的论文主题",
+          text: "把反复使用的调整写成自己的主题函数，比每张图复制一长段 theme() 更可靠。",
+          code: String.raw`theme_rzh <- function(base_size = 13) {
+  theme_minimal(base_size = base_size) +
+    theme(
+      plot.title = element_text(face = "bold", size = base_size + 3),
+      axis.text = element_text(color = "#52645e"),
+      panel.grid.minor = element_blank(),
+      panel.grid.major = element_line(color = "#ebe8df", linewidth = 0.35),
+      plot.background = element_rect(fill = "#fffdf9", color = NA),
+      legend.position = "top"
+    )
+}
+
+ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.35) +
+  theme_rzh()`,
+          explain: "主题函数应只改外观，不偷偷改数据、标度或几何对象。以后所有图调用它即可保持一致。",
+        },
+      ],
+      functions: ["theme", "theme_bw", "theme_minimal", "theme_set", "element_text", "element_line", "element_rect", "element_blank"],
+      conditions: ["主题不改变统计结论。", "字号与最终导出尺寸匹配。", "背景、网格和轴线的对比度足够但不过强。"],
+      interpret: "好的主题让数据成为视觉主体，读者不需要注意背景。把图做“素”不等于删掉单位和图例。",
+      readingNotes: ["theme() 中每个参数只接受对应元素函数。", "element_blank() 会完全移除并释放空间。", "拼图和三联图应共享同一主题函数。"],
+      pitfalls: ["用 element_blank() 删掉必要轴线或图例。", "网格太深压过数据。", "图上字体很大但导出尺寸很小，导致拥挤。", "每张图手工改不同风格。"],
+      practice: "创建自己的论文主题函数，分别应用到散点图、箱式图和误差条图，确认三张图的字体、网格和图例位置一致。",
+      related: ["ggplot-scales-legend", "ggplot-export", "ggplot-facets"],
+      imageKey: "theme-elements",
+      imageCaption: "论文风格示例：白底、弱网格、清晰的标题和标签。主题改变的是视觉层级，数据与统计结果保持不变。",
+    },
+    {
+      type: "visual",
+      id: "ggplot-export",
+      typeLabel: "ggplot2 基础",
+      level: "应用",
+      minutes: 22,
+      title: "论文图形输出与检查",
+      aliases: ["ggsave", "PDF矢量图", "图形导出", "dpi", "论文图"],
+      hero: "按最终尺寸设计和导出，而不是截屏放进论文",
+      audience: "图在 RStudio 里看起来正常，导出后却字体太小、元素被裁掉或分辨率不足。",
+      overview: "论文图应优先用 ggsave() 输出 PDF 矢量图。PDF 放大后仍清楚，适合线条、文本和矢量几何。需要期刊上传 PNG/TIFF 时，按最终物理尺寸和 300 或更高 dpi 导出。图形比例、字号和留白应在目标尺寸下检查，不能把一张超宽屏幕图直接截下来。",
+      features: [
+        "选择 PDF、PNG 或 TIFF。",
+        "按期刊要求设置 width、height、units 和 dpi。",
+        "保存指定 ggplot 对象，避免误存最后一张图。",
+        "导出前检查字体、裁切、图例和色彩。",
+      ],
+      concepts: [
+        { term: "矢量图", explain: "用线条和文字指令保存，放大不会出现像素模糊。PDF、SVG 常作为矢量格式。" },
+        { term: "位图", explain: "由像素组成。放大后会受分辨率限制，常见 PNG、JPEG、TIFF。" },
+        { term: "dpi", explain: "每英寸像素数。期刊常要求 300 或 600 dpi，但前提是物理尺寸和内容设计正确。" },
+        { term: "物理尺寸", explain: "width、height 与 units 一起决定最终版面大小。字号要在这个尺寸下检查。" },
+      ],
+      comparison: {
+        title: "常见导出格式",
+        note: "原始矢量或多分辨率位图按期刊要求选，屏幕截图不适合正式投稿。",
+        headers: ["格式", "优点", "局限", "典型用途"],
+        rows: [
+          ["PDF", "矢量、放大清晰", "部分期刊要求转 TIFF", "论文主图"],
+          ["SVG/PPTX", "可继续编辑", "不同软件兼容性需检查", "团队修改、汇报"],
+          ["PNG", "通用、文件较小", "位图，需设分辨率", "网页、幻灯片"],
+          ["TIFF", "期刊常见高保真位图", "文件大", "期刊投稿"],
+          ["屏幕截图", "最快", "分辨率、裁切和字体不可控", "只适合临时沟通"],
+        ],
+      },
+      whenUse: ["准备论文、汇报或网页图。", "需要精确控制图尺寸。", "图形在 RStudio 中正常但导出异常。"],
+      dataShape: ["知道最终单栏或双栏宽度。", "确认文字最小字号。", "确认期刊对格式、dpi、字体和颜色空间的要求。"],
+      steps: [
+        {
+          title: "保存明确的对象",
+          text: "把最终图赋给 p，然后给 ggsave() 的 plot 参数。这样不会因为后面又画了一张图而保存错误对象。",
+          code: String.raw`p <- ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.35) +
+  labs(title = "钻石重量与价格", x = "克拉", y = "价格（美元）") +
+  theme_bw(base_size = 12)
+
+ggsave(
+  filename = "diamonds_price.pdf",
+  plot = p,
+  width = 7,
+  height = 5,
+  units = "in"
+)`,
+          explain: "PDF 保存为矢量图。width=7、height=5 是论文排版需要检查的物理尺寸，不是像素大小。",
+        },
+        {
+          title: "导出高分辨率位图",
+          text: "期刊要求 PNG 或 TIFF 时，按最终尺寸设置 dpi。300 dpi 是常见起点，具体以投稿指南为准。",
+          code: String.raw`ggsave(
+  filename = "diamonds_price.png",
+  plot = p,
+  width = 7,
+  height = 5,
+  units = "in",
+  dpi = 300,
+  bg = "white"
+)`,
+          explain: "PNG 是位图。dpi 足够但字体太小仍然不可读，因此导出的物理大小和字号必须一起设计。",
+        },
+        {
+          title: "导出后逐项检查",
+          text: "不要只看 RStudio 预览。打开最终文件，检查标题、轴标签、图例、线宽和图中数字。",
+          code: String.raw`# 检查清单：
+# 1. 图上是否有单位、样本量或必要说明？
+# 2. 图例是否遮挡数据？
+# 3. 字号在最终尺寸下是否可读？
+# 4. 颜色在黑白打印下是否仍能区分？
+# 5. 文件格式和 dpi 是否符合投稿要求？`,
+          explain: "导出文件才是读者看到的版本。屏幕预览中的比例和阅读距离与 PDF 或打印稿不同。",
+        },
+      ],
+      functions: ["ggsave", "theme_bw"],
+      conditions: ["图形先通过数据和解释检查。", "导出尺寸与字体一起验证。", "确保投稿格式要求已核对。"],
+      interpret: "矢量 PDF 解决放大清晰度，不解决统计错误。高 dpi 也不能挽救字体过小或图例遮挡。",
+      readingNotes: ["文件名必须有正确后缀，ggsave() 依据后缀选择设备。", "从 RStudio 图形窗口直接复制图片容易失去尺寸控制。"],
+      pitfalls: ["使用屏幕截图作为论文主图。", "宽高单位混用。", "只设置 dpi 不看实际物理大小。", "导出时裁掉图例或轴标签。"],
+      practice: "把同一张图分别导出为 PDF 和 300 dpi PNG，在最终尺寸下比较两者；再缩小到单栏宽度，检查哪些文字需要增大。",
+      related: ["ggplot-themes", "ggplot-scales-legend", "forest"],
+    },
+    {
+      type: "visual",
+      id: "paper-figure-recipes",
+      typeLabel: "论文图实战",
+      level: "应用",
+      minutes: 45,
+      title: "论文常见图组合",
+      aliases: ["论文图", "误差图", "点线图", "柱状图误差线", "生存曲线", "ggplot实战"],
+      hero: "把点、线、误差、分组和分面按阅读顺序组合起来",
+      audience: "已经会单个 geom，但面对论文常见的误差图、分组趋势图和生存曲线时不知道如何组织数据与图层。",
+      overview: "论文图通常先完成数据汇总，再组合两到四个图层。点线图适合展示随有序类别变化的均值，误差条补充不确定性，分面用于性别或地区等分层。柱状图也能表示均值，但读者更容易把柱高误读为总量；若研究目标是展示连续估计，点加误差条通常更清楚。",
+      features: [
+        "用汇总数据画点、线和误差条。",
+        "正确处理 position_dodge 和 facet。",
+        "制作生存曲线和风险人数表。",
+        "在组别、时间与不确定性之间建立视觉层次。",
+      ],
+      concepts: [
+        { term: "汇总图", explain: "每行是一个组或时间点的均数、率、效应和区间，不再是一行一个原始对象。" },
+        { term: "误差条", explain: "必须说明是 SD、SE 或 95% CI。图中位置要与点估计对齐。" },
+        { term: "position_dodge", explain: "让同组类别并排，点和误差条应使用相同宽度，才能对齐。" },
+        { term: "分面", explain: "当性别、地区等层数多时，分面能避免同图里点线拥挤。" },
+      ],
+      comparison: {
+        title: "论文常见组合",
+        note: "图的组合多了以后，图层对齐和尺度一致性比单个图层更重要。",
+        headers: ["任务", "图层组合", "适合", "重点检查"],
+        rows: [
+          ["均值随时间变化", "errorbar + line + point", "有序分类或时间点", "误差条含义和点线对齐"],
+          ["分性别趋势", "errorbar + line + point + facet", "层数较多的重复测量", "facet 坐标是否固定"],
+          ["组均值比较", "bar + errorbar", "少量类别", "柱高含义与 y 轴是否为 0"],
+          ["原始分布比较", "violin + boxplot + jitter", "组内样本量足够", "三层不要互相遮挡"],
+          ["生存过程", "ggsurvplot", "时间到事件数据", "风险人数、删失、时间单位"],
+        ],
+      },
+      whenUse: ["为论文或汇报整理最终图。", "已有汇总数据并需要展示不确定性。", "需要把同一分析按性别或地区分层展示。"],
+      dataShape: ["核对汇总单位、分母、误差类型。", "position_dodge 的宽度在所有图层一致。", "分面变量水平有序、数量适中。"],
+      steps: [
+        {
+          title: "点线误差图",
+          text: "先画误差条，再叠点在线；三个图层使用同一 position_dodge 宽度。",
+          code: String.raw`ggplot(sum_dat, aes(cut, mean, color = color)) +
+  geom_errorbar(
+    aes(ymin = low, ymax = high),
+    width = 0.18,
+    position = position_dodge(0.7)
+  ) +
+  geom_line(
+    aes(group = color),
+    position = position_dodge(0.7)
+  ) +
+  geom_point(
+    size = 2.4,
+    position = position_dodge(0.7)
+  ) +
+  labs(x = "切工", y = "价格均数及 95% CI") +
+  theme_bw()`,
+          explain: "误差条、线和点必须使用相同错开宽度，否则图形会错位。group 让同色点连成一条线。",
+        },
+        {
+          title: "柱图加误差线",
+          text: "柱图适合少量组均值，但 y 轴通常应从 0 开始。误差线宽度与柱宽协调。",
+          code: String.raw`ggplot(sum_dat, aes(cut, mean, fill = cut)) +
+  geom_col(width = 0.62, alpha = 0.78) +
+  geom_errorbar(
+    aes(ymin = low, ymax = high),
+    width = 0.16
+  ) +
+  labs(y = "价格均数及 95% CI") +
+  theme_bw() +
+  theme(legend.position = "none")`,
+          explain: "柱高表示均值，误差线表示不确定性。柱图不适合有很多组，也不适合夸大微小差异。",
+        },
+        {
+          title: "分面展示分层结果",
+          text: "层数较多时，用分面代替把所有组塞进同一坐标系。",
+          code: String.raw`ggplot(sum_dat, aes(cut, mean)) +
+  geom_point(size = 2.2) +
+  geom_errorbar(
+    aes(ymin = low, ymax = high),
+    width = 0.18
+  ) +
+  facet_wrap(~ color, ncol = 3) +
+  coord_flip() +
+  theme_bw()`,
+          explain: "每个面板展示一个 color 水平。coord_flip() 让较长的 cut 标签更容易读。",
+        },
+        {
+          title: "生存曲线与风险人数",
+          text: "先拟合 survfit，再由 ggsurvplot 提供置信区间、p 值和风险人数。",
+          code: String.raw`library(survival)
+library(survminer)
+
+km <- survfit(Surv(time, status) ~ sex, data = lung)
+
+ggsurvplot(
+  km,
+  data = lung,
+  conf.int = TRUE,
+  pval = TRUE,
+  risk.table = TRUE,
+  palette = c("#58789f", "#d97b59"),
+  legend.title = "性别",
+  legend.labs = c("男", "女"),
+  xlab = "随访时间（天）",
+  ylab = "生存概率"
+)`,
+          explain: "生存曲线末端样本少时波动大，风险人数表能帮助读者判断。曲线交叉时不要只报告一个总体 HR。",
+        },
+      ],
+      functions: ["geom_errorbar", "geom_line", "geom_point", "geom_col", "facet_wrap", "ggsurvplot"],
+      conditions: ["误差条统计含义明确。", "所有图层位置调整一致。", "分面后的坐标范围适合比较目标。"],
+      interpret: "论文图的阅读顺序通常是先看总体趋势，再看组间差异，最后看区间与样本量。图层和颜色应服务这个顺序。",
+      readingNotes: ["图注要说明误差条、参照组、样本量和统计模型。", "不要用不同 position 宽度让点和区间错位。"],
+      pitfalls: ["同一图叠三层但不同 dodge 宽度。", "把标准误解释成个体变异。", "柱图与误差线来自不同数据。", "生存曲线不显示风险人数。"],
+      practice: "用自己的汇总数据制作点线误差图、柱图误差线和分面图三版，比较哪一版最适合原始研究问题。",
+      related: ["errorbar", "bar", "survival-curve", "ggplot-facets"],
+      imageKey: "errorbar",
+      imageCaption: "估计值与不确定性应同时展示。点线图、柱图或分面图都可以表达均值，但图注必须说明误差条和分组含义。",
+    },
+    {
+      type: "plot",
+      id: "heatmap",
+      title: "热图",
+      level: "进阶",
+      aliases: ["heatmap", "geom_tile", "geom_raster", "色块图"],
+      hero: "用颜色展示二维网格中的数值",
+      audience: "需要展示地区 × 时间、分类 × 指标的汇总值，或查看两个分类变量交叉后的模式。",
+      definition: "热图把 x、y 两个位置映射成网格，再用 fill 表示每个网格的数值。分类轴顺序、色阶和汇总规则共同决定图形含义。",
+      overview: "geom_tile() 适合矩形网格，geom_raster() 在大规则网格中更快。热图不是原始散点的替代品，它通常画的是计数、均数、中位数、相关或风险等汇总值，因此必须写清每格代表什么。",
+      features: ["适合二维分类结构与数值矩阵。", "能与三色渐变和因子排序配合。", "精确读取依赖数值标签或附表。"],
+      whenUse: ["地区 × 月份、基因 × 样本、指标 × 组别的汇总值。", "相关系数矩阵的简单展示。", "分类太多、条形图放不下时查看整体模式。"],
+      dataShape: ["至少包含 x、y、fill 三列。", "x、y 为有限分类水平或规则数值网格。", "fill 的统计量、单位和汇总规则清楚。"],
+      steps: [
+        {
+          title: "先汇总成网格",
+          text: "热图每个格子必须只有一个值。计数、均值或中位数要在绘图前明确。",
+          code: String.raw`heat <- aggregate(
+  price ~ cut + clarity,
+  data = d,
+  FUN = median
+)`,
+        },
+        {
+          title: "设置因子顺序并画色块",
+          text: "分类变量默认按字符排序，转成 factor 才能按专业顺序排列。",
+          code: String.raw`heat$clarity <- factor(
+  heat$clarity,
+  levels = c("I1", "SI2", "SI1", "VS2", "VS1", "VVS2", "VVS1", "IF")
+)
+
+ggplot(heat, aes(cut, clarity, fill = price)) +
+  geom_tile(color = "white", linewidth = 0.5) +
+  scale_fill_gradient2(
+    low = "#edf5f1",
+    mid = "#f7d9cc",
+    high = "#a54f3d",
+    midpoint = median(heat$price)
+  ) +
+  theme_minimal()`,
+          explain: "颜色表示中位价格。分类水平从低到高排列，读者才能按顺序横向阅读。",
+        },
+      ],
+      functions: ["geom_tile", "geom_raster", "scale_fill_gradient2", "factor"],
+      conditions: ["每个网格只有一个明确统计值。", "分类顺序和色阶有研究意义。", "没有用颜色同时表达多个概念。"],
+      interpret: "颜色越靠向高端表示数值越高或越低，取决于色阶。颜色只帮助发现模式，精确比较仍需数值、图例和附表。",
+      readingNotes: ["热图行列顺序会影响模式感知。", "颜色越多不一定信息越多，连续值优先用渐变而不是彩虹。"],
+      pitfalls: ["没有汇总就把重复组合画成重叠色块。", "分类顺序随意按首字母。", "色阶跨图不一致。", "把不显著的模式解释为聚类。"],
+      practice: "制作地区 × 月份发病率热图，分别按月份和发病率排序，观察顺序对模式识别的影响。",
+      related: ["ggplot-geoms", "correlation-matrix", "ggplot-scales-legend"],
+    },
+    {
+      type: "plot",
+      id: "smooth",
+      title: "平滑曲线图",
+      level: "进阶",
+      aliases: ["geom_smooth", "loess", "平滑曲线", "趋势线"],
+      hero: "在原始点之上观察趋势和不确定性",
+      audience: "连续暴露与结局的关系不是简单直线，或希望探索非线性趋势但仍保留原始观测时。",
+      definition: "平滑曲线图在散点或时间序列上增加统计平滑层，常使用 loess、线性模型、GAM 等。它展示数据和模型共同给出的趋势，不是简单手工连点。",
+      overview: "geom_smooth() 是一个带统计变换的图层。method、formula、span、se 和分组映射都会改变趋势。平滑越灵活越容易跟随噪声，必须结合样本量、数据范围和建模目的解释。",
+      features: ["保留原始点并叠加趋势。", "可显示置信带。", "适合探索非线性和时间趋势。"],
+      whenUse: ["连续变量关系明显弯曲。", "时间序列需要观察趋势。", "回归建模前比较线性与非线性的合理性。"],
+      dataShape: ["x、y 至少两列连续变量。", "点重叠时先降低透明度。", "分组平滑需要足够样本量。"],
+      steps: [
+        {
+          title: "先看点和分组",
+          text: "原始点不能省略。趋势层只负责概括，不替代异常值和样本分布。",
+          code: String.raw`ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.22, size = 1.3) +
+  geom_smooth(method = "loess", se = TRUE) +
+  theme_bw()`,
+        },
+        {
+          title: "比较线性与灵活平滑",
+          text: "线性层便于解释平均变化，loess/GAM 更适合探索弯曲。不要只根据图好不好看选择。",
+          code: String.raw`ggplot(d, aes(carat, price)) +
+  geom_point(alpha = 0.2) +
+  geom_smooth(
+    method = "lm",
+    formula = y ~ x,
+    se = FALSE,
+    linetype = "dashed"
+  ) +
+  geom_smooth(
+    method = "loess",
+    formula = y ~ x,
+    se = TRUE
+  ) +
+  theme_minimal()`,
+          explain: "虚线是线性平均趋势，实线允许弯曲。两者同时展示便于比较，但应避免图层颜色混淆。",
+        },
+      ],
+      functions: ["geom_smooth", "loess", "gam"],
+      conditions: ["样本量和局部范围足以支持平滑。", "平滑方法、自由度和分组在代码或图注中说明。", "原始点保留。"],
+      interpret: "平滑曲线表示模型估计的平均趋势；曲线弯曲不代表因果，也不能说明每个人都会按此轨迹变化。",
+      readingNotes: ["span 越小，loess 越灵活，也更容易过拟合。", "不同组共享平滑参数可能隐藏组间差异。"],
+      pitfalls: ["只画平滑线不展示原始点。", "样本稀疏处过度解释曲线端点。", "把探索性平滑直接当作正式模型。"],
+      practice: "对同一份数据分别画线性平滑和 loess 平滑，缩小 x 范围再比较端点是否稳定。",
+      related: ["scatter", "line", "dose-response"],
+    },
+  ];
+
+  for (const guide of visualGuides) {
+    if (!guideById(guide.id)) guides.push(guide);
+  }
+
+  if (visualCategory) {
+    Object.assign(visualCategory, {
+      title: "数据可视化",
+      subtitle: "从 ggplot2 语法到论文成图",
+      audience: "希望从零建立绘图思路，或需要把现有结果整理成规范论文图、汇报图和探索图的同学。",
+      detail: "先学数据、映射、几何对象和图层，再学标度、图例、坐标、分组、分面、主题和导出。基础完成后按任务学习常见图形，最后进入论文图组合。每节保留原始点和统计摘要，强调改一个参数、看一次变化。",
+    });
+    const items = visualCategory.items || [];
+    const foundationItems = [
+      ["ggplot2 图层语法", "从空白画布逐层添加数据、点和主题", "#guide/visual/ggplot-workflow", "入门"],
+      ["数据映射与图形属性", "color、fill、shape、group 与 position", "#guide/visual/ggplot-aesthetics", "入门"],
+      ["几何对象与统计变换", "点线柱、平滑、误差条与热图", "#guide/visual/ggplot-geoms", "入门"],
+      ["按研究问题选择图形", "分布、关系、比较、趋势与结构", "#guide/visual/plot-selection", "入门"],
+      ["标度、坐标轴与图例", "范围、刻度、颜色映射和图例", "#guide/visual/ggplot-scales-legend", "进阶"],
+      ["坐标系统与尺度转换", "放大、翻转、固定比例与对数轴", "#guide/visual/ggplot-coordinates", "进阶"],
+      ["分组、分面与拼图", "wrap、grid、free scales 与 plot_grid", "#guide/visual/ggplot-facets", "进阶"],
+      ["主题与论文风格", "theme、element_* 和可复用主题", "#guide/visual/ggplot-themes", "进阶"],
+      ["论文图形输出与检查", "PDF、PNG、尺寸、DPI 与导出复核", "#guide/visual/ggplot-export", "应用"],
+      ["论文常见图组合", "误差图、点线图、柱图与生存曲线", "#guide/visual/paper-figure-recipes", "应用"],
+    ].map(([title, note, href, level]) => ({ title, note, href, level }));
+
+    const existingHrefs = new Set(items.map((item) => item.href));
+    for (const item of foundationItems) {
+      if (!existingHrefs.has(item.href)) items.unshift(item);
+    }
+    if (!items.some((item) => item.href === "#guide/plot/heatmap")) {
+      const corrIndex = items.findIndex((item) => item.href === "#guide/plot/correlation-matrix");
+      items.splice(corrIndex >= 0 ? corrIndex + 1 : items.length, 0, {
+        title: "热图",
+        note: "用色块展示地区×时间或分类×指标的汇总值",
+        href: "#guide/plot/heatmap",
+        level: "进阶",
+      });
+    }
+    if (!items.some((item) => item.href === "#guide/plot/smooth")) {
+      const scatterIndex = items.findIndex((item) => item.href === "#guide/plot/scatter");
+      items.splice(scatterIndex >= 0 ? scatterIndex + 1 : items.length, 0, {
+        title: "平滑曲线图",
+        note: "在原始点之上比较线性与非线性趋势",
+        href: "#guide/plot/smooth",
+        level: "进阶",
+      });
+    }
+
+    const desired = [
+      "#guide/visual/ggplot-workflow",
+      "#guide/visual/ggplot-aesthetics",
+      "#guide/parameter/plot-aesthetics",
+      "#guide/visual/ggplot-geoms",
+      "#guide/visual/plot-selection",
+      "#guide/visual/ggplot-scales-legend",
+      "#guide/visual/ggplot-coordinates",
+      "#guide/visual/ggplot-facets",
+      "#guide/visual/ggplot-themes",
+      "#guide/plot/histogram",
+      "#guide/plot/density",
+      "#guide/plot/scatter",
+      "#guide/plot/smooth",
+      "#guide/plot/bar",
+      "#guide/plot/line",
+      "#guide/plot/boxplot",
+      "#guide/plot/violin",
+      "#guide/plot/errorbar",
+      "#guide/plot/correlation-matrix",
+      "#guide/plot/heatmap",
+      "#guide/plot/hexbin",
+      "#guide/plot/qq-plot",
+      "#guide/plot/survival-curve",
+      "#guide/parameter/ggsurvplot-parameters",
+      "#guide/plot/forest",
+      "#guide/plot/sankey",
+      "#guide/plot/dose-response",
+      "#guide/plot/dendrogram",
+      "#guide/plot/interactive",
+      "#guide/visual/paper-figure-recipes",
+      "#guide/visual/ggplot-export",
+      "#guide/plot/treemap",
+      "#guide/plot/missing-pattern",
+      "#visual-tools/colors",
+      "#visual-tools/themes",
+    ];
+    items.sort((a, b) => {
+      const ai = desired.indexOf(a.href);
+      const bi = desired.indexOf(b.href);
+      return (ai < 0 ? 999 : ai) - (bi < 0 ? 999 : bi);
+    });
+  }
+
+  const courseGgplot = (window.RZH_COURSE_MODULES || []).find((item) => item.id === "r-ggplot");
+  if (courseGgplot) {
+    Object.assign(courseGgplot, {
+      subtitle: "从数据映射、图层和标度，到分面、主题与论文导出",
+      minutes: 38,
+      outcome: "能按研究问题选择图形，逐层搭建 ggplot2 图形，并输出可检查、可复现的论文图。",
+    });
+    courseGgplot.sections = [
+      ...(courseGgplot.sections || []),
+      {
+        heading: "先映射，再选几何对象",
+        text: "ggplot() 和 aes() 先说明数据与变量角色；geom_*() 再决定点、线、柱、箱体、色块或误差条。不要在几何对象里重复定义已经继承的映射。",
+      },
+      {
+        heading: "区分映射与固定外观",
+        text: "aes(color = group) 表示由变量生成颜色和图例；geom_point(color = \"red\") 表示所有点统一红色。出现不期望的图例时先检查 aes() 内外。",
+      },
+      {
+        heading: "标度决定读者怎样读数",
+        text: "scale_*() 控制坐标轴范围、刻度、日期格式、分类颜色和连续渐变。因子水平顺序会影响颜色和并排顺序。",
+      },
+      {
+        heading: "分组与分面不是一回事",
+        text: "分组让多组共用一个坐标系；分面把不同数据子集拆成多个小图。固定 scales 便于比较绝对差异，自由 scales 更适合观察各自形状。",
+      },
+      {
+        heading: "主题和导出按最终尺寸设计",
+        text: "先用 theme_bw() 或自定义主题减少背景噪声，再用 ggsave() 明确宽度、高度和格式。论文图优先输出 PDF 矢量图。",
+      },
+    ];
+    courseGgplot.code = String.raw`library(ggplot2)
+set.seed(2026)
+d <- diamonds[sample(nrow(diamonds), 800), ]
+
+p <- ggplot(d, aes(carat, price, color = cut)) +
+  geom_point(alpha = 0.35) +
+  geom_smooth(method = "loess", se = FALSE) +
+  scale_y_continuous(
+    name = "价格（美元）",
+    breaks = seq(0, 20000, 5000)
+  ) +
+  labs(
+    title = "钻石重量与价格",
+    x = "克拉",
+    color = "切工"
+  ) +
+  theme_bw(base_size = 12) +
+  theme(
+    panel.grid.minor = element_blank(),
+    legend.position = "top"
+  )
+
+p
+
+ggsave(
+  "diamonds_price.pdf",
+  plot = p,
+  width = 7,
+  height = 5,
+  units = "in"
+)`;
+    courseGgplot.functions = unique([
+      ...(courseGgplot.functions || []),
+      "ggplot", "aes", "geom_point", "geom_smooth", "scale_y_continuous",
+      "labs", "theme_bw", "element_text", "facet_wrap", "ggsave",
+    ]);
+    courseGgplot.practice = "同一个研究问题分别用同图分组和分面表达，再选一版做成 PDF。说明为什么选择这种组织方式，以及坐标轴应固定还是自由。";
+  }
+
+  const addVisFunction = (item) => {
+    window.RZH_EXTRA_FUNCTIONS_5 = window.RZH_EXTRA_FUNCTIONS_5 || [];
+    window.RZH_EXTRA_FUNCTIONS_5.push({
+      category: "可视化",
+      level: "入门",
+      tips: [],
+      related: [],
+      ...item,
+    });
+  };
+
+  [
+    {
+      id: "geom_smooth",
+      name: "geom_smooth()",
+      package: "ggplot2",
+      aliases: ["平滑曲线", "趋势线", "loess", "GAM层"],
+      summary: "在数据上叠加平滑趋势和可选置信带，常用 lm、loess 或 gam 方法。",
+      syntax: "geom_smooth(mapping = NULL, data = NULL, method = \"loess\", formula = y ~ x, se = TRUE, span = 0.75, ...)",
+      returns: "返回 ggplot2 图层，显示模型或平滑器估计的趋势。",
+      example: String.raw`ggplot(d, aes(carat, price)) +
+  geom_point(alpha = 0.25) +
+  geom_smooth(method = "loess", se = TRUE)`,
+      output: "显示原始点和 loess 平滑曲线。",
+      params: [
+        ["method", "平滑方法，如 lm、loess、gam。", '默认 "loess"'],
+        ["formula", "平滑方法使用的公式。", "默认 y ~ x"],
+        ["se", "是否显示不确定性带。", "默认 TRUE"],
+        ["span", "loess 平滑程度；较小平滑更灵活。", "默认 0.75"],
+      ],
+      tips: ["平滑层不替代原始点。", "样本稀疏处不要过度解释曲线端点。"],
+      related: ["geom_point", "gam"],
+    },
+    {
+      id: "geom_tile",
+      name: "geom_tile()",
+      package: "ggplot2",
+      aliases: ["热图", "色块", "heatmap"],
+      summary: "用矩形色块显示二维网格中的数值，常用于热图和汇总矩阵。",
+      syntax: "geom_tile(mapping = NULL, data = NULL, fill = NA, color = NA, linewidth = 0.1, ...)",
+      returns: "返回矩形色块图层。",
+      example: String.raw`ggplot(heat, aes(cut, clarity, fill = price)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "white", high = "#2f6b5b")`,
+      output: "每个分类组合显示一个带颜色的方格。",
+      params: [
+        ["fill", "映射到色块内部的数值或分类。", "按热图需要"],
+        ["color", "色块边框颜色。", "可空白"],
+        ["linewidth", "色块边框粗细。", "0.1"],
+      ],
+      tips: ["分类轴顺序转成 factor 后更可控。", "每个网格应只有一个统计值。"],
+      related: ["scale_fill_gradient2", "geom_raster"],
+    },
+    {
+      id: "geom_histogram",
+      name: "geom_histogram()",
+      package: "ggplot2",
+      aliases: ["直方图", "分箱频数", "histogram layer"],
+      summary: "把连续变量分箱，并用柱高表示每个区间的频数或统计量。",
+      syntax: "geom_histogram(mapping = NULL, data = NULL, bins = 30, binwidth = NULL, boundary = NULL, ...)",
+      returns: "返回直方图图层。",
+      example: String.raw`ggplot(d, aes(price)) +
+  geom_histogram(bins = 25, fill = "#2f6b5b", color = "white")`,
+      output: "显示价格在不同区间内的频数。",
+      params: [
+        ["x", "要分箱的连续变量。", "必填映射"],
+        ["bins", "分箱数量。", "默认 30"],
+        ["binwidth", "每个分箱宽度；与 bins 二选一。", "自动"],
+        ["boundary", "分箱边界位置。", "自动"],
+      ],
+      tips: ["分箱数量会改变外观。", "先看数值范围，再决定分组。"],
+      related: ["geom_density"],
+    },
+    {
+      id: "geom_density",
+      name: "geom_density()",
+      package: "ggplot2",
+      aliases: ["密度图", "核密度", "density layer"],
+      summary: "用平滑曲线估计连续变量的概率密度，可叠加多个组。",
+      syntax: "geom_density(mapping = NULL, data = NULL, adjust = 1, bw = NULL, fill = NA, ...)",
+      returns: "返回密度曲线图层。",
+      example: String.raw`ggplot(d, aes(price, fill = cut)) +
+  geom_density(alpha = 0.25)`,
+      output: "各组价格分布的平滑密度曲线。",
+      params: [
+        ["x", "连续变量。", "必填映射"],
+        ["adjust", "带宽调节系数，越小曲线越灵活。", "默认 1"],
+        ["fill", "曲线内部填充映射。", "按需要"],
+      ],
+      tips: ["样本量小时不宜解释多峰。", "带宽变化会影响细节。"],
+      related: ["geom_histogram", "geom_violin"],
+    },
+    {
+      id: "geom_raster",
+      name: "geom_raster()",
+      package: "ggplot2",
+      aliases: ["规则热图", "raster heatmap", "快速色块"],
+      summary: "绘制规则矩形网格热图，在大网格中通常比 geom_tile() 更高效。",
+      syntax: "geom_raster(mapping = NULL, data = NULL, hjust = 0.5, vjust = 0.5, ...)",
+      returns: "返回规则矩形色块图层。",
+      example: String.raw`ggplot(heat, aes(clarity, cut, fill = price)) +
+  geom_raster()`,
+      output: "按规则网格绘制热图。",
+      params: [
+        ["x / y", "网格位置。", "必填映射"],
+        ["fill", "色块数值。", "通常必填"],
+        ["hjust / vjust", "网格对齐位置。", "0.5"],
+      ],
+      tips: ["网格应规则且不重叠。", "普通分类热图使用 geom_tile 更直观。"],
+      related: ["geom_tile"],
+    },
+    {
+      id: "geom_errorbar",
+      name: "geom_errorbar()",
+      package: "ggplot2",
+      aliases: ["误差条", "置信区间", "上下限"],
+      summary: "用竖线和横帽显示点估计的不确定性范围。",
+      syntax: "geom_errorbar(mapping = NULL, data = NULL, width = 0.2, position = \"identity\", ...)",
+      returns: "返回误差条图层。",
+      example: String.raw`ggplot(sum_dat, aes(cut, mean)) +
+  geom_errorbar(aes(ymin = low, ymax = high), width = 0.18) +
+  geom_point(size = 2.4)`,
+      output: "显示均数及下限到上限之间的区间。",
+      params: [
+        ["ymin", "误差线下限。", "必填映射"],
+        ["ymax", "误差线上限。", "必填映射"],
+        ["width", "横帽宽度。", "默认 0.2"],
+        ["position", "分组并排或重叠位置。", "identity"],
+      ],
+      tips: ["必须说明是 SD、SE 还是 CI。", "点和误差条应使用相同 position 宽度。"],
+      related: ["geom_point", "geom_linerange"],
+    },
+    {
+      id: "geom_col",
+      name: "geom_col()",
+      package: "ggplot2",
+      aliases: ["柱状图", "已汇总柱图", "identity bar"],
+      summary: "直接用数据中的 y 值画柱高，不重新统计计数。",
+      syntax: "geom_col(mapping = NULL, data = NULL, position = \"stack\", width = NULL, ...)",
+      returns: "返回柱状图图层。",
+      example: String.raw`ggplot(count_dat, aes(cut, n)) +
+  geom_col(fill = "#2f6b5b")`,
+      output: "柱子高度直接等于 n。",
+      params: [
+        ["x", "分类轴变量。", "必填映射"],
+        ["y", "已汇总的高度或比例。", "必填映射"],
+        ["position", "并列、堆积等。", "stack"],
+        ["width", "柱宽。", "自动"],
+      ],
+      tips: ["已有均数或比例时不要改用 geom_bar() 默认计数。", "柱图 y 轴通常从 0 开始。"],
+      related: ["geom_bar", "geom_errorbar"],
+    },
+    {
+      id: "position_dodge",
+      name: "position_dodge()",
+      package: "ggplot2",
+      aliases: ["并排位置", "分组错开", "dodge"],
+      summary: "把同一位置的多个分组并排错开，常用于柱、箱体、点和误差线。",
+      syntax: "position_dodge(width = NULL, preserve = c(\"total\", \"single\"))",
+      returns: "返回位置调整对象，可传给 geom 的 position 参数。",
+      example: String.raw`geom_boxplot(
+  position = position_dodge(width = 0.75)
+)`,
+      output: "同组箱体并排显示。",
+      params: [
+        ["width", "整组占用的位置宽度。", "按图形确定"],
+        ["preserve", "保留总宽或单个位置宽。", '"total"'],
+      ],
+      tips: ["多层点、线和误差条要使用相同 width。", "并排不等于分面。"],
+      related: ["geom_errorbar", "geom_boxplot", "geom_col"],
+    },
+    {
+      id: "geom_jitter",
+      name: "geom_jitter()",
+      package: "ggplot2",
+      aliases: ["抖动散点", "重叠点", "jitter"],
+      summary: "给散点加入少量随机位置偏移，减轻离散分类轴上的点重叠。",
+      syntax: "geom_jitter(mapping = NULL, data = NULL, width = 0.4, height = 0, ...)",
+      returns: "返回抖动点图层。",
+      example: String.raw`ggplot(d, aes(cut, price)) +
+  geom_jitter(width = 0.15, alpha = 0.25, size = 1.2)`,
+      output: "同一类别的点轻微横向散开。",
+      params: [
+        ["width", "横向抖动幅度。", "默认 0.4"],
+        ["height", "纵向抖动幅度。", "默认 0"],
+        ["alpha", "透明度。", "按重叠设置"],
+      ],
+      tips: ["抖动会轻微改变点的位置，不应误解为数值改变。", "论文图应说明使用了抖动。"],
+      related: ["geom_point", "geom_boxplot", "geom_violin"],
+    },
+    {
+      id: "facet_wrap",
+      name: "facet_wrap()",
+      package: "ggplot2",
+      aliases: ["封装分面", "分面", "wrap facet"],
+      summary: "按一个或多个变量的水平拆分子图，并自动排列成二维面板。",
+      syntax: "facet_wrap(facets, nrow = NULL, ncol = NULL, scales = \"fixed\", labeller = \"label_value\", ...)",
+      returns: "返回分面设置。",
+      example: String.raw`ggplot(mpg2, aes(displ, hwy)) +
+  geom_point() +
+  facet_wrap(~ class, ncol = 2, scales = "fixed")`,
+      output: "每个 class 一个子图。",
+      params: [
+        ["facets", "分面表达式，如 ~ class。", "必填"],
+        ["ncol / nrow", "面板列数或行数。", "自动"],
+        ["scales", "fixed、free、free_x 或 free_y。", "fixed"],
+        ["labeller", "面板标签格式。", "label_value"],
+      ],
+      tips: ["固定坐标便于比较绝对差异。", "面板数量过多时减少文字和图层。"],
+      related: ["facet_grid"],
+    },
+    {
+      id: "facet_grid",
+      name: "facet_grid()",
+      package: "ggplot2",
+      aliases: ["网格分面", "行列分面", "grid facet"],
+      summary: "按行和列两个变量组合生成子图矩阵。",
+      syntax: "facet_grid(rows = NULL, cols = NULL, scales = \"fixed\", space = \"fixed\", labeller = \"label_value\", ...)",
+      returns: "返回二维网格分面。",
+      example: String.raw`ggplot(mpg2, aes(displ, hwy)) +
+  geom_point() +
+  facet_grid(drv ~ class)`,
+      output: "drv 为行、class 为列的面板矩阵。",
+      params: [
+        ["rows", "定义行的分面变量。", "可用 . 表示无"],
+        ["cols", "定义列的分面变量。", "可用 . 表示无"],
+        ["scales", "固定或自由坐标。", "fixed"],
+        ["space", "面板尺寸是否随范围变化。", "fixed"],
+      ],
+      tips: ["一个分类变量时通常 facet_wrap 更灵活。", "空组合会产生空面板。"],
+      related: ["facet_wrap"],
+    },
+    {
+      id: "coord_cartesian",
+      name: "coord_cartesian()",
+      package: "ggplot2",
+      aliases: ["笛卡尔坐标", "局部放大", "显示范围"],
+      summary: "使用笛卡尔坐标，可通过 xlim/ylim 裁剪显示范围而不删除原始数据。",
+      syntax: "coord_cartesian(xlim = NULL, ylim = NULL, expand = TRUE, clip = \"on\")",
+      returns: "返回坐标系统设置。",
+      example: String.raw`p + coord_cartesian(ylim = c(0, 12000))`,
+      output: "只在显示窗口放大 y 范围。",
+      params: [
+        ["xlim", "x 轴显示范围。", "自动"],
+        ["ylim", "y 轴显示范围。", "自动"],
+        ["expand", "是否在数据范围外留白。", "TRUE"],
+        ["clip", "是否裁掉范围外图层。", '"on"'],
+      ],
+      tips: ["平滑和汇总仍使用范围外数据。", "图注要说明是否只展示局部范围。"],
+      related: ["scale_y_continuous", "coord_fixed"],
+    },
+    {
+      id: "coord_flip",
+      name: "coord_flip()",
+      package: "ggplot2",
+      aliases: ["坐标翻转", "横向条形图", "flip"],
+      summary: "交换 x 轴和 y 轴的显示方向，常用于较长的分类标签。",
+      syntax: "coord_flip(xlim = NULL, ylim = NULL, expand = TRUE, clip = \"on\")",
+      returns: "返回翻转后的笛卡尔坐标。",
+      example: String.raw`ggplot(count_dat, aes(cut, n)) +
+  geom_col() +
+  coord_flip()`,
+      output: "类别显示在纵轴，数值显示在横轴。",
+      params: [
+        ["xlim", "翻转前 x 显示范围。", "自动"],
+        ["ylim", "翻转前 y 显示范围。", "自动"],
+      ],
+      tips: ["翻转后 axis 参数名称仍按原映射理解。", "新版 geom 也支持 orientation，但 coord_flip 仍适合通用调整。"],
+      related: ["coord_cartesian"],
+    },
+    {
+      id: "coord_fixed",
+      name: "coord_fixed()",
+      package: "ggplot2",
+      aliases: ["固定比例", "等比例坐标", "aspect ratio"],
+      summary: "固定 y 单位与 x 单位的显示长度，适合相关矩阵和空间几何。",
+      syntax: "coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = \"on\")",
+      returns: "返回固定纵横比的坐标设置。",
+      example: String.raw`ggplot(cor_long, aes(Var1, Var2, fill = Freq)) +
+  geom_tile() +
+  coord_fixed()`,
+      output: "每个相关矩阵格子保持相同纵横比。",
+      params: [
+        ["ratio", "y 单位相对 x 单位的显示长度。", "默认 1"],
+        ["xlim / ylim", "显示范围。", "自动"],
+      ],
+      tips: ["与 coord_cartesian 一样只影响显示，不删除数据。", "空间图要明确地图投影后再使用。"],
+      related: ["coord_cartesian", "geom_tile"],
+    },
+    {
+      id: "scale_y_continuous",
+      name: "scale_y_continuous()",
+      package: "ggplot2",
+      aliases: ["连续Y轴", "纵轴刻度", "y scale"],
+      summary: "设置连续型 y 轴的名称、范围、刻度、标签和转换。",
+      syntax: "scale_y_continuous(name = waiver(), breaks = waiver(), labels = waiver(), limits = NULL, trans = \"identity\", ...)",
+      returns: "返回连续位置标度。",
+      example: String.raw`scale_y_continuous(
+  name = "价格（美元）",
+  breaks = seq(0, 20000, 5000)
+)`,
+      output: "设置 y 轴标题和刻度位置。",
+      params: [
+        ["name", "坐标轴标题。", "继承变量名"],
+        ["breaks", "刻度位置。", "自动"],
+        ["labels", "刻度标签。", "自动"],
+        ["limits", "数据范围；范围外值会被移除。", "NULL"],
+        ["trans", "统计前的尺度转换。", '"identity"'],
+      ],
+      tips: ["只想裁剪显示范围时用 coord_cartesian。", "limits 会改变后续统计计算。"],
+      related: ["coord_cartesian", "scale_color_manual"],
+    },
+    {
+      id: "scale_fill_gradient2",
+      name: "scale_fill_gradient2()",
+      package: "ggplot2",
+      aliases: ["三色渐变", "双端色阶", "中间色"],
+      summary: "为连续填充值设置低、中、高三色渐变，常用于相关矩阵和热图。",
+      syntax: "scale_fill_gradient2(low = muted(\"red\"), mid = \"white\", high = muted(\"blue\"), midpoint = 0, ...)",
+      returns: "返回连续填充标度。",
+      example: String.raw`scale_fill_gradient2(
+  low = "#58789f",
+  mid = "white",
+  high = "#d97b59",
+  midpoint = 0
+)`,
+      output: "低值、中间值和高值分别映射到三种颜色。",
+      params: [
+        ["low", "低端颜色。", "默认偏红"],
+        ["mid", "中间颜色。", "默认白色"],
+        ["high", "高端颜色。", "默认偏蓝"],
+        ["midpoint", "中间颜色对应的数值。", "默认 0"],
+        ["name", "颜色条标题。", "继承变量名"],
+      ],
+      tips: ["正负或中心值明确时 midpoint 很重要。", "避免彩虹色造成数值顺序错觉。"],
+      related: ["geom_tile", "scale_fill_manual"],
+    },
+    {
+      id: "guides",
+      name: "guides()",
+      package: "ggplot2",
+      aliases: ["图例设置", "隐藏图例", "legend guide"],
+      summary: "集中控制颜色、形状、填充等图例是否显示及显示方式。",
+      syntax: "guides(...)",
+      returns: "返回图例设置图层。",
+      example: String.raw`p +
+  guides(
+    color = guide_legend(title = "切工", nrow = 1),
+    shape = "none"
+  )`,
+      output: "保留并定制颜色图例，隐藏形状图例。",
+      params: [
+        ["...", "按图形属性设置 guide，如 color、fill、shape。", "按需填写"],
+      ],
+      tips: ["隐藏图例前确认不会失去必要信息。", "多图层同一变量通常会自动合并图例。"],
+      related: ["guide_legend", "theme"],
+    },
+    {
+      id: "guide_legend",
+      name: "guide_legend()",
+      package: "ggplot2",
+      aliases: ["自定义图例", "图例排列", "legend layout"],
+      summary: "设置离散图形属性图例的标题、方向、行数和键样式。",
+      syntax: "guide_legend(title = waiver(), direction = NULL, nrow = NULL, ncol = NULL, reverse = FALSE, ...)",
+      returns: "返回图例 guide 设置。",
+      example: String.raw`guides(
+  color = guide_legend(
+    title = "切工",
+    direction = "horizontal",
+    nrow = 1
+  )
+)`,
+      output: "颜色图例横向显示为一行。",
+      params: [
+        ["title", "图例标题。", "继承标度名称"],
+        ["direction", "horizontal 或 vertical。", "自动"],
+        ["nrow / ncol", "图例项目行列数。", "自动"],
+        ["reverse", "是否反转项目顺序。", "FALSE"],
+      ],
+      tips: ["图例横排适合放顶部或底部。", "项目太多时横排会挤压图形。"],
+      related: ["guides", "scale_color_manual"],
+    },
+    {
+      id: "theme_bw",
+      name: "theme_bw()",
+      package: "ggplot2",
+      aliases: ["黑白主题", "白底主题", "论文主题"],
+      summary: "白色背景和浅灰网格的完整主题，适合论文图和打印。",
+      syntax: "theme_bw(base_size = 11, base_family = \"\", base_line_size = base_size / 22, base_rect_size = base_size / 22)",
+      returns: "返回完整主题设置。",
+      example: "p + theme_bw(base_size = 13)",
+      output: "整幅图切换为白底网格风格。",
+      params: [
+        ["base_size", "整体基准字号。", "默认 11"],
+        ["base_family", "整体字体。", "使用设备默认"],
+        ["base_line_size", "线条基准大小。", "按字号计算"],
+        ["base_rect_size", "矩形元素基准大小。", "按字号计算"],
+      ],
+      tips: ["先用完整主题，再用 theme() 微调。", "字号要按最终导出尺寸检查。"],
+      related: ["theme", "theme_minimal", "ggsave"],
+    },
+    {
+      id: "theme_set",
+      name: "theme_set()",
+      package: "ggplot2",
+      aliases: ["默认主题", "全局主题", "set theme"],
+      summary: "设置当前 R 会话后续 ggplot 图形的默认主题。",
+      syntax: "theme_set(new)",
+      returns: "设置全局默认主题，并通常返回旧主题设置。",
+      example: String.raw`theme_set(theme_bw(base_size = 13))`,
+      output: "之后创建的 ggplot 图形默认使用白底主题。",
+      params: [
+        ["new", "新的完整主题对象。", "必填"],
+      ],
+      tips: ["只影响当前会话。", "单张图仍可在后面叠加 theme() 临时修改。"],
+      related: ["theme", "theme_bw", "theme_minimal"],
+    },
+    {
+      id: "plot_grid",
+      name: "plot_grid()",
+      package: "cowplot",
+      aliases: ["拼图", "多面板组合", "compose plots"],
+      summary: "把多个独立 ggplot 对象或图形组合成一张多面板图。",
+      syntax: "plot_grid(..., plotlist = NULL, nrow = NULL, ncol = NULL, labels = NULL, rel_widths = 1, rel_heights = 1, align = \"none\")",
+      returns: "返回组合后的图形对象。",
+      example: String.raw`cowplot::plot_grid(
+  p1, p2,
+  nrow = 1,
+  labels = c("A", "B"),
+  rel_widths = c(1.2, 1)
+)`,
+      output: "两个独立图并排显示，带有 A/B 面板标签。",
+      params: [
+        ["... / plotlist", "要组合的图形对象。", "至少两个"],
+        ["nrow / ncol", "行列数。", "自动"],
+        ["labels", "面板标签。", "NULL"],
+        ["rel_widths / rel_heights", "各图相对宽高。", "1"],
+        ["align", "是否对齐坐标轴。", '"none"'],
+      ],
+      tips: ["拼图前统一字体、颜色和图例。", "拼图与 facet 分面概念不同。"],
+      related: ["facet_wrap", "ggsave"],
+    },
+    {
+      id: "ggMarginal",
+      name: "ggMarginal()",
+      package: "ggExtra",
+      aliases: ["边际图", "边际密度", "marginal plot"],
+      summary: "在散点图的横轴或纵轴边缘附加直方图、密度图或箱式图。",
+      syntax: "ggMarginal(p, data, type = c(\"density\", \"histogram\", \"boxplot\", \"violin\"), margins = \"both\", size = 5, groupColour = FALSE, groupFill = FALSE, alpha = 1, ...)",
+      returns: "返回带边际分布的组合图形对象。",
+      example: String.raw`library(ggExtra)
+p <- ggplot(mydata, aes(BMI, waist, color = sex)) +
+  geom_point()
+ggMarginal(p, type = "density", groupColour = TRUE, groupFill = TRUE)`,
+      output: "散点图主图外增加按性别分组的边际密度图。",
+      params: [
+        ["p", "已经创建的 ggplot 对象。", "必填"],
+        ["type", "density、histogram、boxplot 或 violin。", '"density"'],
+        ["margins", "both、x 或 y。", '"both"'],
+        ["size", "边际图相对主图的大小。", "5"],
+        ["groupColour / groupFill", "边际图是否沿用主图分组。", "FALSE"],
+        ["alpha", "边际图透明度。", "1"],
+      ],
+      tips: ["主图已经较复杂时，边际图应尽量简洁。", "论文输出前检查主图和边际图坐标是否对齐。"],
+      related: ["geom_point", "geom_density", "plot_grid"],
+    },
+  ].forEach(addVisFunction);
+
+  const glossary = window.RZH_GLOSSARY ||= [];
+  const ids = new Set(glossary.map((item) => item[0]));
+  const addTerm = (item) => {
+    if (!ids.has(item[0])) {
+      glossary.push(item);
+      ids.add(item[0]);
+    }
+  };
+  [
+    ["grammar-of-graphics", "图形语法", "可视化", "把统计图形分解为数据、映射、几何对象、统计变换、标度、坐标和分面等可组合部件。", "像用一套标准积木搭图，而不是每次从头画。", "ggplot(dat, aes(x, y)) + geom_point() 是最小组合之一。"],
+    ["aesthetic-mapping", "图形属性映射", "可视化", "把数据变量对应到位置、颜色、形状、填充、分组等视觉属性的过程。", "像给每一列数据分配一个可见的“表达方式”。", "aes(color = group) 表示分组变量决定颜色。"],
+    ["geom-object", "几何对象", "可视化", "图中最终显示的点、线、柱、箱体、色块或误差线等对象。", "像选择用点、线还是砖块来表达数据。", "geom_point()、geom_line()、geom_tile()"],
+    ["stat-transform", "统计变换", "可视化", "在绘制几何对象前对数据进行计数、分箱、平滑、密度或汇总。", "像先把原料加工成图形需要的半成品。", "geom_bar() 默认执行 count 统计。"],
+    ["position-dodge", "并排位置调整", "可视化", "把同一分类位置上的多个组沿横轴错开，避免柱、点或误差线重叠。", "像让并排站的人互相错开肩膀。", "position_dodge(width = 0.8)"],
+    ["legend", "图例", "可视化", "解释颜色、形状、填充、大小等视觉属性与数据取值对应关系的组件。", "像图形旁边的符号说明。", "离散颜色映射会自动生成图例。"],
+    ["coordinate-system", "坐标系统", "可视化", "定义 x、y 位置怎样放在画布上的二维系统，可翻转、固定比例或转换尺度。", "像选择方形坐标纸、极坐标纸或特殊比例纸。", "coord_flip() 交换横纵轴显示。"],
+    ["facet", "分面", "可视化", "按分类变量把数据拆成多个子图，并自动排列成面板。", "像把同一套图分别装在不同小相框里。", "facet_wrap(~ region) 按地区生成多个子图。"],
+    ["fixed-scale-facet", "固定分面坐标", "可视化", "所有分面共享相同坐标轴范围，便于比较跨面板的绝对位置和大小。", "像所有尺子使用同样刻度。", "facet_wrap(~ group, scales = \"fixed\")"],
+    ["free-scale-facet", "自由分面坐标", "可视化", "允许不同分面使用不同坐标轴范围，突出各自分布形状。", "像每个小图使用适合自己的镜头。", "facet_grid(row ~ col, scales = \"free\")"],
+    ["theme-element", "主题元素", "可视化", "主题中可单独修改的文字、线条、矩形和空白部件。", "像更换图的字体、网格、背景和边框。", "panel.grid.major = element_line(color = \"grey90\")"],
+    ["vector-graphic", "矢量图", "可视化", "以线条、曲线和文字指令保存的图形，放大后不会产生像素模糊。", "像用数学说明书保存图形，而不是拍一张照片。", "论文图常用 PDF、SVG 等矢量格式。"],
+    ["dpi", "每英寸像素数 DPI", "可视化", "位图每英寸包含的像素数量，影响打印清晰度和文件大小。", "像照片的精细颗粒密度。", "ggsave(..., dpi = 300)"],
+    ["plot-composition", "图形拼合", "可视化", "把多个独立图形对象按行列组合成一张多面板图。", "像把几张完成的照片装进同一版面。", "cowplot::plot_grid(p1, p2, nrow = 1)"],
+    ["marginal-plot", "边际分布图", "可视化", "在散点图的横轴或纵轴边缘附加直方图、密度图或箱式图。", "像在主图旁边各放一张数据分布的小侧栏。", "ggExtra::ggMarginal(p, type = \"density\")"],
+  ].forEach(addTerm);
+})();
+
+;
 window.RZH_MANUAL_FUNCTIONS = [
   {
     "id": "install.packages",
@@ -102761,6 +104579,21 @@ const glossaryFunctionMap = {
   separation: ["glm"],
   "discrimination-slope": ["roc"],
   "decision-curve": ["roc"],
+  "grammar-of-graphics": ["ggplot", "aes", "geom_point"],
+  "aesthetic-mapping": ["aes"],
+  "geom-object": ["geom_point", "geom_line", "geom_tile"],
+  "stat-transform": ["geom_smooth", "geom_bar"],
+  "position-dodge": ["position_dodge", "geom_errorbar"],
+  legend: ["guides", "guide_legend"],
+  "coordinate-system": ["coord_cartesian", "coord_flip"],
+  facet: ["facet_wrap", "facet_grid"],
+  "fixed-scale-facet": ["facet_wrap", "facet_grid"],
+  "free-scale-facet": ["facet_wrap", "facet_grid"],
+  "theme-element": ["theme", "element_text", "element_line"],
+  "vector-graphic": ["ggsave"],
+  dpi: ["ggsave"],
+  "plot-composition": ["plot_grid"],
+  "marginal-plot": ["ggMarginal"],
   "control-flow": ["if", "for-loop", "while-loop"],
   conditional: ["if", "ifelse", "case_when"],
   iteration: ["for-loop", "lapply"],
