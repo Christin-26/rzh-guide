@@ -62382,8 +62382,8 @@ ggsurvplot(
       pitfalls: ["同一图叠三层但不同 dodge 宽度。", "把标准误解释成个体变异。", "柱图与误差线来自不同数据。", "生存曲线不显示风险人数。"],
       practice: "用自己的汇总数据制作点线误差图、柱图误差线和分面图三版，比较哪一版最适合原始研究问题。",
       related: ["errorbar", "bar", "survival-curve", "ggplot-facets"],
-      imageKey: "errorbar",
-      imageCaption: "估计值与不确定性应同时展示。点线图、柱图或分面图都可以表达均值，但图注必须说明误差条和分组含义。",
+      imageKey: "paper-error-panels",
+      imageCaption: "左侧用点线和误差条展示分组趋势，右侧用柱图与误差线展示组均值。两种图都同时呈现估计与不确定性，图注需说明误差条含义。",
     },
     {
       type: "plot",
@@ -63141,6 +63141,921 @@ ggMarginal(p, type = "density", groupColour = TRUE, groupFill = TRUE)`,
     ["dpi", "每英寸像素数 DPI", "可视化", "位图每英寸包含的像素数量，影响打印清晰度和文件大小。", "像照片的精细颗粒密度。", "ggsave(..., dpi = 300)"],
     ["plot-composition", "图形拼合", "可视化", "把多个独立图形对象按行列组合成一张多面板图。", "像把几张完成的照片装进同一版面。", "cowplot::plot_grid(p1, p2, nrow = 1)"],
     ["marginal-plot", "边际分布图", "可视化", "在散点图的横轴或纵轴边缘附加直方图、密度图或箱式图。", "像在主图旁边各放一张数据分布的小侧栏。", "ggExtra::ggMarginal(p, type = \"density\")"],
+  ].forEach(addTerm);
+})();
+
+;
+(() => {
+  const modules = window.RZH_COURSE_MODULES ||= [];
+  const units = window.RZH_COURSE_UNITS ||= [];
+  const unique = (items) => [...new Set(items)];
+
+  window.RZH_COURSE_UNITS = [
+    {
+      id: "start",
+      title: "第一部分 起步与工作环境",
+      note: "安装、认识 RStudio，并建立一个以后还能重新运行的项目。",
+      checkpoint: "能打开项目、在 Script 写代码、在 Console 看到结果，并说出 Environment 中对象从哪里来。",
+    },
+    {
+      id: "language",
+      title: "第二部分 R 语言基础",
+      note: "从对象、函数和数据类型，走到能看懂并修改一条普通 R 代码。",
+      checkpoint: "能判断变量类型、创建对象、读懂函数参数，并在报错时先检查对象和参数。",
+    },
+    {
+      id: "data",
+      title: "第三部分 数据管理",
+      note: "把 CSV、Excel 或数据库数据读进来，整理成一行一个观测、一列一个变量的分析表。",
+      checkpoint: "能从原始文件开始完成读取、检查、清洗、变量生成、合并和保存，并保留每一步的检查记录。",
+    },
+    {
+      id: "programming",
+      title: "第四部分 控制流与文本处理",
+      note: "减少重复代码，处理条件、循环、函数、日期、正则和开放文本。",
+      checkpoint: "能把重复三次以上的步骤写成函数或批量处理，并能为一条文本规则准备正例和反例。",
+    },
+    {
+      id: "visual",
+      title: "第五部分 描述、探索与可视化",
+      note: "先认识数据，再用图形表达分布、关系、分组和研究结果。",
+      checkpoint: "拿到一份新数据时，能先做结构、缺失和分布检查，再选择合适图形，不用先猜模型。",
+    },
+    {
+      id: "analysis",
+      title: "第六部分 基本统计方法与模型",
+      note: "按变量角色与结局类型选择检验、回归、生存或混合模型，并解释效应与不确定性。",
+      checkpoint: "能说明为什么选这个模型、参数代表什么、模型假设怎样检查，以及结果不能说明什么。",
+    },
+    {
+      id: "epi",
+      title: "第七部分 流行病学研究设计",
+      note: "把现况、生态、队列、病例对照、随机试验和诊断研究转换成对应的数据结构与分析流程。",
+      checkpoint: "看到研究设计时，能先说出抽样单位、时间方向、效应量和主要偏倚，再决定用什么函数。",
+    },
+    {
+      id: "advanced-epi",
+      title: "第八部分 进阶流行病学分析",
+      note: "处理缺失、功效、交互、因果、Meta 分析、孟德尔随机化和高级预测模型。",
+      checkpoint: "能根据研究问题选择进阶方法，完成主要分析、关键诊断和敏感性分析，而不只输出一个显著结果。",
+    },
+    {
+      id: "project",
+      title: "第九部分 完成一份独立分析",
+      note: "把前面的读取、整理、分析、图形和报告连接成可重复项目。",
+      checkpoint: "另一个人能根据你的目录和脚本，用同一数据重新得到主要表格、图形和结论。",
+    },
+  ];
+
+  const chapterModules = [
+    {
+      id: "r-mean-tests",
+      unit: "analysis",
+      title: "均值比较：t 检验与方差分析",
+      subtitle: "单样本、成组、配对、ANOVA 与多重比较",
+      chapterLabel: "课程第6章 · 均值比较",
+      minutes: 24,
+      outcome: "能根据组数和数据关系选择 t 检验、ANOVA 或重复测量方法，并读懂差值、区间和多重比较。",
+      prerequisite: "理解均数、标准差、标准误、分布和置信区间。",
+      sections: [
+        { heading: "先画图再检验", text: "比较均值前先看各组分布、样本量和异常值。均数不能概括严重偏态或双峰数据。" },
+        { heading: "t 检验的三种场景", text: "单样本比较一个均值，成组 t 检验比较两组独立对象，配对 t 检验比较同一对象的差。" },
+        { heading: "三组及以上", text: "多个组先做 ANOVA，再按研究问题做预先计划的对比或校正后的多重比较。" },
+        { heading: "结果不是只有 p", text: "报告各组均数、均值差或组间变异、95% 置信区间和样本量。方差齐性等假设结合图形判断。" },
+      ],
+      code: String.raw`set.seed(2026)
+dat <- data.frame(
+  group = factor(rep(c("对照", "低剂量", "高剂量"), each = 40)),
+  score = c(rnorm(40, 50, 8), rnorm(40, 54, 8), rnorm(40, 58, 9))
+)
+
+t.test(score ~ group, data = subset(dat, group != "高剂量"))
+
+fit_aov <- aov(score ~ group, data = dat)
+summary(fit_aov)
+TukeyHSD(fit_aov)`,
+      functions: ["t.test", "aov", "TukeyHSD"],
+      practice: "选一个连续结局和一个三组分类变量，先画箱式图，再完成 ANOVA 和校正后的两两比较。",
+      tryIt: "把一个极端值加入其中一组，重新画图和检验，观察均数与中位数、p 值与效应量如何变化。",
+      selfCheck: [
+        "能根据独立或配对关系选择 t 检验。",
+        "能解释 ANOVA 显著后为什么还需要多重比较。",
+        "能同时报告效应量、区间和样本量。",
+      ],
+    },
+    {
+      id: "r-rate-tests",
+      unit: "analysis",
+      title: "率与比例比较：卡方、Fisher 与分层",
+      subtitle: "列联表、期望频数、确切概率和 CMH",
+      chapterLabel: "课程第6章 · 率比较",
+      minutes: 22,
+      outcome: "能根据 2×2 或多分类列联表选择卡方、Fisher 或分层检验，并解释比例差异。",
+      prerequisite: "掌握比例、2×2 表、期望频数和研究分组。",
+      sections: [
+        { heading: "先确认分母", text: "率、比例和构成比不能混用。每个格子必须有明确计数和分母。" },
+        { heading: "卡方检验", text: "卡方检验比较观察频数与独立假设下的期望频数。期望频数过小时结果不稳定。" },
+        { heading: "Fisher 与分层", text: "小样本或稀疏表可用 Fisher 确切概率法；分层资料可用 Cochran-Mantel-Haenszel 检验控制分层变量。" },
+        { heading: "报告差异大小", text: "除 p 值外，报告各组比例、率差、RR 或 OR 及置信区间。大样本下很小差异也可能显著。" },
+      ],
+      code: String.raw`tab <- matrix(
+  c(40, 60, 25, 75),
+  nrow = 2,
+  byrow = TRUE,
+  dimnames = list(
+    exposure = c("yes", "no"),
+    outcome = c("event", "none")
+  )
+)
+tab
+prop.table(tab, margin = 1)
+chisq.test(tab)
+fisher.test(tab)`,
+      functions: ["table", "prop.table", "chisq.test", "fisher.test", "mantelhaen.test"],
+      practice: "为一份暴露 × 结局数据制作列联表，计算行百分比、率差和 OR，并在稀疏表中比较卡方与 Fisher。",
+      tryIt: "把一个格子改成 0 或很小，观察期望频数、卡方警告和 Fisher 结果。",
+      selfCheck: [
+        "能区分率、比例和构成比。",
+        "能判断何时使用 Fisher 或分层检验。",
+        "能报告效应大小而不只报告 p 值。",
+      ],
+    },
+    {
+      id: "r-nonparam",
+      unit: "analysis",
+      title: "非参数检验与秩方法",
+      subtitle: "Wilcoxon、Kruskal-Wallis 和多重比较",
+      chapterLabel: "课程第6章 · 非参数检验",
+      minutes: 20,
+      outcome: "能在偏态、有序或小样本数据中选择秩检验，并正确解释中位数和秩关系。",
+      prerequisite: "理解中位数、秩、偏态分布和假设检验。",
+      sections: [
+        { heading: "什么时候不用 t 或 ANOVA", text: "明显偏态、有序结局、极端值或小样本时，秩方法更依赖排序而不是正态均数。" },
+        { heading: "两组与多组", text: "Wilcoxon 秩和检验用于两组独立数据，Kruskal-Wallis 用于多组。配对资料使用符号秩检验。" },
+        { heading: "事后比较", text: "Kruskal-Wallis 显著后需做校正的成对比较。统计软件和包的选择要在方法中说明。" },
+        { heading: "解释秩检验", text: "结果主要支持一组观测倾向于更大或更小，不等于直接比较中位数差，除非补充分布假设。" },
+      ],
+      code: String.raw`set.seed(2026)
+dat <- data.frame(
+  group = factor(rep(c("A", "B", "C"), each = 35)),
+  score = c(rexp(35, 1/5), rexp(35, 1/6), rexp(35, 1/4))
+)
+
+wilcox.test(score ~ group, data = subset(dat, group != "C"))
+kruskal.test(score ~ group, data = dat)
+
+pairwise.wilcox.test(
+  dat$score, dat$group,
+  p.adjust.method = "BH"
+)`,
+      functions: ["wilcox.test", "kruskal.test", "pairwise.wilcox.test"],
+      practice: "对一份明显偏态的结局比较两组和多组，并说明选秩检验而不是 t/ANOVA 的理由。",
+      tryIt: "对同一组数据分别运行 t 检验和 Wilcoxon，比较 p 值、效应方向及对极端值的敏感性。",
+      selfCheck: [
+        "能判断独立和配对秩检验。",
+        "能解释秩检验不等于简单比较中位数。",
+        "能说明多重比较校正方法。",
+      ],
+    },
+    {
+      id: "r-correlation",
+      unit: "analysis",
+      title: "相关分析与线性回归",
+      subtitle: "相关方向、散点图、简单与多重线性模型",
+      chapterLabel: "课程第6章 · 相关与回归",
+      minutes: 26,
+      outcome: "能先画散点图，再选择相关或线性回归，区分关联强度、回归斜率和调整后的效应。",
+      prerequisite: "理解散点图、相关系数、最小二乘和连续结局。",
+      sections: [
+        { heading: "相关不等于回归", text: "相关系数描述两个变量的线性或单调关系；回归给出一个变量变化时结局的平均变化，并可调整协变量。" },
+        { heading: "先检查形状", text: "散点图可以发现非线性、分组差异、异常点和高杠杆点。相关系数接近 0 不代表完全没有关系。" },
+        { heading: "线性模型", text: "lm() 估计系数、标准误和残差。连续变量斜率必须带单位，分类变量系数依赖参照组。" },
+        { heading: "模型检查", text: "查看残差、异常点和共线性，区分统计显著与临床重要差异。" },
+      ],
+      code: String.raw`ggplot(dat, aes(exposure, outcome, color = group)) +
+  geom_point(alpha = 0.4) +
+  geom_smooth(method = "lm", se = FALSE) +
+  theme_minimal()
+
+cor.test(dat$exposure, dat$outcome, method = "pearson")
+
+fit_linear <- lm(
+  outcome ~ exposure + age + sex,
+  data = dat
+)
+summary(fit_linear)
+confint(fit_linear)`,
+      functions: ["cor", "cor.test", "geom_point", "lm", "summary", "confint"],
+      practice: "选择一个连续暴露和连续结局，先画分组散点，再报告相关、简单回归和调整回归三组结果。",
+      tryIt: "加入一个与暴露高度相关的协变量，观察系数和标准误怎样变化，并检查共线性。",
+      selfCheck: [
+        "能解释相关与回归的区别。",
+        "能写出连续变量斜率对应的单位变化。",
+        "能用散点图和残差检查线性假设。",
+      ],
+    },
+    {
+      id: "r-survey",
+      unit: "epi",
+      title: "现况研究与抽样调查",
+      subtitle: "患病率、抽样误差、标准化和横断面关联",
+      chapterLabel: "课程第7章 · 现况研究",
+      minutes: 30,
+      outcome: "能识别现况研究的分析单位，计算患病率与分组描述，并正确解释横断面关联。",
+      prerequisite: "完成描述统计、可视化、置信区间与 Logistic 回归基础。",
+      sections: [
+        { heading: "先判断研究问题", text: "现况研究在特定时间测量暴露和结局。它适合描述患病率和分布，不能仅凭先后顺序判断因果。" },
+        { heading: "抽样和权重", text: "复杂抽样涉及分层、整群、多阶段和抽样权重。忽略设计会让标准误和置信区间失真。" },
+        { heading: "患病率与标准化", text: "患病率需要明确分子、分母、时间点和诊断标准。比较年龄结构不同的人群时，应考虑标准化。" },
+        { heading: "横断面关联", text: "列联表和 Logistic 回归可以描述当前暴露与当前结局的关联，但解释仍受时间顺序和幸存者影响。" },
+      ],
+      code: String.raw`dat <- data.frame(
+  exposure = rep(c("高", "低"), each = 100),
+  age_group = rep(c("青年", "中年"), 100),
+  outcome = rbinom(200, 1, 0.28)
+)
+
+tab <- table(dat$exposure, dat$outcome)
+tab
+prop.table(tab, margin = 1)
+
+fit <- glm(
+  outcome ~ exposure + factor(age_group),
+  data = dat,
+  family = binomial()
+)
+exp(cbind(OR = coef(fit), confint(fit)))`,
+      functions: ["table", "prop.table", "glm", "confint"],
+      practice: "为一份横断面问卷写出分析单位、主要暴露、结局、分母和至少两项偏倚，再生成分组患病率表。",
+      tryIt: "把年龄组再细分后重新计算分组患病率，观察粗率与调整后关联是否改变。",
+      selfCheck: [
+        "能说明为什么现况研究通常不能估计发病率。",
+        "能指出患病率的分母和时间点。",
+        "能解释抽样权重或标准化为什么会影响比较。",
+      ],
+    },
+    {
+      id: "r-ecological",
+      unit: "epi",
+      title: "生态学研究与群体水平关联",
+      subtitle: "地区或时间作分析单位，处理人口分母与生态学谬误",
+      chapterLabel: "课程第8章 · 生态学研究",
+      minutes: 32,
+      outcome: "能以地区或时间单位为一行建立生态数据，拟合群体水平关联并说明生态学谬误。",
+      prerequisite: "理解率、offset、Poisson 回归和时间趋势控制。",
+      sections: [
+        { heading: "分析单位是群体", text: "生态研究常以地区、学校、年份或时间点为一行。群体关联不能自动搬到个体层面。" },
+        { heading: "不要把人数当率", text: "不同地区人口规模不同，事件数不能直接比较。使用人时或人口 offset 转换到率尺度。" },
+        { heading: "生态趋势", text: "时间序列生态研究还要控制长期趋势、季节和自相关，避免把共同趋势误当暴露效应。" },
+        { heading: "生态学谬误", text: "群体平均暴露与平均结局相关，不代表同一个体暴露与结局相关。解释时必须写明分析层级。" },
+      ],
+      code: String.raw`eco <- data.frame(
+  city = 1:8,
+  cases = c(35, 42, 51, 28, 63, 47, 55, 39),
+  population = c(80000, 92000, 110000, 76000, 130000, 98000, 120000, 87000),
+  exposure = c(12, 15, 18, 10, 20, 16, 19, 14)
+)
+
+fit_eco <- glm(
+  cases ~ exposure,
+  offset = log(population),
+  family = poisson(),
+  data = eco
+)
+exp(cbind(IRR = coef(fit_eco), confint(fit_eco)))`,
+      functions: ["glm", "offset", "confint"],
+      practice: "把一张地区数据表整理为一行一个地区，写出事件数、人口、暴露和潜在混杂，再拟合带 offset 的 Poisson 模型。",
+      tryIt: "用每 10 万人口事件率绘图并排序，比较粗事件数和率排序是否不同。",
+      selfCheck: [
+        "能说出生态研究的分析单位。",
+        "能解释 offset 为什么进入计数模型。",
+        "能用一个例子说明生态学谬误。",
+      ],
+    },
+    {
+      id: "r-cohort",
+      unit: "epi",
+      title: "队列研究与生存分析",
+      subtitle: "累积发病、人时、Kaplan-Meier 与 Cox 模型",
+      chapterLabel: "课程第9章 · 队列研究",
+      minutes: 38,
+      outcome: "能整理人时和生存数据，计算累积发病与发病率密度，并完成 KM 与 Cox 分析。",
+      prerequisite: "已经掌握率、比例、生存时间、删失和 Cox 模型的基本概念。",
+      sections: [
+        { heading: "队列数据的时间结构", text: "一行可以代表一个人，也可以代表同一人的多个随访区间。必须明确时间起点、终点、事件和删失。" },
+        { heading: "风险与率", text: "累积发病风险要求完整随访；发病率密度利用人时。分母不同，解释也不同。" },
+        { heading: "KM 与 Cox", text: "KM 描述未发生事件的概率，Cox 估计调整后的瞬时风险比。两者需要风险人数和比例风险检查。" },
+        { heading: "随访质量", text: "失访、竞争风险、时间依赖暴露和 immortal time 都会影响结果，不能只看 HR 的 p 值。" },
+      ],
+      code: String.raw`library(survival)
+library(survminer)
+
+dat$event <- as.integer(dat$status == "death")
+fit_km <- survfit(Surv(follow_days, event) ~ exposure, data = dat)
+
+ggsurvplot(
+  fit_km, data = dat,
+  conf.int = TRUE,
+  risk.table = TRUE,
+  pval = TRUE
+)
+
+fit_cox <- coxph(
+  Surv(follow_days, event) ~ exposure + age + sex,
+  data = dat
+)
+cox.zph(fit_cox)
+exp(cbind(HR = coef(fit_cox), confint(fit_cox)))`,
+      functions: ["Surv", "survfit", "ggsurvplot", "coxph", "cox.zph", "confint"],
+      practice: "根据一份随访数据写出研究起点、终点、事件与删失定义，并比较 KM 曲线和调整 Cox 模型的回答有何不同。",
+      tryIt: "把随访单位从日改成月，确认时间单位一致后重跑模型，比较 HR 是否不变而解释更清楚。",
+      selfCheck: [
+        "能解释累积发病风险与发病率密度的分母差异。",
+        "能说明删失不是无事件。",
+        "能用 cox.zph() 和图形检查比例风险。",
+      ],
+    },
+    {
+      id: "r-case-control",
+      unit: "epi",
+      title: "病例对照研究：非匹配、匹配与倾向评分",
+      subtitle: "从 OR 到条件 Logistic 和匹配后平衡",
+      chapterLabel: "课程第10章 · 病例对照研究",
+      minutes: 38,
+      outcome: "能按匹配方式选择普通或条件 Logistic，检查匹配均衡，并正确解释 OR。",
+      prerequisite: "完成 Logistic 回归、OR、匹配和条件 Logistic 专题。",
+      sections: [
+        { heading: "从结局回看暴露", text: "病例对照研究按结局抽样，常见效应量是 OR。非匹配和匹配资料需要不同模型。" },
+        { heading: "频数匹配与个体匹配", text: "频数匹配控制组间分布；个体匹配形成 1:1 或 1:M 组，需要在组内比较。" },
+        { heading: "条件 Logistic", text: "clogit() 配合 strata() 保留匹配组，不估计截距，也不能直接预测绝对风险。" },
+        { heading: "倾向评分匹配", text: "PSM 用协变量估计接受暴露的概率，匹配后仍需检查平衡，不能自动处理未测量混杂。" },
+      ],
+      code: String.raw`library(survival)
+
+fit_unmatched <- glm(
+  case ~ exposure + age + sex,
+  family = binomial(),
+  data = unmatched
+)
+
+fit_matched <- clogit(
+  case ~ exposure + age + strata(match_set),
+  data = matched
+)
+
+exp(cbind(OR = coef(fit_matched), confint(fit_matched)))`,
+      functions: ["glm", "clogit", "strata", "matchit", "match.data", "confint"],
+      practice: "拿到病例对照数据后，先判断是否匹配，再写出主模型、匹配组变量、调整变量和 OR 的解释。",
+      tryIt: "对匹配前后协变量的标准化差异做一个平衡表，判断匹配是否真正改善可比性。",
+      selfCheck: [
+        "能根据设计而不是 p 值选择普通或条件 Logistic。",
+        "能解释条件 Logistic 为什么没有个体绝对概率。",
+        "能说明匹配后仍需检查协变量平衡。",
+      ],
+    },
+    {
+      id: "r-rct",
+      unit: "epi",
+      title: "随机对照试验与 ITT 分析",
+      subtitle: "随机分配、基线均衡、意向性治疗与效应估计",
+      chapterLabel: "课程第11章 · 随机对照试验",
+      minutes: 36,
+      outcome: "能设计随机分组数据，区分 ITT 与符合方案集，并完成基线与结局分析。",
+      prerequisite: "理解均值、比例、回归和置信区间。",
+      sections: [
+        { heading: "随机化解决什么", text: "随机分配让已知和未知混杂在组间期望平衡。分配隐藏和盲法分别保护随机化过程与结果测量。" },
+        { heading: "分析人群", text: "ITT 按原随机组分析，保留随机化的比较优势；符合方案集回答不同的依从性问题。" },
+        { heading: "基线与结局", text: "基线表用于检查随机化结果，不应把基线 p 值当作分组成功的标准。" },
+        { heading: "提高效率", text: "连续结局可在回归中调整基线值，二分类结局可报告风险差、RR 或 OR。效应尺度和临床意义要同时说明。" },
+      ],
+      code: String.raw`set.seed(2026)
+dat <- data.frame(
+  id = 1:120,
+  group = rep(c("control", "treatment"), each = 60)
+)
+dat$baseline <- rnorm(120, 50, 10)
+dat$outcome <- 35 +
+  ifelse(dat$group == "treatment", 4, 0) +
+  0.55 * dat$baseline +
+  rnorm(120, 0, 7)
+
+fit <- lm(outcome ~ group + baseline, data = dat)
+summary(fit)
+confint(fit)`,
+      functions: ["sample", "lm", "summary", "confint", "table"],
+      practice: "为一项两组 RCT 写出随机单位、分配隐藏、盲法、主要结局、ITT 分析集和效应尺度。",
+      tryIt: "比较不调整基线与调整基线后的组间效应，解释为什么随机试验仍可能从基线调整中获益。",
+      selfCheck: [
+        "能说明分配隐藏、盲法和随机化各自防什么偏倚。",
+        "能区分 ITT 与符合方案集。",
+        "能解释基线均衡应看临床差异而非只做 p 值筛选。",
+      ],
+    },
+    {
+      id: "r-diagnostic",
+      unit: "epi",
+      title: "筛检与诊断试验评价",
+      subtitle: "灵敏度、特异度、预测值、ROC 与联合试验",
+      chapterLabel: "课程第12章 · 筛检和诊断试验",
+      minutes: 34,
+      outcome: "能从 2×2 表计算诊断指标，理解患病率对预测值的影响，并完成 ROC 分析。",
+      prerequisite: "掌握比例、列联表和 Logistic 回归基础。",
+      sections: [
+        { heading: "金标准与设计", text: "待评价试验和金标准应尽量独立、同步并减少判定偏倚。研究对象谱会影响灵敏度、特异度和预测值。" },
+        { heading: "真实性与可靠性", text: "灵敏度、特异度、似然比描述真实性；Kappa 和重复测量一致性描述可靠性。" },
+        { heading: "预测值依赖患病率", text: "PPV 和 NPV 不只由试验性能决定，还取决于目标人群患病率。" },
+        { heading: "连续指标与阈值", text: "ROC 描述所有阈值下的区分能力，AUC 只是摘要。最佳截断值还应考虑漏诊、误诊成本和净获益。" },
+      ],
+      code: String.raw`tab <- matrix(
+  c(85, 15, 20, 180),
+  nrow = 2,
+  byrow = TRUE,
+  dimnames = list(
+    test = c("positive", "negative"),
+    truth = c("case", "noncase")
+  )
+)
+tab
+
+sensitivity <- tab["positive", "case"] / sum(tab[, "case"])
+specificity <- tab["negative", "noncase"] / sum(tab[, "noncase"])
+ppv <- tab["positive", "case"] / sum(tab["positive", ])
+npv <- tab["negative", "noncase"] / sum(tab["negative", ])
+
+c(sensitivity, specificity, ppv, npv)`,
+      functions: ["table", "roc", "coords", "glm"],
+      practice: "为一项诊断研究建立 2×2 表，计算灵敏度、特异度、PPV、NPV，并解释改变患病率后哪些指标不变。",
+      tryIt: "把阈值调高或调低，观察灵敏度与特异度怎样交换，并用 ROC 检查整体区分能力。",
+      selfCheck: [
+        "能说明灵敏度和特异度为什么比预测值更少受患病率影响。",
+        "能解释 AUC 不能替代截断值选择。",
+        "能区分真实性与可靠性。",
+      ],
+    },
+    {
+      id: "r-missing",
+      unit: "advanced-epi",
+      title: "缺失值处理与多重插补",
+      subtitle: "缺失模式、完整案例分析、mice 和结果合并",
+      chapterLabel: "课程第13章 · 缺失值处理",
+      minutes: 34,
+      outcome: "能描述缺失模式，提出缺失机制假设，并在合适场景下完成多重插补与结果合并。",
+      prerequisite: "掌握数据清洗、回归和模型结果解释。",
+      sections: [
+        { heading: "先区分缺失类型", text: "NA、空字符串、未知、拒答和跳过题含义不同。缺失机制假设应结合问卷流程和专业知识。" },
+        { heading: "完整案例不是默认答案", text: "na.omit() 简单但可能造成样本损失和选择偏倚。应报告删除比例并比较缺失组与非缺失组。" },
+        { heading: "多重插补", text: "mice 建立多个插补数据集，再分别拟合模型并 pool()。插补模型也要包含结局和重要协变量。" },
+        { heading: "敏感性分析", text: "MAR 只是常见假设。不同机制或不同插补策略下结论是否改变，应明确展示。" },
+      ],
+      code: String.raw`library(mice)
+library(VIM)
+
+aggr(dat, numbers = TRUE, prop = FALSE)
+
+imp <- mice(
+  dat,
+  m = 5,
+  method = "pmm",
+  seed = 2026
+)
+
+fit_imp <- with(
+  imp,
+  glm(outcome ~ exposure + age + sex, family = binomial())
+)
+summary(pool(fit_imp))`,
+      functions: ["is.na", "aggr", "mice", "with", "pool", "complete"],
+      practice: "先绘制缺失模式并计算变量缺失率，再提出至少两种缺失机制解释，说明为什么选择某种处理。",
+      tryIt: "比较完整案例和多重插补模型的样本量、效应估计与置信区间，记录差异。",
+      selfCheck: [
+        "能区分缺失值、空字符串和未知编码。",
+        "能解释完整案例分析可能带来的选择偏倚。",
+        "能描述 mice→with→pool 的三步流程。",
+      ],
+    },
+    {
+      id: "r-power",
+      unit: "advanced-epi",
+      title: "功效分析与样本量",
+      subtitle: "效应量、显著性水平、功效与常见设计",
+      chapterLabel: "课程第14章 · 功效分析",
+      minutes: 28,
+      outcome: "能根据研究设计选择功效分析函数，并说明效应量、alpha、power 和样本量之间的关系。",
+      prerequisite: "理解假设检验、置信区间、效应量和两类错误。",
+      sections: [
+        { heading: "四个核心量", text: "效应量、显著性水平、统计功效和样本量相互制约。计算前必须给出有依据的效应量。" },
+        { heading: "效应量来源", text: "优先使用预试验、既往研究、最小临床重要差异或专家共识，不能为了让样本量变小而夸大效应。" },
+        { heading: "设计与函数", text: "t 检验、比例、相关和回归需要不同函数和参数。多组比较、重复测量和失访率要另外考虑。" },
+        { heading: "功效不是事后 p 值", text: "研究完成后用观察效应计算“事后功效”通常不能解决原研究是否有足够把握的问题。" },
+      ],
+      code: String.raw`library(pwr)
+
+pwr.t.test(
+  d = 0.4,
+  sig.level = 0.05,
+  power = 0.80,
+  type = "two.sample"
+)
+
+pwr.2p.test(
+  h = ES.h(0.30, 0.18),
+  sig.level = 0.05,
+  power = 0.80
+)`,
+      functions: ["pwr.t.test", "pwr.2p.test", "ES.h", "power.t.test", "pwr.anova.test"],
+      practice: "为一项两组比例比较研究写出预期对照比例、最小重要差异、alpha、power，并计算无失访时样本量。",
+      tryIt: "将预期效应减半重新计算，观察样本量怎样变化，并加上 15% 失访膨胀。",
+      selfCheck: [
+        "能说明效应量的来源和含义。",
+        "能区分 alpha、power 与 p 值。",
+        "能把计算样本量按失访比例膨胀。",
+      ],
+    },
+    {
+      id: "r-interaction",
+      unit: "advanced-epi",
+      title: "交互作用：相乘与相加",
+      subtitle: "乘积项、RERI、AP 和 S",
+      chapterLabel: "课程第15章 · 交互作用分析",
+      minutes: 32,
+      outcome: "能在回归模型中加入交互项，区分相乘与相加交互，并解释公共卫生意义。",
+      prerequisite: "理解 Logistic 回归、OR、置信区间和模型参照组。",
+      sections: [
+        { heading: "交互回答什么", text: "交互表示一个暴露的效应随另一个暴露水平而改变。统计乘积项和相加交互不是同一个问题。" },
+        { heading: "相乘交互", text: "乘积项系数检验联合效应是否偏离两个 OR 的乘积关系。" },
+        { heading: "相加交互", text: "RERI、AP、S 描述联合效应偏离相加程度，通常更贴近公共卫生负担。" },
+        { heading: "尺度与报告", text: "交互结果依赖暴露编码、参照组、连续变量单位和模型尺度。必须报告联合暴露单元格和置信区间。" },
+      ],
+      code: String.raw`fit <- glm(
+  outcome ~ exposure_a * exposure_b + age + sex,
+  family = binomial(),
+  data = dat
+)
+
+exp(cbind(OR = coef(fit), confint(fit)))
+
+# 相加交互通常结合联合暴露 OR 计算
+# RERI = OR11 - OR10 - OR01 + 1
+# AP = RERI / OR11
+# S = (OR11 - 1) / ((OR10 - 1) + (OR01 - 1))`,
+      functions: ["glm", "epi.interaction", "boot", "confint"],
+      practice: "构建一个含乘积项的 Logistic 模型，分别计算两个单独暴露、双暴露和双不暴露的 OR，并解释参照组。",
+      tryIt: "在相同数据上比较相乘交互 p 值与 RERI，说明为什么两者可能给出不同信息。",
+      selfCheck: [
+        "能说明相乘交互用的尺度和相加交互的区别。",
+        "能写出 RERI 的四个联合暴露 OR。",
+        "能指出交互分析中的参照组和单位。",
+      ],
+    },
+    {
+      id: "r-causal",
+      unit: "advanced-epi",
+      title: "因果推断与观察性数据",
+      subtitle: "DAG、混杂、匹配、加权与工具变量",
+      chapterLabel: "课程第16章 · 因果推断",
+      minutes: 38,
+      outcome: "能把研究问题画成 DAG，识别混杂与碰撞，并选择匹配、加权或工具变量等估计策略。",
+      prerequisite: "理解混杂、选择偏倚、回归和倾向评分。",
+      sections: [
+        { heading: "先定义因果问题", text: "因果问题需要明确暴露、结局、人群、时间零点和比较策略。没有反事实定义，方法选择会失去方向。" },
+        { heading: "DAG", text: "有向无环图帮助表达研究者对变量关系的假设，识别后门路径、碰撞点和不应调整的变量。" },
+        { heading: "匹配与加权", text: "倾向评分匹配和 IPTW 试图平衡已测量混杂。匹配后要检查平衡，加权后要检查极端权重。" },
+        { heading: "工具变量", text: "工具变量需要与暴露相关、只通过暴露影响结局，并且与混杂无关。假设不能仅由数据自动验证。" },
+      ],
+      code: String.raw`library(ggdag)
+library(MatchIt)
+
+dag <- dagify(
+  outcome ~ exposure + age + sex,
+  exposure ~ age + sex,
+  exposure = "exposure",
+  outcome = "outcome"
+)
+
+ggdag_status(dag) + theme_dag()
+
+m <- matchit(
+  exposure ~ age + sex,
+  data = dat,
+  method = "nearest"
+)
+matched <- match.data(m)
+summary(m)`,
+      functions: ["dagify", "ggdag_status", "matchit", "match.data", "glm", "ivreg"],
+      practice: "为你的研究问题画一个 DAG，标出暴露、结局、已测量混杂、未测量混杂和可能碰撞点。",
+      tryIt: "比较匹配前后年龄、性别的标准化差异，并说明匹配平衡不等于无混杂。",
+      selfCheck: [
+        "能解释后门路径和碰撞点。",
+        "能说明倾向评分为何不能处理未测量混杂。",
+        "能复述工具变量的三项核心假设。",
+      ],
+    },
+    {
+      id: "r-meta",
+      unit: "advanced-epi",
+      title: "Meta 分析与证据综合",
+      subtitle: "效应量、异质性、森林图、漏斗图和敏感性分析",
+      chapterLabel: "课程第17章 · Meta 分析",
+      minutes: 36,
+      outcome: "能把多个研究的效应量和方差合并，解释固定/随机效应、异质性、发表偏倚和敏感性分析。",
+      prerequisite: "理解效应量、标准误、置信区间和研究异质性。",
+      sections: [
+        { heading: "先统一效应尺度", text: "二分类、连续和单组率研究使用不同效应量。escalc() 可以把原始结果转换为可合并的 yi 和方差 vi。" },
+        { heading: "固定与随机效应", text: "固定效应假设同一真实效应；随机效应允许研究间存在分布。模型选择应在看到结果前说明。" },
+        { heading: "异质性", text: "I²、τ² 和 Q 描述研究差异。亚组和 Meta 回归只能探索已编码差异，不能自动解释全部异质性。" },
+        { heading: "机制检验", text: "森林图展示主结果，漏斗图和 Egger 检验帮助评估发表偏倚，但研究少于 10 项时检验能力有限。" },
+      ],
+      code: String.raw`library(metafor)
+
+dat_es <- escalc(
+  measure = "RR",
+  ai = events_treat,
+  bi = total_treat - events_treat,
+  ci = events_control,
+  di = total_control - events_control,
+  data = studies
+)
+
+fit_meta <- rma(
+  yi, vi,
+  data = dat_es,
+  method = "REML"
+)
+
+forest(fit_meta)
+funnel(fit_meta)`,
+      functions: ["escalc", "rma", "forest", "funnel", "regtest"],
+      practice: "选择同一研究问题的三项研究，统一效应尺度后绘制森林图，并用文字说明异质性来源假设。",
+      tryIt: "分别拟合固定和随机效应模型，比较权重、总体效应和置信区间。",
+      selfCheck: [
+        "能说明 yi 和 vi 分别是什么。",
+        "能区分 I² 和 τ²。",
+        "能解释森林图与漏斗图各回答什么。",
+      ],
+    },
+    {
+      id: "r-mr",
+      unit: "advanced-epi",
+      title: "孟德尔随机化",
+      subtitle: "工具变量、IVW、Egger、加权中位数与敏感性分析",
+      chapterLabel: "课程第18章 · 孟德尔随机化",
+      minutes: 38,
+      outcome: "能整理暴露与结局 GWAS 汇总数据，协调等位基因，运行常见 MR 方法并检查多效性。",
+      prerequisite: "理解因果推断、工具变量、GWAS 汇总统计和遗传变异。",
+      sections: [
+        { heading: "三项假设", text: "遗传工具需与暴露相关、不经暴露以外路径影响结局，并且不与暴露-结局混杂相关。后两项通常无法完全验证。" },
+        { heading: "数据协调", text: "暴露和结局数据的效应等位基因、方向、重复 SNP 和样本重叠都要处理。harmonise_data() 会把 SNP 对齐。" },
+        { heading: "多种估计", text: "IVW 是主分析，MR-Egger、加权中位数和众数用于不同稳健性假设。单个方法显著不等于结论可靠。" },
+        { heading: "敏感性分析", text: "异质性、水平多效性、逐项剔除和 Steiger 方向性检验应一起报告，并说明工具变量强度。" },
+      ],
+      code: String.raw`library(TwoSampleMR)
+
+exposure_dat <- read_exposure_data(
+  filename = "exposure.tsv",
+  sep = "\t",
+  snp_col = "SNP",
+  beta_col = "beta",
+  se_col = "se",
+  effect_allele_col = "effect_allele",
+  other_allele_col = "other_allele",
+  pval_col = "p"
+)
+
+outcome_dat <- extract_outcome_data(
+  snps = exposure_dat$SNP,
+  outcomes = "ieu-a-7"
+)
+
+dat_mr <- harmonise_data(exposure_dat, outcome_dat)
+mr_results <- mr(dat_mr, method_list = c(
+  "mr_ivw",
+  "mr_egger_regression",
+  "mr_weighted_median"
+))
+mr_pleiotropy_test(dat_mr)`,
+      functions: ["read_exposure_data", "extract_outcome_data", "harmonise_data", "mr", "mr_pleiotropy_test", "mr_presso"],
+      practice: "为一项 MR 研究写出暴露、结局、工具变量筛选标准、主分析方法和三项敏感性检查。",
+      tryIt: "比较 IVW、MR-Egger 和加权中位数结果，说明方向不一致时怎样解释而不是只选显著结果。",
+      selfCheck: [
+        "能复述 MR 的三项核心假设。",
+        "能解释 harmonise_data() 为什么必要。",
+        "能说出异质性和水平多效性检验各看什么。",
+      ],
+    },
+  ];
+
+  for (const module of chapterModules) {
+    if (!modules.some((item) => item.id === module.id)) modules.push(module);
+  }
+
+  for (const id of [
+    "r-advanced",
+    "r-advanced-models",
+    "r-bayesian",
+    "r-evidence-synthesis",
+    "r-machine-learning",
+  ]) {
+    const module = modules.find((item) => item.id === id);
+    if (module) module.unit = "advanced-epi";
+  }
+
+  const originalById = new Map(modules.map((item) => [item.id, item]));
+  const orderedIds = [
+    "r-1", "r-install", "rstudio", "r-project",
+    "r-2", "r-packages", "r-3", "r-syntax", "r-4", "r-index", "r-logical-vectors",
+    "r-tidy", "r-5", "r-database", "r-6", "r-clean", "r-reshape", "r-data-pipeline",
+    "r-8", "r-functions", "r-text",
+    "r-eda", "r-7", "r-basegraph", "r-ggplot",
+    "r-stats", "r-mean-tests", "r-rate-tests", "r-nonparam", "r-correlation",
+    "r-models", "r-model-grid",
+    "r-survey", "r-ecological", "r-cohort", "r-case-control", "r-rct", "r-diagnostic",
+    "r-missing", "r-power", "r-interaction", "r-causal", "r-meta", "r-mr",
+    "r-advanced", "r-advanced-models", "r-bayesian", "r-evidence-synthesis", "r-machine-learning",
+    "r-quarto", "r-9", "r-10",
+  ];
+
+  const unitById = new Map(window.RZH_COURSE_UNITS.map((unit) => [unit.id, unit]));
+  const ordered = orderedIds
+    .map((id) => originalById.get(id))
+    .filter(Boolean);
+
+  const prerequisiteHints = {
+    "r-1": "无需先修。准备好电脑并愿意动手运行代码即可。",
+    "r-install": "能说明自己使用的是 Windows、macOS 还是 Linux。",
+    "rstudio": "已经安装 R 和 RStudio。",
+    "r-project": "能在 Console 运行一条命令。",
+    "r-2": "知道 R 和 RStudio 的区别。",
+    "r-packages": "知道函数名后面通常需要括号。",
+    "r-3": "能创建并打印一个数值向量。",
+    "r-syntax": "理解对象是给数据或结果起的名字。",
+    "r-4": "能说出 numeric、character 和 logical 的区别。",
+    "r-index": "知道数据框由行和列组成。",
+    "r-logical-vectors": "能使用 [ ] 取出基本元素。",
+    "r-tidy": "能读取一个简单表格。",
+    "r-5": "知道文件路径和当前工作目录。",
+    "r-database": "能使用 read.csv() 或 read_excel()。",
+    "r-6": "能查看数据结构和前几行。",
+    "r-clean": "能按列筛选和创建变量。",
+    "r-reshape": "理解一行一个观测。",
+    "r-data-pipeline": "完成数据读取、清洗和长宽转换。",
+    "r-8": "能读懂简单条件表达式。",
+    "r-functions": "会使用已有函数和向量。",
+    "r-text": "能创建字符向量。",
+    "r-eda": "能导入一份分析数据。",
+    "r-7": "知道连续变量和分类变量。",
+    "r-basegraph": "会计算基本描述统计。",
+    "r-ggplot": "知道数据框的 x、y 和分组变量。",
+    "r-stats": "能描述数据并判断变量类型。",
+    "r-mean-tests": "理解均数、标准差、标准误和置信区间。",
+    "r-rate-tests": "会制作列联表并理解比例。",
+    "r-nonparam": "见过明显偏态分布或有序结局。",
+    "r-correlation": "会画散点图并理解相关系数。",
+    "r-models": "理解 p 值、置信区间和线性回归。",
+    "r-model-grid": "能拟合至少一个回归模型。",
+    "r-survey": "理解比例、患病率和置信区间。",
+    "r-ecological": "理解率和 Poisson 回归。",
+    "r-cohort": "理解风险、率和生存时间。",
+    "r-case-control": "理解 OR 和 Logistic 回归。",
+    "r-rct": "理解均值比较与回归。",
+    "r-diagnostic": "会制作 2×2 表。",
+    "r-missing": "能检查数据并拟合回归模型。",
+    "r-power": "理解假设检验和效应量。",
+    "r-interaction": "能读懂含多个变量的回归模型。",
+    "r-causal": "理解混杂和关联不等于因果。",
+    "r-meta": "理解效应量、标准误和置信区间。",
+    "r-mr": "理解遗传工具变量和 GWAS 汇总数据。",
+    "r-advanced": "已掌握基本回归、生存和模型检查。",
+    "r-advanced-models": "理解线性模型和广义线性模型。",
+    "r-bayesian": "理解概率、先验和回归基础。",
+    "r-evidence-synthesis": "理解研究设计与效应量。",
+    "r-machine-learning": "理解回归、分类和样本外验证。",
+    "r-quarto": "已有可运行的 R 脚本和输出文件。",
+    "r-9": "完成数据整理、分析和绘图主要章节。",
+    "r-10": "已经完成至少一份小型分析。",
+  };
+
+  ordered.forEach((module, index) => {
+    module.number = index + 1;
+    const unit = unitById.get(module.unit);
+    module.unitTitle = unit?.title || "";
+    if (!module.prerequisite) {
+      module.prerequisite = prerequisiteHints[module.id] ||
+        (index > 0 ? `建议先完成《${ordered[index - 1].title}》。` : "无需特别先修。");
+    }
+    if (!module.selfCheck) {
+      module.selfCheck = [
+        module.outcome,
+        "能独立运行本课代码，并逐行说出输入、处理和输出。",
+        "能改动一个参数或数据后，解释结果为什么变化。",
+      ];
+    }
+    if (!module.tryIt) {
+      module.tryIt = "换一份自己的数据或一个参数重新做一次，并把结果与示例对照。";
+    }
+  });
+
+  window.RZH_COURSE_MODULES.splice(0, window.RZH_COURSE_MODULES.length, ...ordered);
+
+  const categories = window.RZH_TEACHING_CATEGORIES || [];
+  const systemCategory = categories.find((category) => category.id === "system");
+  if (systemCategory) {
+    systemCategory.title = "全流程系统学习";
+    systemCategory.subtitle = "按九个阶段从 R 基础走到流行病学应用";
+    systemCategory.audience = "适合希望系统学习、减少跳读和走马观花的初学者，也适合需要补齐研究分析流程的研究生。";
+    systemCategory.detail = `按先修关系组织 ${ordered.length} 课：先掌握环境、数据管理与可视化，再学习基本模型、六类流行病学研究设计，最后进入缺失值、功效、交互、因果、Meta、孟德尔随机化与完整项目。每个阶段有完成标准，每课有独立自查。`;
+    systemCategory.items = [
+      {
+        title: "打开九阶段课程总览",
+        note: `${ordered.length} 节系统课，按阶段进入`,
+        href: "#learn/category/system",
+        level: "入门",
+      },
+      {
+        title: "从第一课开始",
+        note: "适合没有 R 基础的初学者",
+        href: "#learn/r-1",
+        level: "入门",
+      },
+    ];
+  }
+
+  const addFunction = (item) => {
+    window.RZH_EXTRA_FUNCTIONS_5 = window.RZH_EXTRA_FUNCTIONS_5 || [];
+    if (!window.RZH_EXTRA_FUNCTIONS_5.some((existing) => existing.id === item.id)) {
+      window.RZH_EXTRA_FUNCTIONS_5.push({
+        category: "流行病学",
+        level: "进阶",
+        tips: [],
+        related: [],
+        ...item,
+      });
+    }
+  };
+
+  [
+    ["svydesign", "svydesign()", "survey", "复杂抽样设计", "定义分层、整群和抽样权重，为复杂抽样调查建立设计对象。", "svydesign(ids = ~cluster, strata = ~stratum, weights = ~weight, data = dat)", "返回 survey.design 对象。", [["ids", "抽样单位或整群变量。", "必填"], ["strata", "分层变量。", "按设计"], ["weights", "抽样权重。", "按设计"], ["data", "调查数据框。", "必填"]], ["复杂抽样不能直接把所有人当简单随机样本。"], ["svymean", "svyglm"]],
+    ["svymean", "svymean()", "survey", "复杂抽样均数", "按复杂抽样设计计算均数及其标准误。", "svymean(~ score, design = des)", "返回均数和标准误。", [["x", "公式或变量。", "必填"], ["design", "svydesign 对象。", "必填"]], ["不能丢掉权重。"], ["svydesign", "svyglm"]],
+    ["svyglm", "svyglm()", "survey", "复杂抽样回归", "在复杂抽样设计下拟合广义线性模型，调整权重和设计效应。", "svyglm(outcome ~ exposure + age, design = des, family = quasibinomial())", "返回 survey GLM 模型对象。", [["formula", "模型公式。", "必填"], ["design", "调查设计对象。", "必填"], ["family", "结局分布。", "按结局"]], ["标准误与普通 glm 不同。"], ["svydesign", "glm"]],
+    ["matchit", "matchit()", "MatchIt", "倾向评分匹配", "根据协变量计算匹配权重或距离，生成匹配后的研究样本。", "matchit(exposure ~ age + sex, data = dat, method = \"nearest\")", "返回 matchit 对象。", [["formula", "处理或暴露 ~ 协变量。", "必填"], ["data", "数据框。", "必填"], ["method", "nearest、optimal 等。", "nearest"]], ["匹配后仍需检查平衡和共同支持。"], ["match.data", "summary"]],
+    ["match.data", "match.data()", "MatchIt", "提取匹配数据", "从 matchit 对象中提取匹配后的数据及权重。", "match.data(match_obj)", "返回匹配或加权后的数据框。", [["object", "matchit 对象。", "必填"]], ["后续模型需考虑匹配权重。"], ["matchit", "glm"]],
+    ["coords", "coords()", "pROC", "ROC截断点", "从 ROC 对象提取指定阈值或最佳阈值下的灵敏度和特异度。", "coords(roc_obj, \"best\", ret = c(\"threshold\", \"sensitivity\", \"specificity\"))", "返回阈值及诊断指标。", [["x", "roc 对象。", "必填"], ["x", "阈值或 best。", "best"], ["ret", "需要返回的指标。", "按需"]], ["最佳阈值标准必须结合漏诊和误诊后果。"], ["roc"]],
+    ["power.t.test", "power.t.test()", "stats", "t检验功效", "计算 t 检验的样本量、功效或可检测效应。", "power.t.test(delta = 5, sd = 10, sig.level = .05, power = .8)", "返回四量之间的计算结果。", [["delta", "均值差。", "按目标"], ["sd", "标准差。", "按目标"], ["n", "每组样本量。", "按目标"], ["power", "统计功效。", "按目标"]], ["效应量必须有外部依据。"], ["pwr.t.test"]],
+    ["pwr.2p.test", "pwr.2p.test()", "pwr", "两组比例功效", "计算两组比例比较所需样本量或功效。", "pwr.2p.test(h = ES.h(.30,.18), power = .8)", "返回样本量。", [["h", "比例差异的效应量。", "必填"], ["power", "目标功效。", "按目标"], ["sig.level", "显著性水平。", "0.05"]], ["效应量使用 ES.h() 计算。"], ["ES.h", "pwr.t.test"]],
+    ["mice", "mice()", "mice", "多重插补", "按变量类型和缺失模式生成多个插补数据集。", "mice(dat, m = 5, method = \"pmm\", seed = 2026)", "返回 mids 多重插补对象。", [["data", "含缺失的数据框。", "必填"], ["m", "插补数据集数量。", "常用5或更多"], ["method", "各变量插补方法。", "按变量"], ["seed", "随机种子。", "应报告"]], ["插补模型和缺失机制假设必须说明。"], ["with", "pool"]],
+    ["pool", "pool()", "mice", "合并插补结果", "把多个插补数据集的模型估计和标准误按 Rubin 规则合并。", "pool(model_list)", "返回合并后的模型结果。", [["object", "mira 模型列表。", "必填"]], ["不能只分析一个插补数据集。"], ["mice", "summary"]],
+    ["epi.interaction", "epi.interaction()", "epiR", "交互作用指标", "从回归模型计算 RERI、AP 和 S 等相加交互指标。", "epi.interaction(model, param = \"dummy\", coef = coef(model), vcov = vcov(model))", "返回相加交互指标和区间。", [["model", "含交互项的模型。", "必填"], ["param", "参数化方式。", "按暴露编码"], ["coef", "模型系数。", "默认模型提取"], ["vcov", "系数协方差矩阵。", "默认模型提取"]], ["参照组和暴露编码决定指标解释。"], ["glm"]],
+    ["escalc", "escalc()", "metafor", "Meta效应量", "把原始研究结果转换为统一效应量和抽样方差。", "escalc(measure = \"RR\", ai = a, bi = b, ci = c, di = d, data = dat)", "返回带 yi 和 vi 的数据框。", [["measure", "RR、OR、RD、SMD 等。", "按设计"], ["ai/bi/ci/di", "2×2 表计数。", "按资料类型"], ["data", "研究数据。", "推荐填写"]], ["不同研究必须使用兼容效应尺度。"], ["rma"]],
+    ["rma", "rma()", "metafor", "Meta模型", "拟合固定或随机效应 Meta 分析模型。", "rma(yi, vi, data = dat, method = \"REML\")", "返回 rma 模型对象。", [["yi", "研究效应量。", "必填"], ["vi", "效应量方差。", "必填"], ["method", "异质性方差估计方法。", "REML"], ["data", "研究数据。", "推荐填写"]], ["随机效应模型不是自动更保守。"], ["escalc", "forest", "funnel"]],
+    ["funnel", "funnel()", "metafor", "漏斗图", "绘制效应量与精度的漏斗图，辅助检查小研究效应和发表偏倚。", "funnel(model)", "返回漏斗图。", [["x", "Meta 模型。", "必填"]], ["漏斗图不对称不等于发表偏倚已证实。"], ["regtest", "rma"]],
+    ["harmonise_data", "harmonise_data()", "TwoSampleMR", "MR数据协调", "对齐暴露与结局 GWAS 的效应等位基因和方向。", "harmonise_data(exposure_dat, outcome_dat)", "返回可进行 MR 的协调数据。", [["exposure_dat", "暴露汇总数据。", "必填"], ["outcome_dat", "结局汇总数据。", "必填"], ["action", "等位基因处理方式。", "默认2"]], ["必须检查回文 SNP 和等位基因方向。"], ["mr"]],
+    ["mr", "mr()", "TwoSampleMR", "MR估计", "使用 IVW、MR-Egger、加权中位数等方法估计因果效应。", "mr(dat, method_list = c(\"mr_ivw\", \"mr_egger_regression\"))", "返回各方法 OR/β 和标准误。", [["dat", "协调后的 MR 数据。", "必填"], ["method_list", "需要运行的 MR 方法。", "按预设"]], ["应同时报告主分析、异质性和多效性检查。"], ["harmonise_data", "mr_pleiotropy_test"]],
+    ["mr_pleiotropy_test", "mr_pleiotropy_test()", "TwoSampleMR", "MR水平多效性检验", "通过 MR-Egger 截距检查平均水平多效性。", "mr_pleiotropy_test(dat)", "返回截距及检验结果。", [["dat", "协调后的 MR 数据。", "必填"]], ["截距不显著不能证明不存在多效性。"], ["mr"]],
+    ["mr_presso", "mr_presso()", "MRPRESSO", "MR-PRESSO", "检测并排除可能由水平多效性造成的离群工具变量。", "mr_presso(BetaOutcome, BetaExposure, SdOutcome, SdExposure, OUTLIERtest = TRUE, DISTORTIONtest = TRUE)", "返回全局检验和离群 SNP 结果。", [["BetaOutcome", "结局效应。", "必填"], ["BetaExposure", "暴露效应。", "必填"], ["SdOutcome", "结局标准误。", "必填"], ["SdExposure", "暴露标准误。", "必填"]], ["排除工具后需要重跑主分析和敏感性分析。"], ["mr"]],
+  ].forEach(([id, name, pkg, aliasesText, summary, syntax, returns, params, tips, related]) => {
+    addFunction({
+      id,
+      name,
+      package: pkg,
+      aliases: aliasesText.split("、"),
+      summary,
+      syntax,
+      returns,
+      example: syntax,
+      output: returns,
+      params: params.map(([pname, pdesc, pusage]) => [pname, pdesc, pusage]),
+      tips,
+      related,
+    });
+  });
+
+  const glossary = window.RZH_GLOSSARY ||= [];
+  const termIds = new Set(glossary.map((item) => item[0]));
+  const addTerm = (term) => {
+    if (!termIds.has(term[0])) {
+      glossary.push(term);
+      termIds.add(term[0]);
+    }
+  };
+  [
+    ["intention-to-treat", "意向性治疗 ITT", "流行病学", "所有经随机分组的对象按原分配组分析，以保留随机化比较。", "像按最初抽到的车厢统计，而不是按后来走到哪节车厢统计。", "RCT 主分析通常优先遵循 ITT 原则。"],
+    ["per-protocol", "符合方案集", "流行病学", "只分析按计划完成干预和随访的对象，回答更接近理想依从条件下的效应。", "像只统计真正按说明书服药的人。", "PP 分析可能因剔除对象破坏随机化。"],
+    ["allocation-concealment", "分配隐藏", "流行病学", "在随机分配完成前隐藏下一位受试者将被分到哪一组，防止选择偏倚。", "像抽签结果在抽签前不能被人看到。", "分配隐藏与盲法不是同一概念。"],
+    ["blinding", "盲法", "流行病学", "让研究对象、实施者或结果评价者不知道分组，以减少测量和实施偏倚。", "像评委不知道作品作者是谁。", "开放标签试验也能通过盲法结果评价降低偏倚。"],
+    ["standardization", "标准化", "流行病学", "按标准人口年龄或其他结构重新加权粗率，使不同人群可比。", "像把不同年龄结构的城市人口换算到同一套年龄比例再比较。", "直接标准化需要标准人口和分层率。"],
+    ["ecological-study", "生态学研究", "流行病学", "以群体而不是个体为观察和分析单位，研究群体暴露与群体结局的关系。", "像比较各城市平均气温和每日死亡数，而不是某个人的体温和死亡。", "群体关联不能直接推断个体关联。"],
+    ["nested-case-control", "巢式病例对照", "流行病学", "在已建立队列中选取发生结局者作为病例，并从同一风险集抽样对照。", "像从一个完整随访队列中取出病例和当时的对照样本。", "仍需保留风险集和匹配时间。"],
+    ["missing-completely-random", "完全随机缺失 MCAR", "缺失数据", "缺失与任何已观察或未观察变量都无关。", "像抽样时完全随机漏掉了几页问卷。", "完整案例分析在 MCAR 下偏倚较小，但仍损失效率。"],
+    ["missing-at-random", "随机缺失 MAR", "缺失数据", "在已观察变量条件下，缺失与未观察值无关。", "像不同年龄组的缺失率不同，但同年龄组内缺失与真实值无关。", "MAR 是多重插补常用假设。"],
+    ["effect-size", "效应量", "统计建模", "研究中可量化的差异大小，例如均值差、SMD、RR、OR 或危险比。", "像用同一把尺子表示干预带来的变化。", "功效分析必须基于有依据的效应量。"],
+    ["statistical-power", "统计功效", "统计建模", "真实效应存在时，研究正确检出它的概率。", "像雷达真的能发现目标而不是漏掉。", "常设为 80% 或 90%，需与 alpha、效应量和样本量一起考虑。"],
+    ["additive-interaction", "相加交互作用", "流行病学", "联合暴露的风险偏离两个单独效应相加的程度。", "像两人一起推车的额外效果是否大于分别推车贡献之和。", "常用 RERI、AP 和 S 描述。"],
+    ["reri", "RERI", "流行病学", "相对超额风险交互指标，衡量联合暴露风险超出相加预期的量。", "像合作产生的一份额外收益。", "RERI=0 表示无相加交互。"],
+    ["collider", "碰撞点", "因果推断", "DAG 中被两个或多个变量共同指向的变量，按它筛选可能人为制造关联。", "像只观察两类原因都容易进入的人群，会制造虚假联系。", "调整碰撞点或选择碰撞点后样本可能引入偏倚。"],
+    ["instrumental-variable", "工具变量", "因果推断", "与暴露相关、只通过暴露影响结局且与混杂无关的变量。", "像一把只能推动目标齿轮的杠杆。", "孟德尔随机化以遗传变异作为常见工具变量。"],
+    ["mendelian-randomization", "孟德尔随机化", "因果推断", "用与暴露相关的遗传变异作为工具变量估计暴露对结局的因果效应。", "像利用出生时随机分配的遗传差异做自然实验。", "必须检查工具强度、水平多效性和方向性。"],
+    ["horizontal-pleiotropy", "水平多效性", "因果推断", "遗传工具通过暴露以外的路径影响结局，从而违反工具变量排他性。", "像本来应只经过一扇门，结果还有侧门影响结果。", "MR-Egger 截距、MR-PRESSO 等方法辅助检查。"],
+    ["meta-heterogeneity", "异质性", "证据综合", "不同研究之间真实效应的差异程度，超出抽样误差的部分。", "像不同医院治疗同一疾病，效果本身可能不完全一样。", "常用 Q、I² 和 τ² 描述。"],
+    ["publication-bias", "发表偏倚", "证据综合", "阳性、显著或符合预期的研究更可能被发表和检索。", "像只看到被摆上货架的商品。", "漏斗图和 Egger 检验只能提示，不能单凭图形证明。"],
   ].forEach(addTerm);
 })();
 
@@ -105826,30 +106741,20 @@ function courseRoadmapMarkup(recommended) {
     const modules = courseModules.filter((module) => (unit.id ? module.unit === unit.id : true));
     if (!modules.length) return "";
     const completedInUnit = modules.filter((module) => state.courseCompleted.has(module.id)).length;
+    const progress = Math.round((completedInUnit / modules.length) * 100);
+    const next = modules.find((module) => !state.courseCompleted.has(module.id)) || modules[0];
     return `
-      <section class="course-unit">
-        <div class="course-unit-head">
-          <div><h3>${escapeHtml(unit.title)}</h3><p>${escapeHtml(unit.note)}</p></div>
-          <span>${completedInUnit} / ${modules.length} 课</span>
-        </div>
-        <div class="course-roadmap">
-          ${modules.map((module) => {
-            const done = state.courseCompleted.has(module.id);
-            const current = !done && module.id === recommended.id;
-            return `
-              <a class="course-module ${done ? "done" : ""} ${current ? "current" : ""}" href="#learn/${module.id}">
-                <span class="module-number">${done ? icon("check") : String(module.number).padStart(2, "0")}</span>
-                <span class="module-copy">
-                  <strong>${escapeHtml(module.title)}</strong>
-                  <small>${escapeHtml(module.subtitle)}</small>
-                </span>
-                <span class="module-time">${module.minutes} 分</span>
-                ${icon("arrow-right")}
-              </a>
-            `;
-          }).join("")}
-        </div>
-      </section>
+      <a class="course-stage-card ${completedInUnit === modules.length ? "done" : ""}" href="#learn/unit/${unit.id}">
+        <span class="course-stage-count">${String(units.indexOf(unit) + 1).padStart(2, "0")}</span>
+        <span class="course-stage-copy">
+          <strong>${escapeHtml(unit.title)}</strong>
+          <small>${escapeHtml(unit.note)}</small>
+          <span class="course-stage-meta">${completedInUnit} / ${modules.length} 课 · ${modules.reduce((sum, module) => sum + module.minutes, 0)} 分钟</span>
+          <span class="course-stage-track" aria-hidden="true"><i style="width:${progress}%"></i></span>
+        </span>
+        <span class="course-stage-next">${completedInUnit === modules.length ? "复习本单元" : `继续：${escapeHtml(next.title)}`}</span>
+        ${icon("arrow-right")}
+      </a>
     `;
   }).join("");
 }
@@ -105863,7 +106768,7 @@ function learningDashboardMarkup() {
       <div class="progress-panel">
         <div class="progress-head"><strong>系统课程进度</strong><span>${completed} / ${courseModules.length} 课</span></div>
         <div class="progress-track" role="progressbar" aria-label="系统课程进度" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress}%"></span></div>
-        <p>${completed ? `已完成 ${completed} 课，继续按顺序学习即可。` : "从第一课开始，不需要预先掌握 R。"} </p>
+        <p>${completed ? `已完成 ${completed} 课。课程按九个阶段组织，先完成当前单元的自查，再进入下一阶段。` : "从第一课开始，不需要预先掌握 R。每课先看目标，再运行代码，最后独立完成自查。"} </p>
         <a class="button button-primary" href="#learn/${recommended.id}">${completed ? "继续学习" : "开始第一课"} ${icon("arrow-right")}</a>
       </div>
       <a class="quick-start-card" href="#learn/quick">
@@ -105873,6 +106778,64 @@ function learningDashboardMarkup() {
         <span class="text-link">开始快速入门 ${icon("arrow-right")}</span>
       </a>
     </section>
+  `;
+}
+
+function renderCourseUnit(unitId) {
+  const unit = courseUnits.find((item) => item.id === unitId);
+  if (!unit) {
+    renderNotFound();
+    return;
+  }
+  const unitIndex = courseUnits.indexOf(unit);
+  const unitModules = courseModules.filter((module) => module.unit === unit.id);
+  const completed = unitModules.filter((module) => state.courseCompleted.has(module.id)).length;
+  const progress = unitModules.length ? Math.round((completed / unitModules.length) * 100) : 0;
+  const nextUnit = courseUnits[unitIndex + 1];
+  app.innerHTML = `
+    <div class="page course-unit-page">
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
+      <header class="course-unit-hero">
+        <div>
+          <span class="eyebrow">系统课程 · 第 ${unitIndex + 1} 阶段</span>
+          <h1>${escapeHtml(unit.title)}</h1>
+          <p>${escapeHtml(unit.note)}</p>
+        </div>
+        <div class="course-unit-progress">
+          <strong>${completed} / ${unitModules.length}</strong>
+          <span>本阶段课程</span>
+          <div class="progress-track" role="progressbar" aria-label="${escapeHtml(unit.title)}进度" aria-valuenow="${progress}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress}%"></span></div>
+        </div>
+      </header>
+      ${unit.checkpoint ? `<section class="course-unit-checkpoint"><span>${icon("check")} 本阶段完成标准</span><p>${escapeHtml(unit.checkpoint)}</p></section>` : ""}
+      <section class="course-unit-lessons" aria-label="${escapeHtml(unit.title)}课程">
+        <div class="section-title-row">
+          <div><h2 class="section-title">按顺序学习</h2><p class="section-copy">每课都写明先修内容、可运行示例和完成后的独立自查。</p></div>
+          <a class="text-link" href="#learn/category/system">查看完整阶段总览 ${icon("arrow-right")}</a>
+        </div>
+        <div class="course-roadmap">
+          ${unitModules.map((module) => {
+            const done = state.courseCompleted.has(module.id);
+            return `
+              <a class="course-module ${done ? "done" : ""}" href="#learn/${module.id}">
+                <span class="module-number">${done ? icon("check") : String(module.number).padStart(2, "0")}</span>
+                <span class="module-copy">
+                  <strong>${escapeHtml(module.title)}</strong>
+                  <small>${escapeHtml(module.chapterLabel || module.subtitle)}</small>
+                  <span class="module-prereq">开始前：${escapeHtml(module.prerequisite)}</span>
+                </span>
+                <span class="module-time">${module.minutes} 分</span>
+                ${icon("arrow-right")}
+              </a>
+            `;
+          }).join("")}
+        </div>
+      </section>
+      <footer class="course-unit-footer">
+        <a class="button" href="#learn/category/system">${icon("arrow-left")} 返回阶段总览</a>
+        ${nextUnit ? `<a class="button button-primary" href="#learn/unit/${nextUnit.id}">下一阶段：${escapeHtml(nextUnit.title)} ${icon("arrow-right")}</a>` : `<a class="button button-primary" href="#learn/category/system">完成课程复习 ${icon("arrow-right")}</a>`}
+      </footer>
+    </div>
   `;
 }
 
@@ -106187,6 +107150,7 @@ function renderCourseLesson(id) {
           <header class="lesson-header">
             <div class="function-tags">
               ${badge(`第 ${module.number} 课`, "brand")}
+              ${module.chapterLabel ? badge(module.chapterLabel, "blue") : ""}
               ${badge(`约 ${module.minutes} 分钟`, "blue")}
               ${done ? badge("已完成", "gold") : badge("建议按顺序学习")}
             </div>
@@ -106195,6 +107159,17 @@ function renderCourseLesson(id) {
             <div class="lesson-outcome"><span>学完能够</span><strong>${escapeHtml(module.outcome)}</strong></div>
             ${courseAnalogies[module.id] ? `<div class="lesson-analogy"><span>打个比方</span><p>${escapeHtml(courseAnalogies[module.id])}</p></div>` : ""}
           </header>
+
+          <section class="lesson-contract" aria-label="本课先修和独立自查">
+            <div>
+              <span>开始前</span>
+              <p>${escapeHtml(module.prerequisite || "建议先完成前一课。")}</p>
+            </div>
+            <div>
+              <span>完成后自查</span>
+              <ul>${(module.selfCheck || []).map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}</ul>
+            </div>
+          </section>
 
           <section class="lesson-reading-keys" aria-label="阅读本课代码的三个步骤">
             <div><span>01</span><strong>先找输入</strong><small>这段代码要用哪份数据、哪一列？</small></div>
@@ -106235,7 +107210,8 @@ function renderCourseLesson(id) {
           <section class="practice-card">
             <span>${icon("check")} 本课实践检查</span>
             <p>${escapeHtml(module.practice)}</p>
-            ${module.tryIt ? `<div class="lesson-try"><strong>再走一步</strong><p>${escapeHtml(module.tryIt)}</p></div>` : ""}
+            ${module.tryIt ? `<div class="lesson-try"><strong>独立迁移</strong><p>${escapeHtml(module.tryIt)}</p></div>` : ""}
+            <p class="lesson-self-check-note">能独立解释代码、解释结果并完成迁移任务，再标记本课完成。</p>
             ${module.id === "r-8" ? `<a class="text-link" href="#control-flow">打开控制流完整速查 ${icon("arrow-right")}</a>` : ""}
           </section>
 
@@ -107636,9 +108612,18 @@ function routeMeta(route) {
     };
   }
   if (route === "learn/quick") return { nav: "learn", title: "十分钟快速入门", crumb: "从 0 开始学 / 十分钟快速入门" };
+  if (route.startsWith("learn/unit/")) {
+    const unit = courseUnits.find((item) => item.id === route.split("/")[2]);
+    return {
+      nav: "learn",
+      title: unit?.title || "课程阶段",
+      crumb: `系统课程 / ${unit?.title || "阶段总览"}`,
+    };
+  }
   if (route.startsWith("learn/")) {
     const lesson = courseModules.find((item) => item.id === route.split("/")[1]);
-    return { nav: "learn", title: lesson?.title || "从 0 开始学", crumb: `从 0 开始学 / ${lesson?.title || "课程"}` };
+    const unit = lesson ? courseUnits.find((item) => item.id === lesson.unit) : null;
+    return { nav: "learn", title: lesson?.title || "从 0 开始学", crumb: `系统课程 / ${unit?.title || lesson?.unitTitle || "课程"} / ${lesson?.title || "课程"}` };
   }
   const map = {
     home: ["home", "学习首页", "学习首页"],
@@ -107673,7 +108658,11 @@ function parentRoute(route) {
   }
   if (route.startsWith("learn/category/")) return "learn";
   if (route === "learn/quick") return "learn/category/quick";
-  if (route.startsWith("learn/") && route !== "learn") return "learn/category/system";
+  if (route.startsWith("learn/unit/")) return "learn/category/system";
+  if (route.startsWith("learn/") && route !== "learn") {
+    const lesson = courseModules.find((item) => item.id === route.split("/")[1]);
+    return lesson?.unit ? `learn/unit/${lesson.unit}` : "learn/category/system";
+  }
   if (route.startsWith("workflow/")) {
     const id = decodeURIComponent(route.split("/")[1]);
     const item = workflows.find((workflow) => workflow.id === id);
@@ -107714,6 +108703,7 @@ function renderRoute() {
   else if (route === "learn") renderLearnHub();
   else if (route.startsWith("learn/category/")) renderTeachingCategory(route.split("/")[2]);
   else if (route === "learn/quick") renderQuickStart();
+  else if (route.startsWith("learn/unit/")) renderCourseUnit(route.split("/")[2]);
   else if (route.startsWith("learn/")) renderCourseLesson(route.split("/")[1]);
   else if (route.startsWith("guide/")) {
     const [, type, id] = route.split("/");
