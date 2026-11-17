@@ -1,7 +1,7 @@
 {
-  "name": "R知 中文 R 函数与任务导航",
+  "name": "R知 中文 R 函数、统计学与研究应用学习平台",
   "short_name": "R知",
-  "description": "面向公共卫生、医学与心理学研究的中文 R 函数与任务导航",
+  "description": "面向公共卫生、医学与心理学学习者的中文 R 函数词典、统计学课程、统计概念与研究应用工具",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#f6f4ee",

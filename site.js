@@ -68111,6 +68111,239 @@ mr_pleiotropy_test(dat_mr)`,
     }),
   );
 
+  window.RZH_STAT_COURSE_META = {
+    title: "统计学基础与进阶",
+    subtitle: "从统计思维、研究设计到回归、因果推断与高级模型，沿着一条可执行的 R 学习路线建立完整的生物统计知识体系。",
+    audience: "适合公共卫生、流行病学、医学、护理与心理学学习者；可以零统计基础开始，也适合已经会做检验、但希望真正理解方法和结果解释的人。",
+    outcome: "学完后能判断研究问题需要什么设计和方法，读懂常见统计量与模型输出，并在 R 中完成从数据检查到结果报告的基本流程。",
+    note: "课程不要求数学推导。每章先解释概念解决什么问题，再说明公式各部分在比较什么，最后把概念落到 R 代码、输出字段和研究场景。",
+  };
+
+  window.RZH_STAT_COURSE_CHAPTERS = [
+    {
+      id: "stat-thinking",
+      part: "基础篇",
+      level: "入门",
+      minutes: 55,
+      title: "统计思维：从研究问题到数据",
+      shortTitle: "统计思维与数据",
+      summary: "先分清总体、样本、参数、统计量、变量类型和分析单位，再决定描述、检验或建模。",
+      outcome: "能把一个医学或心理学问题拆成研究对象、暴露、结局、时间方向与数据结构。",
+      keyIdeas: ["统计学处理的是带不确定性的数据，不是一套检验菜单。", "样本结果能否推断总体，取决于抽样框和研究设计。", "一行数据代表什么，决定后续能否把观测当作独立个体。"],
+      concepts: ["statistics", "population-sample", "parameter-statistic", "variable-types", "variation", "random-variable", "data-screening"],
+      applications: [
+        { title: "用 R 检查数据结构", note: "查看行数、列类型、分类标签、缺失和重复记录。", href: "#workflow/data-types" },
+        { title: "数据整理与转换专题", note: "把原始变量整理成可分析的数据表。", href: "#guide/data/data-transformation" },
+      ],
+      practice: "找一份你熟悉的问卷或临床数据，只做数据体检：写出分析单位、列出暴露和结局类型、找出一个可能影响抽样代表性的因素。",
+      checkpoints: ["能区分总体参数与样本统计量。", "能说明一行数据代表谁。", "能发现 ID 重复、类型错误或逻辑不可能的取值。"],
+    },
+    {
+      id: "describing-data",
+      part: "基础篇",
+      level: "入门",
+      minutes: 65,
+      title: "描述统计：让数据先开口",
+      shortTitle: "描述统计与图表",
+      summary: "用均数、中位数、变异指标、分位数和图形描述分布，而不是急着做检验。",
+      outcome: "能根据变量分布和测量尺度选择描述指标，并用图检查偏态、异常值和组间差异。",
+      keyIdeas: ["均数和标准差适合描述近似对称的连续数据。", "中位数与四分位距更稳健，适合偏态、等级或极端值较多的数据。", "任何汇总数字都应配合分布图，否则可能掩盖多峰、分组和异常值。"],
+      concepts: ["mean", "median", "geometric-mean", "percentile", "iqr", "variance", "standard-deviation", "coefficient-of-variation", "skewness-kurtosis", "boxplot", "outlier"],
+      applications: [
+        { title: "描述统计与数据检查", note: "计算中心位置、离散程度，并用图形核对分布。", href: "#learn/r-7" },
+        { title: "箱式图教学", note: "读懂箱体、须、异常点和组间比较。", href: "#guide/plot/boxplot" },
+      ],
+      practice: "选择一份含连续变量和分类变量的数据，按变量类型做一张描述表；再画直方图或箱式图，说明数字没有显示出来的分布信息。",
+      checkpoints: ["能解释 SD、SE 与 IQR 的区别。", "能判断何时优先报告中位数。", "不会把箱式图圆点自动当成错误数据。"],
+    },
+    {
+      id: "probability-sampling",
+      part: "基础篇",
+      level: "入门",
+      minutes: 70,
+      title: "概率、分布与抽样波动",
+      shortTitle: "概率分布与抽样",
+      summary: "理解随机变量、常见分布、抽样分布、标准误和中心极限定理，知道估计为什么会波动。",
+      outcome: "能根据数据类型认识二项、Poisson、正态等分布，并解释样本量如何影响估计精度。",
+      keyIdeas: ["概率描述长期随机机制，有限样本中的比例和均数都会波动。", "抽样分布描述统计量在重复抽样中的分布，标准误是它的离散程度。", "中心极限定理帮助解释样本均数为何常近似正态，但不负责修复错误抽样。"],
+      concepts: ["probability", "normal-distribution", "binomial-distribution", "poisson-distribution", "sampling-distribution", "central-limit", "standard-error", "degrees-freedom", "law-large-numbers"],
+      applications: [
+        { title: "动态看抽样波动", note: "改变样本量，观察样本均数分布和置信区间覆盖。", href: "#statistics/simulations" },
+        { title: "结构方程中的潜变量", note: "先理解随机变量和变异，再进入后续模型。", href: "#guide/advanced/sem" },
+      ],
+      practice: "用一个明显偏态的变量重复抽样，分别取 n=5、n=30、n=100，记录样本均数分布怎样变化；再说明标准误与个体标准差为什么不是一回事。",
+      checkpoints: ["能根据结局类型选择二项或 Poisson 分布。", "能说清样本量变大时什么变小、什么不变。", "不会把标准误解释成样本内个体的标准差。"],
+    },
+    {
+      id: "estimation",
+      part: "基础篇",
+      level: "核心",
+      minutes: 55,
+      title: "参数估计与置信区间",
+      shortTitle: "参数估计",
+      summary: "从点估计走到区间估计，理解标准误、置信水平和估计精度如何共同影响研究结论。",
+      outcome: "能读懂均数差、比例差、OR、HR 等估计值及其置信区间，不用 p 值代替效应信息。",
+      keyIdeas: ["点估计给出最可能的方向和大小，但本身没有显示不确定性。", "置信区间同时包含效应大小与精度。", "95% 是构造方法的长期覆盖率，不是某个已算出的区间有 95% 概率包含真值。"],
+      concepts: ["point-estimate", "confidence-interval", "bootstrap", "maximum-likelihood", "standard-error"],
+      applications: [
+        { title: "置信区间动态演示", note: "看重复抽样中区间如何覆盖、如何错过真实参数。", href: "#statistics/simulations" },
+        { title: "R 输出中的估计与区间", note: "从 confint() 和模型摘要中定位 Estimate、SE 和区间。", href: "#function/confint" },
+      ],
+      practice: "对同一组数据分别计算均数差和 bootstrap 区间，解释点估计、标准误和置信区间各回答什么问题。",
+      checkpoints: ["能区分 SD、SE 和置信区间。", "能用效应量和区间描述结果。", "不会把区间跨 0 说成效应绝对不存在。"],
+    },
+    {
+      id: "hypothesis-tests",
+      part: "基础篇",
+      level: "核心",
+      minutes: 90,
+      title: "假设检验与检验方法选择",
+      shortTitle: "假设检验",
+      summary: "从零假设、p 值、两类错误和功效，走到 t 检验、方差分析、卡方及非参数方法的选择。",
+      outcome: "能先判断研究设计和数据类型，再选择合理检验，并用效应量和区间解释结果。",
+      keyIdeas: ["p 值衡量数据与零假设的不相容程度，不是零假设为真的概率。", "检验方法必须匹配分析单位、组数、配对关系和结局类型。", "统计显著不等于效应大，也不等于临床或公共卫生重要。"],
+      concepts: ["hypothesis-testing", "null-alternative", "p-value", "alpha", "type-errors", "statistical-power", "effect-size", "multiple-comparisons", "t-test", "anova", "categorical-test", "nonparametric-test", "sample-size"],
+      applications: [
+        { title: "均值比较：t 检验与 ANOVA", note: "学习成组、配对、多组比较和多重比较。", href: "#learn/r-mean-tests" },
+        { title: "率与比例比较", note: "学习卡方、Fisher 和 Mantel-Haenszel 分层。", href: "#learn/r-rate-tests" },
+        { title: "检验参数专题", note: "集中查看常见检验函数的参数与输出。", href: "#guide/parameter/base-parameters" },
+      ],
+      practice: "给出三个研究问题：两组独立均数、同一批人前后变化、两组率的比较。先写研究假设和数据结构，再分别为它们选择检验。",
+      checkpoints: ["能解释 p 值不是什么。", "能识别配对数据和聚类数据。", "多重比较时有校正意识。"],
+    },
+    {
+      id: "study-design",
+      part: "进阶篇",
+      level: "核心",
+      minutes: 85,
+      title: "研究设计与偏倚",
+      shortTitle: "研究设计与偏倚",
+      summary: "理解现况、病例对照、队列、生态学、随机试验和诊断研究能回答什么问题，以及各自的主要偏倚。",
+      outcome: "看到论文时能先判断研究的时间方向、比较组、抽样方式、偏倚风险和可推断范围。",
+      keyIdeas: ["设计先于统计：再复杂的模型也不能自动修复错误抽样或错误比较。", "选择偏倚、信息偏倚和混杂在设计与分析阶段都可能出现。", "生态学关联不能直接套到个体层面。"],
+      concepts: ["sampling", "randomization", "control-group", "blinding", "allocation-concealment", "confounding", "selection-bias", "information-bias", "ecological-fallacy", "case-control", "cohort-study", "ecological-study", "randomized-trial"],
+      applications: [
+        { title: "研究方法专题", note: "分别进入队列、病例对照、现况、生态和 RCT。", href: "#learn" },
+        { title: "STROBE 与研究报告", note: "用报告规范检查观察性研究的关键设计信息。", href: "#learn/r-quarto" },
+      ],
+      practice: "选择一篇医学论文，填写一张设计判断表：研究对象、时间方向、比较组、主要结局、抽样方式、最可能的两类偏倚。",
+      checkpoints: ["能区分队列研究与病例对照研究。", "能说出混杂与中介的不同。", "能识别生态学谬误风险。"],
+    },
+    {
+      id: "effect-measures",
+      part: "进阶篇",
+      level: "核心",
+      minutes: 65,
+      title: "关联、效应量与诊断评价",
+      shortTitle: "效应量与诊断",
+      summary: "理解 RR、OR、RD、归因指标、灵敏度和特异度，知道相对效应与绝对风险各自适合什么场景。",
+      outcome: "能根据研究设计和基线风险选择效应量，并把诊断指标与临床决策联系起来。",
+      keyIdeas: ["OR 与 RR 不等价，事件常见时差异会更明显。", "相对效应适合说明强度，绝对风险差和 NNT 更贴近个体与公共卫生负担。", "诊断试验除了灵敏度与特异度，还要看预测值、ROC、校准和使用场景。"],
+      concepts: ["relative-risk", "odds-ratio", "risk-difference", "attributable-risk", "diagnostic-test", "kappa", "number-needed-to-treat", "incidence-density"],
+      applications: [
+        { title: "诊断试验研究", note: "从四格表、ROC 到临床使用条件。", href: "#guide/method/diagnostic" },
+        { title: "诊断模型评估", note: "学习 AUC、校准和决策曲线。", href: "#guide/ml/evaluation" },
+      ],
+      practice: "给定一组 2×2 表数据，分别计算暴露组风险、对照组风险、RR、OR、RD 和 NNT，并写一段不夸大因果的解释。",
+      checkpoints: ["能解释 OR 不能直接当 RR。", "能区分灵敏度和阳性预测值。", "能说明 NNT 依赖基线风险和时间窗。"],
+    },
+    {
+      id: "regression",
+      part: "进阶篇",
+      level: "进阶",
+      minutes: 100,
+      title: "回归、预测与模型评价",
+      shortTitle: "回归与预测模型",
+      summary: "从线性回归走到 Logistic、Poisson、模型诊断、变量选择、区分度和校准。",
+      outcome: "能根据结局分布选择回归模型，读懂核心系数，并知道模型需要哪些诊断和验证。",
+      keyIdeas: ["回归系数是在其他变量保持不变时的平均变化或对数效应尺度变化。", "模型能计算不代表模型合理，残差、共线性、过离散和分离都要检查。", "预测模型不能只看 AUC，还要看校准、外部验证和决策价值。"],
+      concepts: ["correlation", "simple-linear-regression", "multiple-linear-regression", "ols", "residual", "r-squared", "multicollinearity", "heteroscedasticity", "logistic-regression", "poisson-regression", "model-selection", "roc-auc", "calibration"],
+      applications: [
+        { title: "多重线性回归", note: "学习系数解释、残差和共线性诊断。", href: "#guide/model/linear" },
+        { title: "Logistic 回归", note: "学习二分类结局、OR、事件数和分离。", href: "#guide/model/logistic" },
+        { title: "Poisson 回归", note: "学习计数结局、人时、offset 和过离散。", href: "#guide/model/poisson" },
+      ],
+      practice: "分别设计一个连续结局和一个二分类结局的回归分析，写出变量角色、模型族、效应尺度、需要检查的诊断和最终报告字段。",
+      checkpoints: ["能根据结局类型选择模型族。", "能区分 R²、OR、RR 和校准。", "不会只凭 p 值筛变量。"],
+    },
+    {
+      id: "survival",
+      part: "进阶篇",
+      level: "进阶",
+      minutes: 75,
+      title: "生存分析与时间到事件结局",
+      shortTitle: "生存分析",
+      summary: "理解删失、生存函数、风险率、Kaplan-Meier、Cox 模型和竞争风险。",
+      outcome: "能正确整理时间、事件和删失变量，读懂生存曲线与 HR，并检查比例风险假设。",
+      keyIdeas: ["删失提供“至少随访到该时点”的信息，不能简单删除。", "生存曲线描述累计无事件概率，HR 描述瞬时风险比。", "竞争事件会阻止目标事件被观察到，需要不同的估计和解释。"],
+      concepts: ["survival-analysis", "hazard-ratio", "cox-model", "proportional-hazards", "c-index", "competing-risk", "immortal-time-bias"],
+      applications: [
+        { title: "Kaplan-Meier 与 Cox 模型", note: "从数据编码到生存曲线、HR 和假设检查。", href: "#guide/model/cox" },
+        { title: "生存曲线绘图", note: "学习曲线的分组、删失标记、风险表和配色。", href: "#guide/plot/survival-curve" },
+      ],
+      practice: "把一份生存数据整理成 time、event 和 group 三列，解释每一列含义，再画出 KM 曲线并说明为什么不能只比较末点生存率。",
+      checkpoints: ["能解释右删失。", "能区分 HR 与风险差。", "会检查比例风险和风险集。"],
+    },
+    {
+      id: "causal-longitudinal",
+      part: "应用篇",
+      level: "高级",
+      minutes: 100,
+      title: "因果推断、缺失数据与纵向结构",
+      shortTitle: "因果与纵向数据",
+      summary: "理解混杂控制、DAG、倾向评分、工具变量、缺失机制、多重插补和重复测量。",
+      outcome: "能说明一项观察性比较依赖哪些因果假设，并选择合适的缺失、聚类或纵向分析方法。",
+      keyIdeas: ["因果问题要明确干预、比较、结局、时间零点和目标人群。", "倾向评分只平衡已测量变量，不能修复未测量混杂。", "缺失机制、聚类层级和重复测量属于数据结构，不能到分析最后才处理。"],
+      concepts: ["causal-inference", "dag", "propensity-score", "iptw", "instrumental-variable", "mendelian-randomization", "missing-data", "mcar", "mar", "mnar", "multiple-imputation", "clustered-data", "gee", "linear-mixed-model"],
+      applications: [
+        { title: "因果推断设计", note: "学习目标试验、DAG、倾向评分和敏感性分析。", href: "#guide/advanced/causal-inference" },
+        { title: "多重插补", note: "学习缺失机制、插补模型和 Rubin 合并。", href: "#guide/advanced/multiple-imputation" },
+        { title: "纵向与聚类模型", note: "学习 LMM、GEE 和重复测量结构。", href: "#guide/advanced/longitudinal-models" },
+      ],
+      practice: "画出你研究问题的最小 DAG，标出暴露、结局、混杂、中介和碰撞点；再说明数据中的缺失和重复测量应如何处理。",
+      checkpoints: ["能区分混杂、中介与碰撞点。", "能说清 MAR 与 MNAR。", "不会把重复测量当独立观测。"],
+    },
+    {
+      id: "advanced-topics",
+      part: "应用篇",
+      level: "高级",
+      minutes: 120,
+      title: "高级统计与前沿应用",
+      shortTitle: "高级统计专题",
+      summary: "概览 DLNM、时间序列、Meta 分析、贝叶斯、结构方程、潜变量、机器学习和心理网络。",
+      outcome: "能判断一项高级方法解决什么问题、依赖哪些假设，并知道继续深入时需要学习哪些概念与函数。",
+      keyIdeas: ["高级方法不是普通模型的升级版，而是针对特定数据结构或问题设计的工具。", "预测、病因、潜变量和证据综合回答不同问题，不能用同一套评价标准。", "模型越复杂，越需要事先定义、敏感性分析和外部验证。"],
+      concepts: ["dlnm", "time-series", "meta-analysis", "heterogeneity", "bayesian-inference", "prior-distribution", "posterior-distribution", "credible-interval", "structural-equation-model", "factor-analysis", "pca", "clustering", "machine-learning", "network-analysis", "scale", "irt"],
+      applications: [
+        { title: "DLNM 环境流行病学", note: "学习暴露—滞后—反应结构与累积效应。", href: "#guide/model/dlnm" },
+        { title: "Meta 分析与证据综合", note: "学习效应量合并、异质性和发表偏倚。", href: "#guide/review/meta-analysis" },
+        { title: "贝叶斯统计", note: "从先验、后验和可信区间开始。", href: "#guide/bayesian/foundations" },
+        { title: "机器学习全流程", note: "学习训练、验证、校准和外部表现。", href: "#guide/ml/workflow" },
+      ],
+      practice: "选择一个你感兴趣的进阶方法，用一页说明它解决的问题、数据结构、核心假设、主要 R 包、不能回答的问题和下一步学习入口。",
+      checkpoints: ["能区分预测模型与因果模型。", "能说明高级模型的适用条件。", "知道复杂不等于更可靠。"],
+    },
+    {
+      id: "r-application",
+      part: "应用篇",
+      level: "应用",
+      minutes: 70,
+      title: "把统计原理落到 R 分析",
+      shortTitle: "统计到 R 应用",
+      summary: "把研究问题、数据筛查、统计方法、模型诊断、结果解释和可重复报告连成一条工作流。",
+      outcome: "能从一个研究问题出发，写出一份包含数据检查、主要分析、诊断、敏感性分析和结果表达的 R 分析计划。",
+      keyIdeas: ["先写分析问题和方法，再打开函数词典。", "统计分析前的结构、缺失、重复和取值范围检查属于研究的一部分。", "可重复性要求原始数据、脚本、版本、随机种子和结果说明能够追溯。"],
+      concepts: ["analysis-workflow", "data-screening", "assumption-check", "result-reporting", "reproducible-analysis"],
+      applications: [
+        { title: "完成第一条研究流程", note: "把读取、清洗、分析、绘图和报告串起来。", href: "#learn/r-9" },
+        { title: "可重复报告与 Quarto", note: "用项目结构、脚本和文档保留完整分析过程。", href: "#learn/r-quarto" },
+        { title: "用代码解析检查步骤", note: "粘贴已有代码，核对函数、参数和分析逻辑。", href: "#code-parser" },
+      ],
+      practice: "从你的真实研究中写一份一页分析计划：研究问题、目标人群、暴露、结局、研究设计、描述统计、主要模型、诊断、缺失处理、敏感性分析和结果表格。",
+      checkpoints: ["能说明每个 R 步骤对应什么统计问题。", "能列出主要模型假设和诊断。", "能写清缺失、排除和敏感性分析。"],
+    },
+  ];
+
   window.RZH_STAT_RESOURCES = [
     {
       title: "《生物医学研究的统计方法（第2版）》",
@@ -108010,6 +108243,302 @@ functions.forEach((item) => {
 });
 functions.splice(0, functions.length, ...uniqueFunctionsById.values());
 
+const detailedFunctionOverrides = {
+  lowess: {
+    aliases: ["局部加权平滑", "散点平滑", "LOESS 前身"],
+    summary: "用局部加权多项式在散点中画一条平滑趋势线。每一小段主要参考附近的数据点，适合先观察非线性关系，而不是直接给出因果效应。",
+    syntax: "lowess(x, y = NULL, f = 2/3, iter = 3, delta = 0.01 * diff(range(x)))",
+    returns: "返回含 x、y 两列的平滑坐标列表，通常交给 lines() 叠加到现有散点图上。",
+    example: `plot(cars$speed, cars$dist, pch = 19, col = "#2F6B5B")\nfit <- lowess(cars$speed, cars$dist, f = 0.5)\nlines(fit, col = "#C95D63", lwd = 2)`,
+    output: "散点图上的红线是局部平滑趋势；曲线弯曲提示关系可能不是一条直线。",
+    params: [
+      ["x", "横轴变量，通常是连续数值向量。", "必填"],
+      ["y", "纵轴变量；若省略，则按时间序列方式处理。", "通常提供"],
+      ["f", "平滑窗口占全部观测的比例。越大越平滑，越小越贴近局部波动。", "默认 2/3"],
+      ["iter", "稳健重加权次数，用来降低极端值对曲线的影响。", "默认 3"],
+      ["delta", "控制计算网格的间隔，主要影响计算速度。", "通常保持默认"],
+    ],
+    tips: ["平滑曲线用于探索关系，不能自动证明非线性因果效应。", "窗口越小越容易被少数点带动，应改变 f 检查趋势是否稳定。"],
+    related: ["scatter", "spline", "lm"],
+  },
+  qqline: {
+    aliases: ["Q-Q 参考线", "正态参考线", "分位线"],
+    summary: "在 Q-Q 图上添加一条参考直线，帮助判断点是否大体沿理论分布排列，以及尾部是否偏离。",
+    syntax: "qqline(y, datax = FALSE, distribution = qnorm, probs = c(0.25, 0.75), qtype = 7, ...)",
+    returns: "在现有图形上添加参考线，不返回需要继续计算的数据。",
+    example: `qqnorm(model$residuals)\nqqline(model$residuals, col = "#C95D63", lwd = 2)`,
+    output: "点接近直线表示与指定理论分布大致相符；两端系统性弯曲常提示偏态或尾部异常。",
+    params: [
+      ["y", "要检查的数值向量，例如模型残差。", "必填"],
+      ["datax", "是否把数据放在横轴；常规 Q-Q 图保持 FALSE。", "默认 FALSE"],
+      ["distribution", "理论分布的分位数函数，默认正态分布 qnorm。", "默认 qnorm"],
+      ["probs", "用哪两个理论分位点确定参考线。", "默认 0.25 与 0.75"],
+      ["qtype", "计算样本分位数的算法。", "默认 7"],
+    ],
+    tips: ["参考线不负责给出正态性检验 p 值。", "判断偏离时要同时考虑样本量和图形两端。"],
+    related: ["qqnorm", "shapiro.test", "residual"],
+  },
+  split: {
+    aliases: ["按组拆分", "分组切片", "split by factor"],
+    summary: "按照一个或多个分组变量，把向量或数据框拆成若干子对象组成的列表。",
+    syntax: "split(x, f, drop = FALSE, ...)",
+    returns: "返回列表；列表名称通常来自分组水平，每个元素是一组数据。",
+    example: `parts <- split(birthwt$bwt, birthwt$race)\nstr(parts)\nlapply(parts, mean, na.rm = TRUE)`,
+    output: "parts 中每个元素是一组的出生体重；lapply() 随后对每组分别计算均数。",
+    params: [
+      ["x", "要拆分的向量、数据框或列表。", "必填"],
+      ["f", "分组因子；多个因子会形成交叉分组。", "必填"],
+      ["drop", "是否删除没有观测的分组组合。", "默认 FALSE"],
+      ["...", "继续传给底层方法，通常无需填写。", "可选"],
+    ],
+    tips: ["拆成列表后常配合 lapply()、purrr::map() 使用。", "分组变量含多余水平时，先 droplevels() 或核对 factor。"],
+    related: ["lapply", "group_by", "droplevels"],
+  },
+  "as.formula": {
+    aliases: ["字符串转公式", "动态公式", "formula object"],
+    summary: "把一段字符文本转换成 R 能识别的公式对象，常用于循环中动态更换结局或解释变量。",
+    syntax: "as.formula(object, env = parent.frame())",
+    returns: "返回 formula 对象，可直接交给 lm()、glm()、coxph() 等建模函数。",
+    example: `outcome <- "mpg"\nform <- as.formula(paste(outcome, "~ wt + hp"))\nfit <- lm(form, data = mtcars)`,
+    output: "form 等价于 mpg ~ wt + hp；模型公式由文本生成，而不是手写固定公式。",
+    params: [
+      ["object", "一个符合 R 公式语法的字符串。", "必填"],
+      ["env", "公式查找变量和函数时所处的环境。", "默认调用环境"],
+    ],
+    tips: ["变量名来自用户输入时要校验，不能把任意文本直接拼接成公式。", "公式对象保存变量关系，不保存数据本身。"],
+    related: ["formula", "lm", "glm"],
+  },
+  cc: {
+    aliases: ["病例对照表", "2×2 表", "epiDisplay cc"],
+    summary: "epiDisplay 中用于展示结局与暴露关系的表格函数，可按队列、病例对照或横断面设计输出比例和关联指标。",
+    syntax: "cc(outcome, exposure, design, decimal = 2, ...)",
+    returns: "在控制台输出列联表、比例和相应关联指标；具体返回对象以当前包版本为准。",
+    example: `library(epiDisplay)\ncc(outcome, exposure, data = dat, design = "case-control", graph = FALSE)`,
+    output: "重点看暴露与结局的四格表、各组比例及 OR 等关联结果，并结合设计解释。",
+    params: [
+      ["outcome", "二分类结局变量。", "必填"],
+      ["exposure", "二分类暴露或分组变量。", "必填"],
+      ["design", "研究设计类型，影响该显示哪些关联指标。", "需按设计设置"],
+      ["decimal", "结果保留的小数位数。", "常用 2"],
+      ["...", "data、graph、标题和轴标签等附加设置。", "按需填写"],
+    ],
+    tips: ["输出表格不能替代混杂控制；需要时继续使用分层或多变量模型。", "先核对分类标签和参照组方向。"],
+    related: ["mhor", "table", "odds-ratio"],
+  },
+  end: {
+    aliases: ["时间终点", "最后一个时间点", "time series end"],
+    summary: "返回时间序列的最后一个时间点，帮助确认起止范围、周期和切片位置。",
+    syntax: "end(x, ...)",
+    returns: "返回表示最后一个观测时间的 time 对象；月度、季度等数据会保留周期信息。",
+    example: `end(ts(co2, start = c(1959, 1), frequency = 12))\nwindow(co2, end = c(1960, 12))`,
+    output: "第一个结果说明序列终点；window() 用该时间信息截取指定结束月份。",
+    params: [
+      ["x", "一个时间序列对象或带时间属性的对象。", "必填"],
+      ["...", "传给具体方法，通常无需填写。", "可选"],
+    ],
+    tips: ["不要和 matrix 的最后一列 end() 用法混淆。", "先确认 frequency() 是否反映了真实观测周期。"],
+    related: ["start", "frequency", "window"],
+  },
+  fnr: {
+    aliases: ["假阴性率", "漏诊率", "false negative rate"],
+    summary: "根据真阳性与假阴性人数计算假阴性率，公式为 FN / (TP + FN)，等价于 1−灵敏度。",
+    syntax: "fnr(tp, fn, ...)",
+    returns: "返回 0 到 1 之间的假阴性率。",
+    example: `fnr(tp = 31, fn = 11)`,
+    output: "结果约 0.262，表示真正有病者中约 26.2% 被判为阴性，也就是漏诊比例。",
+    params: [
+      ["tp", "真阳性人数。", "必填"],
+      ["fn", "假阴性人数。", "必填"],
+      ["...", "其他控制项，以当前 cutpointr 版本为准。", "可选"],
+    ],
+    tips: ["假阴性率关注漏诊，阳性预测值则关注“检测阳性者中有多少真患病”。", "不同患病率会使预测值变化，但灵敏度本身通常按病例组计算。"],
+    related: ["plr", "fpr", "diagnostic-test"],
+  },
+  fpr: {
+    aliases: ["假阳性率", "误诊率", "false positive rate"],
+    summary: "根据假阳性与真阴性人数计算假阳性率，公式为 FP / (FP + TN)，等价于 1−特异度。",
+    syntax: "fpr(tp, fn, fp, tn, ...)",
+    returns: "返回 0 到 1 之间的假阳性率。",
+    example: `fpr(fp = 13, tn = 45)`,
+    output: "结果约 0.224，表示真正无病者中约 22.4% 被判为阳性。",
+    params: [
+      ["tp", "真阳性人数；部分版本可省略，以当前函数签名为准。", "按需"],
+      ["fn", "假阴性人数；用于识别完整四格表。", "按需"],
+      ["fp", "假阳性人数。", "必填"],
+      ["tn", "真阴性人数。", "必填"],
+      ["...", "其他控制项，以当前包版本为准。", "可选"],
+    ],
+    tips: ["假阳性率不等于阳性预测值。", "ROC 曲线的横轴正是不同阈值下的假阳性率。"],
+    related: ["fnr", "plr", "roc-auc"],
+  },
+  frequency: {
+    aliases: ["时间序列频率", "采样周期", "seasonality"],
+    summary: "读取或设置时间序列在一年中的观测频率，例如月度数据为 12、季度数据为 4。",
+    syntax: "frequency(x, ...)",
+    returns: "返回每个时间单位中的观测数；赋值写法 frequency(x) <- value 可改变元数据。",
+    example: `frequency(co2)\nmonthly <- ts(rnorm(48), start = c(2022, 1), frequency = 12)\nfrequency(monthly)`,
+    output: "结果 12 说明每个年度包含 12 个观测，后续季节分解和 ARIMA 会使用这一周期。",
+    params: [
+      ["x", "时间序列对象。", "必填"],
+      ["...", "传给具体方法，通常无需填写。", "可选"],
+    ],
+    tips: ["频率设错会让季节模型和日期轴整体错位。", "日数据要区分一年 365 天与每周 7 天等分析周期。"],
+    related: ["start", "end", "ts"],
+  },
+  matchTab: {
+    aliases: ["匹配分层表", "配对资料表", "matched table"],
+    summary: "jsmodule 中用于展示暴露、结局与匹配或分层结构关系的表格工具，适合先检查配对资料的组成。",
+    syntax: "matchTab(outcome, exposure, strata, ...)",
+    returns: "输出分层或匹配结构下的表格结果；具体对象以当前包版本为准。",
+    example: `library(jsmodule)\nmatchTab(outcome == "是", exposure, strata = subclass, data = matched_data)`,
+    output: "按 strata 检查各匹配组内暴露与结局的分布，再决定后续配对或分层分析。",
+    params: [
+      ["outcome", "二分类结局表达式。", "必填"],
+      ["exposure", "暴露或分组变量。", "必填"],
+      ["strata", "匹配组、对子或分层变量。", "必填"],
+      ["...", "数据和其他显示设置。", "按当前包文档填写"],
+    ],
+    tips: ["先检查每个匹配组是否真正可比。", "表格只描述结构，条件效应仍需相应模型估计。"],
+    related: ["mhor", "conditional-logistic", "matching"],
+  },
+  mhor: {
+    aliases: ["M-H OR", "分层 OR", "Mantel-Haenszel"],
+    summary: "epiDisplay 中用于分层四格表的 Mantel-Haenszel 优势比与检验，按层内信息合并暴露和结局关联。",
+    syntax: "mhor(outcome, exposure, stratum, design = \"case-control\", ...)",
+    returns: "输出各层表格、合并 M-H OR、检验结果和异质性提示。",
+    example: `library(epiDisplay)\nmhor(outcome, exposure, stratum, data = dat, design = "case-control")`,
+    output: "重点看合并 OR、置信区间和层间效应是否大致一致。",
+    params: [
+      ["outcome", "二分类结局。", "必填"],
+      ["exposure", "二分类暴露。", "必填"],
+      ["stratum", "分层变量。", "必填"],
+      ["design", "研究设计，决定默认展示的效应尺度。", "按设计填写"],
+      ["...", "data、小数位和图形等附加设置。", "按需"],
+    ],
+    tips: ["层间效应差异很大时，单一合并 OR 可能掩盖效应修饰。", "避免层数过多造成稀疏表。"],
+    related: ["mantelhaen.test", "odds-ratio", "stratification"],
+  },
+  nlr: {
+    aliases: ["阴性似然比", "negative likelihood ratio"],
+    summary: "计算阴性似然比，表示检测阴性者中真无病与真患病证据的相对强度，公式为 (1−灵敏度)/特异度。",
+    syntax: "nlr(tp, fn, fp, tn, ...)",
+    returns: "返回阴性似然比；小于 1 通常使患病概率下降。",
+    example: `nlr(tp = 31, fn = 11, fp = 13, tn = 45)`,
+    output: "结果越小，阴性结果排除疾病的能力通常越强；还需结合验前概率解释。",
+    params: [
+      ["tp", "真阳性人数。", "必填"],
+      ["fn", "假阴性人数。", "必填"],
+      ["fp", "假阳性人数。", "必填"],
+      ["tn", "真阴性人数。", "必填"],
+      ["...", "其他控制项，以当前包版本为准。", "可选"],
+    ],
+    tips: ["似然比不直接等于验后概率。", "验前概率不同，同一个阴性似然比带来的验后变化也不同。"],
+    related: ["plr", "diagnostic-test", "odds-ratio"],
+  },
+  plr: {
+    aliases: ["阳性似然比", "positive likelihood ratio"],
+    summary: "计算阳性似然比，表示阳性结果在真患病者中相对于真无病者出现的倍数，公式为灵敏度/(1−特异度)。",
+    syntax: "plr(tp, fn, fp, tn, ...)",
+    returns: "返回阳性似然比；大于 1 通常提高患病概率。",
+    example: `plr(tp = 31, fn = 11, fp = 13, tn = 45)`,
+    output: "数值越大，阳性结果越能改变验前概率；判断临床价值仍需结合具体场景。",
+    params: [
+      ["tp", "真阳性人数。", "必填"],
+      ["fn", "假阴性人数。", "必填"],
+      ["fp", "假阳性人数。", "必填"],
+      ["tn", "真阴性人数。", "必填"],
+      ["...", "其他控制项，以当前包版本为准。", "可选"],
+    ],
+    tips: ["阳性似然比不能直接当成阳性预测值。", "极端截断值可能带来很高 PLR，但灵敏度可能很低。"],
+    related: ["nlr", "diagnostic-test", "odds-ratio"],
+  },
+  row: {
+    aliases: ["行索引矩阵", "matrix row index"],
+    summary: "返回与矩阵同形的行号矩阵，每个位置的值表示它位于第几行。",
+    syntax: "row(x, as.factor = FALSE)",
+    returns: "返回与 x 行列结构相同的整数或因子矩阵。",
+    example: `m <- matrix(1:6, nrow = 2)\nrow(m)`,
+    output: "结果中第一行全是 1，第二行全是 2，用于按位置生成索引。",
+    params: [
+      ["x", "矩阵或类似二维对象。", "必填"],
+      ["as.factor", "是否把行号返回为因子。", "默认 FALSE"],
+    ],
+    tips: ["row() 返回位置编号，不会读取数据本身。", "与 col() 组合可生成位置索引。"],
+    related: ["col", "which", "matrix"],
+  },
+  start: {
+    aliases: ["时间起点", "第一个时间点", "time series start"],
+    summary: "返回时间序列的第一个时间点，帮助确认数据从哪一年、月或季度开始。",
+    syntax: "start(x, ...)",
+    returns: "返回表示第一个观测时间的 time 对象。",
+    example: `start(co2)\nwindow(co2, start = c(1960, 1))`,
+    output: "第一个结果给出起始时间；window() 用它从指定时点截取数据。",
+    params: [
+      ["x", "时间序列对象。", "必填"],
+      ["...", "传给具体方法，通常无需填写。", "可选"],
+    ],
+    tips: ["先确认 start 和 frequency 是否符合真实观测时间。", "日期标签错误会让后续时间序列模型整体错位。"],
+    related: ["end", "frequency", "ts"],
+  },
+  unit: {
+    aliases: ["grid 单位", "图形尺寸单位", "unit object"],
+    summary: "grid 图形系统中的尺寸对象，把数值和单位绑定起来，例如 0.5 行、2 毫米或 1 厘米。",
+    syntax: "unit(x, units, data = NULL)",
+    returns: "返回 grid unit 对象，供主题元素、图例间距和图形布局使用。",
+    example: `theme(legend.key.size = grid::unit(0.5, "lines"))`,
+    output: "图例键的尺寸被设为 0.5 行高，比裸数字更能随字体和输出设备稳定缩放。",
+    params: [
+      ["x", "数值。", "必填"],
+      ["units", "单位字符串，例如 lines、cm、mm、points。", "必填"],
+      ["data", "特殊单位使用的数据环境。", "通常省略"],
+    ],
+    tips: ["theme 中的尺寸不要只写裸数字，容易因单位和设备不同而失控。", "论文图常用 cm、mm、pt 表达稳定物理尺寸。"],
+    related: ["theme", "element_text", "ggsave"],
+  },
+  vars: {
+    aliases: ["引用变量", "tidyselect 变量列表", "facet vars"],
+    summary: "把一组列名包装成 tidyselect 可识别的变量引用，常用于 facet_wrap() 或需要传递变量集合的函数。",
+    syntax: "vars(...)",
+    returns: "返回 quoted 变量列表，供下游 tidy 评估函数使用。",
+    example: `ggplot(mtcars, aes(wt, mpg)) +\n  geom_point() +\n  facet_wrap(vars(cyl))`,
+    output: "图形按 cyl 的每个水平分面，而不需要把列名写成字符串。",
+    params: [
+      ["...", "一个或多个不加引号的列名。", "必填"],
+    ],
+    tips: ["普通公式或函数不一定要用 vars()；它主要服务 tidyselect 语境。", "变量不存在时会在使用 vars() 的图形或管道步骤中报错。"],
+    related: ["facet_wrap", "select", "ggplot"],
+  },
+  youden: {
+    aliases: ["约登指数", "Youden index", "J statistic"],
+    summary: "计算约登指数 J，公式为灵敏度 + 特异度 − 1，用来概括某个截断值同时兼顾真阳性和真阴性的程度。",
+    syntax: "youden(tp, fn, fp, tn, ...)",
+    returns: "返回约登指数，范围通常在 0 到 1 之间。",
+    example: `youden(tp = 31, fn = 11, fp = 13, tn = 45)`,
+    output: "指数越大表示该截断值的灵敏度与特异度综合表现越好，但仍需结合临床代价。",
+    params: [
+      ["tp", "真阳性人数。", "必填"],
+      ["fn", "假阴性人数。", "必填"],
+      ["fp", "假阳性人数。", "必填"],
+      ["tn", "真阴性人数。", "必填"],
+      ["...", "其他控制项，以当前包版本为准。", "可选"],
+    ],
+    tips: ["约登指数最大不代表临床最优，漏诊和误诊的代价可能不同。", "应在指定阈值范围内选择和验证截断值。"],
+    related: ["plr", "nlr", "roc-auc"],
+  },
+  theme: {
+    params: [
+      ["...", "主题元素设置，例如 axis.text、legend.position、panel.grid.major。", "按需填写"],
+      ["complete", "是否把主题视为完整主题并补全缺失元素。", "默认 FALSE"],
+      ["validate", "是否检查元素类型是否正确。", "默认 TRUE"],
+    ],
+  },
+};
+
+functions.forEach((item) => {
+  const override = detailedFunctionOverrides[item.id];
+  if (override) Object.assign(item, override);
+});
+
 const courseFunctionIds = new Set([
   "read.csv",
   "filter",
@@ -108247,6 +108776,8 @@ const learningGuides = [...(window.RZH_GUIDES || []), ...(window.RZH_ADVANCED_GU
 const statUnits = window.RZH_STAT_UNITS || [];
 const statConcepts = window.RZH_STAT_CONCEPTS || [];
 const statResources = window.RZH_STAT_RESOURCES || [];
+const statCourseMeta = window.RZH_STAT_COURSE_META || {};
+const statCourseChapters = window.RZH_STAT_COURSE_CHAPTERS || [];
 const normalizeStatLookup = (value) => String(value || "").toLowerCase().replace(/[\s·（）()、，,._-]/g, "");
 const statGlossaryLookup = new Map();
 statConcepts.forEach((concept) => {
@@ -108307,6 +108838,7 @@ const state = {
   notes: safeRead("rzh-notes", {}),
   courseCompleted: new Set(safeRead("rzh-course-progress", [])),
   quickCompleted: new Set(safeRead("rzh-quick-progress", [])),
+  statCourseCompleted: new Set(safeRead("rzh-stat-course-progress", [])),
   teachingVisited: new Set(safeRead("rzh-teaching-visited", [])),
   activeTeachingCategory: safeRead("rzh-active-teaching-category", ""),
   functionQuery: "",
@@ -110053,8 +110585,8 @@ function renderHome() {
       <section class="goal-home home-purpose-hero home-simple-hero">
         <div class="goal-home-copy">
           <span class="eyebrow">按目标开始</span>
-          <h1>查 R 函数、统计概念与研究方法</h1>
-          <p>输入函数名、统计术语、符号、报错或研究任务。既可以从代码进入 R，也可以先理解统计原理，再进入完整应用课程。</p>
+          <h1>学 R，也真正读懂统计与研究</h1>
+          <p>从一个函数、一个统计概念或一个研究问题出发。你可以先系统学习统计学基础与进阶，再沿着 R 课程把数据处理、模型诊断和结果解释真正跑通。</p>
           <form class="goal-search" data-search-form>
             <label>
               <span class="sr-only">搜索任务、函数、术语或符号</span>
@@ -110064,14 +110596,14 @@ function renderHome() {
             <button class="button button-primary" type="submit">查找</button>
           </form>
           <div class="hero-actions">
-            <a class="button button-primary" href="#learn/quick">不知道从哪开始？先学 10 分钟 ${icon("arrow-right")}</a>
-            <a class="button" href="#learn">查看完整课程</a>
+            <a class="button button-primary" href="#statistics/course">进入统计学基础与进阶 ${icon("arrow-right")}</a>
+            <a class="button" href="#learn/quick">先学 10 分钟 R</a>
           </div>
           <div class="home-mini-stats home-stats-inline">
             <span><b>${functions.length}</b> 函数</span>
             <span><b>${statConcepts.length}</b> 统计概念</span>
-            <span><b>${courseModules.length}</b> 系统课</span>
-            <span><b>${learningGuides.length}</b> 教学专题</span>
+            <span><b>${statCourseChapters.length}</b> 统计课章节</span>
+            <span><b>${courseModules.length}</b> R 系统课</span>
           </div>
         </div>
       </section>
@@ -110121,6 +110653,8 @@ function renderHome() {
           </a>
         </div>
       </section>
+
+      ${statisticsCourseEntryMarkup("home")}
 
       <section class="ai-home-entry" aria-labelledby="ai-home-title">
         <div>
@@ -110721,6 +111255,87 @@ function renderFunctionResults() {
     : `<div class="empty-state" style="grid-column:1/-1">${icon("search")}<h3>没有找到匹配条目</h3><p>试试更短的关键词，或重置分类与包筛选。</p></div>`;
 }
 
+const functionPrincipleConceptMap = {
+  "t.test": ["t-test", "hypothesis-testing", "confidence-interval"],
+  "aov": ["anova", "f-distribution", "multiple-comparisons"],
+  anova: ["anova", "likelihood-tests", "model-selection"],
+  "chisq.test": ["categorical-test", "chi-square-distribution", "hypothesis-testing"],
+  "fisher.test": ["categorical-test", "odds-ratio"],
+  "prop.test": ["proportion", "confidence-interval", "categorical-test"],
+  "cor.test": ["correlation", "hypothesis-testing", "confidence-interval"],
+  "wilcox.test": ["nonparametric-test", "paired-design"],
+  "kruskal.test": ["nonparametric-test", "anova"],
+  "shapiro.test": ["normal-distribution", "hypothesis-testing"],
+  lowess: ["spline", "scatter"],
+  qqline: ["qq-plot", "normal-distribution"],
+  "as.formula": ["regression-model"],
+  frequency: ["time-series"],
+  start: ["time-series"],
+  end: ["time-series"],
+  lm: ["multiple-linear-regression", "ols", "residual"],
+  glm: ["logistic-regression", "maximum-likelihood", "regression-model"],
+  coxph: ["cox-model", "hazard-ratio", "proportional-hazards"],
+  survfit: ["survival-analysis", "cox-model"],
+  survdiff: ["survival-analysis", "hypothesis-testing"],
+  "p.adjust": ["multiple-comparisons", "false-discovery"],
+  "power.t.test": ["statistical-power", "sample-size", "type-errors"],
+  "power.prop.test": ["sample-size", "statistical-power"],
+  crossbasis: ["dlnm", "cross-basis", "distributed-lag"],
+  crosspred: ["dlnm", "distributed-lag", "spline"],
+  crossreduce: ["dlnm", "cross-basis"],
+  lmer: ["linear-mixed-model", "random-effects", "icc"],
+  glmer: ["linear-mixed-model", "random-effects"],
+  geeglm: ["gee", "clustered-data", "robust-standard-error"],
+  mice: ["multiple-imputation", "missing-data", "mar"],
+  pool: ["multiple-imputation", "missing-data"],
+  rma: ["meta-analysis", "heterogeneity", "meta-regression"],
+  metagen: ["meta-analysis", "heterogeneity", "effect-size"],
+  roc: ["roc-auc", "diagnostic-test", "calibration"],
+  "cox.zph": ["proportional-hazards", "cox-model"],
+  vif: ["multicollinearity", "assumption-check"],
+  confint: ["confidence-interval", "maximum-likelihood"],
+  predict: ["regression-model", "calibration"],
+  mhor: ["mantel-haenszel", "odds-ratio", "stratification"],
+  cc: ["case-control", "odds-ratio", "relative-risk"],
+  fnr: ["diagnostic-test", "roc-auc"],
+  fpr: ["diagnostic-test", "roc-auc"],
+  plr: ["diagnostic-test", "odds-ratio"],
+  nlr: ["diagnostic-test", "odds-ratio"],
+  youden: ["diagnostic-test", "roc-auc"],
+};
+
+function principleConceptsForFunction(item, conceptLinks) {
+  const preferred = (functionPrincipleConceptMap[item.id] || []).map(findStatConcept).filter(Boolean);
+  const fallback = conceptLinks.filter((concept) => !preferred.some((preferredItem) => preferredItem.id === concept.id));
+  return [...preferred, ...fallback].slice(0, 3);
+}
+
+function functionStatPrincipleMarkup(item, conceptLinks) {
+  const concepts = principleConceptsForFunction(item, conceptLinks);
+  if (!concepts.length) return "";
+  return `
+    <section class="panel detail-section function-stat-principles">
+      <h2>这个函数背后的统计原理</h2>
+      <p>先知道方法在解决什么问题，再读参数和输出。这里不要求数学推导，只说明公式在比较什么，以及 R 结果中应该找哪一项。</p>
+      <div class="function-stat-principle">
+        ${concepts.map((concept) => `
+          <article class="function-stat-principle-card">
+            <div class="function-tags">${badge(concept.level, concept.level === "基础" ? "brand" : "blue")}${concept.english ? badge(concept.english) : ""}</div>
+            <h3><a href="#statistics/concept/${concept.id}">${escapeHtml(concept.title)}</a></h3>
+            <p>${escapeHtml(concept.oneLine)}</p>
+            ${concept.formula ? `<div class="function-stat-formula">${escapeHtml(concept.formula)}</div>` : ""}
+            <div class="function-stat-reading">
+              ${concept.formulaRead ? `<p><strong>公式怎么读：</strong>${escapeHtml(concept.formulaRead)}</p>` : ""}
+              ${concept.output ? `<p><strong>输出找什么：</strong>${escapeHtml(concept.output)}</p>` : ""}
+            </div>
+            <a href="#statistics/concept/${concept.id}">查看完整原理、例子与适用条件 ${icon("arrow-right")}</a>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+  `;
+}
+
 function renderFunctionDetail(id) {
   const item = findFunction(id);
   if (!item) {
@@ -110764,6 +111379,8 @@ function renderFunctionDetail(id) {
               ${escapeHtml(functionSyntax)}
             </div>
           </section>
+
+          ${functionStatPrincipleMarkup(item, conceptLinks)}
 
           ${plainLanguageMarkup(item)}
 
@@ -111087,14 +111704,45 @@ function renderCourseUnit(unitId) {
   `;
 }
 
+function statisticsCourseEntryMarkup(context = "learn") {
+  const progress = statCourseProgress();
+  const recommended = recommendedStatCourseChapter();
+  const previewChapters = context === "home" ? statCourseChapters.slice(0, 4) : statCourseChapters.slice(0, 6);
+  return `
+    <section class="statistics-course-entry ${context === "home" ? "is-home" : ""}" aria-labelledby="statistics-course-entry-title">
+      <div class="statistics-course-entry-copy">
+        <span class="eyebrow">系统统计课</span>
+        <h2 id="statistics-course-entry-title">${escapeHtml(statCourseMeta.title || "统计学基础与进阶")}</h2>
+        <p>${escapeHtml(statCourseMeta.subtitle || "")}</p>
+        <div class="statistics-course-entry-chapters">
+          ${previewChapters.map((chapter, index) => `<span><b>${String(index + 1).padStart(2, "0")}</b>${escapeHtml(chapter.shortTitle)}</span>`).join("")}
+          <span><b>…</b>共 ${statCourseChapters.length} 章</span>
+        </div>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#statistics/course">${progress.completed ? "继续系统学习" : "查看课程目录"} ${icon("arrow-right")}</a>
+          <a class="button" href="#statistics/course/${recommended?.id || ""}">${progress.completed ? "继续下一章" : "从第一章开始"}</a>
+        </div>
+      </div>
+      <aside class="statistics-course-entry-side">
+        <span>适合谁</span>
+        <p>公共卫生、医学、护理、心理学，以及希望补齐统计基础的 R 学习者。</p>
+        <strong>${progress.completed} / ${progress.total}</strong>
+        <small>章已完成</small>
+        <div class="progress-track" role="progressbar" aria-label="统计系统课进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress.percent}%"></span></div>
+      </aside>
+    </section>
+  `;
+}
+
 function renderLearnHub() {
   app.innerHTML = `
     <div class="page page-enter">
       <header class="page-header">
         <span class="eyebrow">教学专区</span>
-        <h1 class="page-title">按目标选择学习内容</h1>
-        <p class="page-subtitle">先选择一个学习方向，再进入独立页面查看课程与专题。需要按顺序系统学习时，选择“全流程深入学习”。</p>
+        <h1 class="page-title">学 R，也学统计：从入门到研究应用</h1>
+        <p class="page-subtitle">想补生物统计基础与进阶，可以按 12 章系统学习；想从代码入手，可以进入全流程 R 课程。两条路线会在函数、统计概念和研究方法页面互相连接。</p>
       </header>
+      ${statisticsCourseEntryMarkup("learn")}
       ${teachingZoneMarkup("learn")}
       <section class="learn-hub-footer">
         <div><strong>${courseModules.length} 节系统课</strong><span>包含数据流程、可视化、统计、高级建模、贝叶斯、综述与机器学习</span></div>
@@ -111587,21 +112235,271 @@ function renderStatisticsResults(query = "") {
     : `<div class="empty-state">${icon("search")}<h3>没有找到匹配概念</h3><p>试试“p 值、标准误、Logistic、混杂、缺失值或 DLNM”。</p></div>`;
 }
 
+function statCourseChapterById(id) {
+  return statCourseChapters.find((chapter) => chapter.id === id);
+}
+
+function statCourseProgress() {
+  const completed = statCourseChapters.filter((chapter) => state.statCourseCompleted.has(chapter.id)).length;
+  const total = statCourseChapters.length;
+  return {
+    completed,
+    total,
+    percent: total ? Math.round((completed / total) * 100) : 0,
+  };
+}
+
+function recommendedStatCourseChapter() {
+  return statCourseChapters.find((chapter) => !state.statCourseCompleted.has(chapter.id)) || statCourseChapters.at(-1);
+}
+
+function toggleStatCourseChapter(id) {
+  if (!statCourseChapterById(id)) return;
+  if (state.statCourseCompleted.has(id)) state.statCourseCompleted.delete(id);
+  else state.statCourseCompleted.add(id);
+  safeWrite("rzh-stat-course-progress", [...state.statCourseCompleted]);
+  showToast(state.statCourseCompleted.has(id) ? "已标记本章完成，可再次点击取消。" : "已取消本章完成标记。");
+  renderRoute();
+}
+
+function statCourseChapterCard(chapter, index) {
+  const done = state.statCourseCompleted.has(chapter.id);
+  const recommended = recommendedStatCourseChapter()?.id === chapter.id;
+  const validConceptCount = chapter.concepts.filter(findStatConcept).length;
+  return `
+    <a class="stat-course-chapter-card ${done ? "is-done" : ""} ${recommended ? "is-recommended" : ""}" href="#statistics/course/${chapter.id}">
+      <span class="stat-course-chapter-number">${String(index + 1).padStart(2, "0")}</span>
+      <span class="stat-course-chapter-copy">
+        <span class="function-tags">${badge(chapter.level, chapter.level === "入门" ? "brand" : "blue")}${recommended ? badge("建议从这里继续", "gold") : ""}${done ? badge("已完成", "brand") : ""}</span>
+        <strong>${escapeHtml(chapter.title)}</strong>
+        <small>${escapeHtml(chapter.summary)}</small>
+        <span class="stat-course-chapter-meta">${validConceptCount} 个概念 · 约 ${chapter.minutes} 分钟</span>
+      </span>
+      <span class="stat-course-chapter-state">${done ? icon("check") : icon("arrow-right")}</span>
+    </a>
+  `;
+}
+
+function renderStatCourseHome() {
+  const progress = statCourseProgress();
+  const recommended = recommendedStatCourseChapter();
+  const conceptCount = new Set(statCourseChapters.flatMap((chapter) => chapter.concepts)).size;
+  const partNotes = {
+    "基础篇": "先学会看懂数据、随机波动、估计与检验。",
+    "进阶篇": "进入研究设计、效应量、回归和生存分析。",
+    "应用篇": "处理因果、缺失、纵向结构、高级方法和完整 R 工作流。",
+  };
+  const parts = ["基础篇", "进阶篇", "应用篇"];
+  app.innerHTML = `
+    <div class="page statistics-course-page">
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
+      <header class="statistics-course-hero">
+        <div>
+          <span class="eyebrow">系统统计课</span>
+          <h1>${escapeHtml(statCourseMeta.title || "统计学基础与进阶")}</h1>
+          <p>${escapeHtml(statCourseMeta.subtitle || "")}</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#statistics/course/${recommended?.id || ""}">${progress.completed ? "继续下一章" : "从第一章开始"} ${icon("arrow-right")}</a>
+            <a class="button" href="#statistics">先查一个统计概念</a>
+          </div>
+        </div>
+        <aside class="statistics-course-metrics">
+          <strong>${statCourseChapters.length}</strong><span>章系统课程</span>
+          <strong>${conceptCount}</strong><span>个核心概念</span>
+          <strong>${statCourseChapters.reduce((sum, chapter) => sum + chapter.minutes, 0)}</strong><span>分钟建议学习量</span>
+        </aside>
+      </header>
+
+      <section class="stat-course-audience panel">
+        <div>
+          <span>适合谁</span>
+          <p>${escapeHtml(statCourseMeta.audience || "")}</p>
+        </div>
+        <div>
+          <span>学完能够</span>
+          <p>${escapeHtml(statCourseMeta.outcome || "")}</p>
+        </div>
+      </section>
+
+      <section class="stat-course-progress-card panel" aria-label="统计课程学习进度">
+        <div>
+          <span>我的学习进度</span>
+          <strong>${progress.completed} / ${progress.total} 章</strong>
+        </div>
+        <div class="progress-track" role="progressbar" aria-label="统计学基础与进阶学习进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress.percent}%"></span></div>
+        <small>${progress.completed ? `已完成 ${progress.percent}%。每章学完后可手动标记，再点一次即可取消。` : "建议按章节顺序学习。每章先读概念，再完成 R 应用练习。"}</small>
+      </section>
+
+      ${parts.map((part) => {
+        const chapters = statCourseChapters.filter((chapter) => chapter.part === part);
+        return `
+          <section class="stat-course-part" aria-labelledby="stat-course-${encodeURIComponent(part)}">
+            <div class="stat-course-part-head">
+              <div><span>${part}</span><h2 id="stat-course-${encodeURIComponent(part)}">${part}</h2><p>${escapeHtml(partNotes[part])}</p></div>
+              <small>${chapters.length} 章</small>
+            </div>
+            <div class="stat-course-chapter-list">
+              ${chapters.map((chapter) => statCourseChapterCard(chapter, statCourseChapters.indexOf(chapter))).join("")}
+            </div>
+          </section>
+        `;
+      }).join("")}
+
+      <section class="statistics-bridge panel">
+        <div>
+          <span class="eyebrow">学习方式</span>
+          <h2>课程负责顺序，概念页负责解释，R 课程负责落实</h2>
+          <p>${escapeHtml(statCourseMeta.note || "")}</p>
+        </div>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#statistics/simulations">打开动态原理演示 ${icon("arrow-right")}</a>
+          <a class="button" href="#learn/category/system">进入 R 系统课程</a>
+        </div>
+      </section>
+    </div>
+  `;
+}
+
+function renderStatCourseChapter(chapterId) {
+  const chapter = statCourseChapterById(chapterId);
+  if (!chapter) {
+    renderNotFound();
+    return;
+  }
+  const index = statCourseChapters.indexOf(chapter);
+  const previous = statCourseChapters[index - 1];
+  const next = statCourseChapters[index + 1];
+  const concepts = chapter.concepts.map(findStatConcept).filter(Boolean);
+  const done = state.statCourseCompleted.has(chapter.id);
+  const progress = statCourseProgress();
+  app.innerHTML = `
+    <div class="page statistics-course-chapter-page">
+      <button class="detail-back" type="button" data-action="go-back">${icon("arrow-left")} 返回上一页</button>
+      <nav class="stat-course-chapter-nav" aria-label="统计学课程章节">
+        ${statCourseChapters.map((item, chapterIndex) => `
+          <a href="#statistics/course/${item.id}" class="${item.id === chapter.id ? "active" : ""} ${state.statCourseCompleted.has(item.id) ? "is-done" : ""}" ${item.id === chapter.id ? 'aria-current="page"' : ""}>
+            <span>${state.statCourseCompleted.has(item.id) ? icon("check") : String(chapterIndex + 1).padStart(2, "0")}</span>
+            <strong>${escapeHtml(item.shortTitle)}</strong>
+          </a>
+        `).join("")}
+      </nav>
+
+      <header class="stat-course-chapter-hero">
+        <div class="function-tags">${badge(chapter.part, "brand")}${badge(`第 ${index + 1} 章`, "blue")}${badge(chapter.level)}${done ? badge("已完成", "gold") : ""}</div>
+        <h1>${escapeHtml(chapter.title)}</h1>
+        <p>${escapeHtml(chapter.summary)}</p>
+        <div class="stat-course-chapter-outcome">${icon("check")}<span><strong>学完能够</strong>${escapeHtml(chapter.outcome)}</span></div>
+      </header>
+
+      <div class="stat-course-chapter-layout">
+        <article class="stat-course-chapter-main">
+          <section class="panel stat-course-section">
+            <div class="stat-course-section-title"><span>01</span><div><h2>先建立这三个判断</h2><p>不需要背定义，先知道遇到数据时应该先问什么。</p></div></div>
+            <div class="stat-course-key-ideas">
+              ${chapter.keyIdeas.map((idea, ideaIndex) => `<div><span>${String(ideaIndex + 1).padStart(2, "0")}</span><p>${escapeHtml(idea)}</p></div>`).join("")}
+            </div>
+          </section>
+
+          <section class="panel stat-course-section">
+            <div class="stat-course-section-title"><span>02</span><div><h2>按顺序学习本章概念</h2><p>遇到不懂的内容，打开详情页后可用返回按钮回到本章。</p></div></div>
+            <div class="stat-course-concept-list">
+              ${concepts.map((concept, conceptIndex) => `
+                <a href="#statistics/concept/${concept.id}">
+                  <span>${String(conceptIndex + 1).padStart(2, "0")}</span>
+                  <div><strong>${escapeHtml(concept.title)}</strong><small>${escapeHtml(concept.oneLine)}</small></div>
+                  ${icon("arrow-right")}
+                </a>
+              `).join("")}
+            </div>
+          </section>
+
+          <section class="panel stat-course-section">
+            <div class="stat-course-section-title"><span>03</span><div><h2>把统计方法放进 R 与真实研究</h2><p>概念理解后，马上进入对应工具或研究专题。</p></div></div>
+            <div class="stat-course-application-grid">
+              ${chapter.applications.map((item) => `<a href="${escapeHtml(item.href)}"><strong>${escapeHtml(item.title)}</strong><small>${escapeHtml(item.note)}</small><span>进入学习 ${icon("arrow-right")}</span></a>`).join("")}
+            </div>
+          </section>
+
+          <section class="panel stat-course-section stat-course-practice">
+            <div class="stat-course-section-title"><span>04</span><div><h2>本章练习与自查</h2><p>能运行代码只是开始，能解释方法选择和结果是完成标准。</p></div></div>
+            <p>${escapeHtml(chapter.practice)}</p>
+            <ul>${chapter.checkpoints.map((item) => `<li>${icon("check")}<span>${escapeHtml(item)}</span></li>`).join("")}</ul>
+          </section>
+
+          <footer class="stat-course-chapter-footer">
+            ${previous ? `<a class="button" href="#statistics/course/${previous.id}">${icon("arrow-left")}上一章</a>` : `<a class="button" href="#statistics/course">${icon("arrow-left")}课程目录</a>`}
+            <button class="button completion-toggle ${done ? "is-done" : "is-open"}" type="button" data-action="toggle-stat-chapter" data-id="${chapter.id}" aria-pressed="${done}">
+              ${icon("check")}<span>${done ? "已完成 · 点击取消" : "标记本章完成"}</span>
+            </button>
+            ${next ? `<a class="button button-primary" href="#statistics/course/${next.id}">下一章 ${icon("arrow-right")}</a>` : `<a class="button button-primary" href="#statistics/course">回到课程目录 ${icon("arrow-right")}</a>`}
+          </footer>
+        </article>
+
+        <aside class="stat-course-chapter-aside">
+          <section class="panel aside-card">
+            <h3>课程进度</h3>
+            <strong>${progress.completed} / ${progress.total} 章 · ${progress.percent}%</strong>
+            <div class="progress-track" role="progressbar" aria-label="统计学课程总进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress.percent}%"></span></div>
+            <p>建议先完成本章练习，再决定是否标记完成。</p>
+          </section>
+          <section class="panel aside-card">
+            <h3>本章定位</h3>
+            <div class="stat-course-aside-meta"><span>${escapeHtml(chapter.part)} · ${escapeHtml(chapter.level)}</span><span>${concepts.length} 个概念</span><span>约 ${chapter.minutes} 分钟</span></div>
+          </section>
+          <section class="panel aside-card">
+            <h3>快速切换</h3>
+            <div class="related-links">
+              <a href="#statistics/course"><span>课程总目录</span>${icon("arrow-right")}</a>
+              <a href="#statistics"><span>统计概念速查</span>${icon("arrow-right")}</a>
+              <a href="#statistics/simulations"><span>动态原理演示</span>${icon("arrow-right")}</a>
+              <a href="#functions"><span>函数词典</span>${icon("arrow-right")}</a>
+            </div>
+          </section>
+        </aside>
+      </div>
+    </div>
+  `;
+}
+
 function renderStatisticsHome() {
+  const courseProgress = statCourseProgress();
   app.innerHTML = `
     <div class="page statistics-home">
       <header class="statistics-hero">
         <div>
-          <span class="eyebrow">统计概念与原理</span>
-          <h1>先理解统计在问什么，再用 R 回答</h1>
-          <p>从总体与样本、概率分布、置信区间和假设检验，一直走到 Logistic、生存分析、因果推断、Meta 分析与高级模型。每个概念都对应一段 R 代码和可以继续学习的应用路径。</p>
+          <span class="eyebrow">统计学习与速查</span>
+          <h1>既能系统学统计，也能遇到问题时随手查</h1>
+          <p>从统计思维、描述数据和研究设计，一直走到回归、生存分析、因果推断与高级模型。想按顺序学习，就进入 12 章系统统计课；只想确认一个词，也可以直接搜索概念。</p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#statistics/course">进入统计学基础与进阶 ${icon("arrow-right")}</a>
+            <a class="button" href="#statistics/concept/p-value">先弄懂 p 值</a>
+          </div>
         </div>
         <div class="statistics-hero-stats">
           <strong>${statConcepts.length}</strong><span>个中文统计概念</span>
-          <strong>${statUnits.length}</strong><span>个学习阶段</span>
-          <a class="button button-primary" href="#statistics/simulations">打开动态原理演示 ${icon("arrow-right")}</a>
+          <strong>${statCourseChapters.length}</strong><span>章系统统计课</span>
+          <a class="button" href="#statistics/simulations">打开动态原理演示 ${icon("arrow-right")}</a>
         </div>
       </header>
+
+      <section class="statistics-course-launch">
+        <div>
+          <span class="eyebrow">系统学习入口</span>
+          <h2>${escapeHtml(statCourseMeta.title || "统计学基础与进阶")}</h2>
+          <p>${escapeHtml(statCourseMeta.subtitle || "")}</p>
+          <div class="statistics-course-parts">
+            <span><strong>基础篇</strong>统计思维、描述、概率、估计与检验</span>
+            <span><strong>进阶篇</strong>研究设计、效应量、回归与生存分析</span>
+            <span><strong>应用篇</strong>因果、纵向数据、高级方法与 R 落地</span>
+          </div>
+        </div>
+        <aside>
+          <strong>${courseProgress.completed} / ${courseProgress.total}</strong>
+          <span>章已完成</span>
+          <div class="progress-track" role="progressbar" aria-label="统计系统课进度" aria-valuenow="${courseProgress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${courseProgress.percent}%"></span></div>
+          <a class="button button-primary" href="#statistics/course/${recommendedStatCourseChapter()?.id || ""}">${courseProgress.completed ? "继续学习" : "从第一章开始"} ${icon("arrow-right")}</a>
+        </aside>
+      </section>
 
       <section class="stats-search-panel panel">
         <div class="section-title-row">
@@ -113320,6 +114218,21 @@ function routeMeta(route) {
     const title = tab === "themes" ? "主题画廊" : "命名颜色选色盘";
     return { nav: "visual-tools", title, crumb: `可视化工具 / ${title}` };
   }
+  if (route.startsWith("statistics/course/")) {
+    const chapter = statCourseChapterById(route.split("/")[2]);
+    return {
+      nav: "statistics",
+      title: chapter?.title || "统计课程章节",
+      crumb: `统计学习 / ${statCourseMeta.title || "统计学基础与进阶"} / ${chapter?.title || "未知章节"}`,
+    };
+  }
+  if (route === "statistics/course") {
+    return {
+      nav: "statistics",
+      title: statCourseMeta.title || "统计学基础与进阶",
+      crumb: `统计学习 / ${statCourseMeta.title || "系统统计课"}`,
+    };
+  }
   if (route.startsWith("statistics/concept/")) {
     const concept = findStatConcept(route.split("/")[2]);
     return { nav: "statistics", title: concept?.title || "统计概念", crumb: `统计基础 / ${concept?.title || "未知概念"}` };
@@ -113407,6 +114320,8 @@ function parentRoute(route) {
   if (route.startsWith("scales/")) return "scales";
   if (route.startsWith("saved/")) return "saved";
   if (route.startsWith("visual-tools/")) return "visual-tools";
+  if (route.startsWith("statistics/course/")) return "statistics/course";
+  if (route === "statistics/course") return "statistics";
   if (route.startsWith("statistics/concept/")) {
     const concept = findStatConcept(route.split("/")[2]);
     return concept ? `statistics/unit/${concept.category}` : "statistics";
@@ -113448,6 +114363,8 @@ function renderRoute() {
     renderGuide(type, id);
   }
   else if (route === "statistics") renderStatisticsHome();
+  else if (route === "statistics/course") renderStatCourseHome();
+  else if (route.startsWith("statistics/course/")) renderStatCourseChapter(route.split("/")[2]);
   else if (route.startsWith("statistics/unit/")) renderStatUnit(route.split("/")[2]);
   else if (route.startsWith("statistics/concept/")) renderStatConcept(route.split("/")[2]);
   else if (route === "statistics/simulations") renderStatSimulations();
@@ -113969,7 +114886,23 @@ function buildSearchItems() {
     ].join(" ").toLowerCase(),
     symbol: "Σ",
   }));
-  return [...basicItems, ...courseItems, ...guideItems, ...packageItems, ...statItems, ...glossaryItems, ...toolItems, ...problemItems, ...errorItems, ...functionItems, ...workflowItems, ...structureItems, ...symbolItems];
+  const statCourseItems = statCourseChapters.map((chapter, index) => ({
+    type: "统计课",
+    title: chapter.title,
+    subtitle: `统计学系统课 · 第 ${index + 1} 章 · ${chapter.part}`,
+    route: `statistics/course/${chapter.id}`,
+    keywords: [
+      chapter.title,
+      chapter.shortTitle,
+      chapter.summary,
+      chapter.outcome,
+      chapter.part,
+      ...chapter.keyIdeas,
+      ...chapter.checkpoints,
+    ].join(" ").toLowerCase(),
+    symbol: "课",
+  }));
+  return [...basicItems, ...courseItems, ...statCourseItems, ...guideItems, ...packageItems, ...statItems, ...glossaryItems, ...toolItems, ...problemItems, ...errorItems, ...functionItems, ...workflowItems, ...structureItems, ...symbolItems];
 }
 
 const allSearchItems = buildSearchItems();
@@ -113977,7 +114910,7 @@ const allSearchItems = buildSearchItems();
 function searchTypeMatches(item) {
   if (state.searchType === "全部") return true;
   if (state.searchType === "函数") return item.type === "函数";
-  if (state.searchType === "统计") return item.type === "统计";
+  if (state.searchType === "统计") return item.type === "统计" || item.type === "统计课";
   if (state.searchType === "R包") return item.type === "R包";
   if (state.searchType === "符号") return item.type === "符号";
   if (state.searchType === "术语") return item.type === "术语";
@@ -113993,7 +114926,7 @@ function searchMatches(query) {
     if (state.searchType === "报错") return allSearchItems.filter((item) => item.type === "报错").slice(0, 10);
     if (state.searchType === "术语") return allSearchItems.filter((item) => item.type === "术语").slice(0, 10);
     if (state.searchType === "函数") return allSearchItems.filter((item) => item.type === "函数").slice(0, 10);
-    if (state.searchType === "统计") return allSearchItems.filter((item) => item.type === "统计").slice(0, 12);
+    if (state.searchType === "统计") return allSearchItems.filter((item) => item.type === "统计" || item.type === "统计课").slice(0, 12);
     if (state.searchType === "R包") return allSearchItems.filter((item) => item.type === "R包").slice(0, 10);
     if (state.searchType === "教程") return allSearchItems.filter((item) => ["系统课", "入门", "任务", "问题"].includes(item.type)).slice(0, 10);
     return [
@@ -114327,6 +115260,7 @@ document.addEventListener("click", (event) => {
     }
     if (action === "toggle-course-done") toggleCourseDone(actionElement.dataset.id);
     if (action === "toggle-quick-done") toggleQuickDone(actionElement.dataset.id);
+    if (action === "toggle-stat-chapter") toggleStatCourseChapter(actionElement.dataset.id);
     if (action === "rstudio-panel") selectRStudioPanel(actionElement.dataset.panel);
     if (action === "control-tab") {
       state.controlTab = actionElement.dataset.tab;
