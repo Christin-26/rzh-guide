@@ -131,7 +131,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="site.css?v=58">
+  <link rel="stylesheet" href="site.css?v=59">
   <script>
     (() => {
       try {
@@ -476,6 +476,26 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <aside class="learning-dock is-hidden" id="learning-dock" aria-live="polite"></aside>
-  <script src="site.js?v=104" defer></script>
+  <script src="site.js?v=107" defer></script>
+  <script>
+    (() => {
+      const loadExtended = () => {
+        const start = () => {
+          if (window.RZH_MANUAL_FUNCTIONS) {
+            window.RZH_HYDRATE_EXTENDED?.();
+            return;
+          }
+          const script = document.createElement("script");
+          script.src = "site-extended.js?v=107";
+          script.onload = () => window.RZH_HYDRATE_EXTENDED?.();
+          document.head.appendChild(script);
+        };
+        if ("requestIdleCallback" in window) requestIdleCallback(start, { timeout: 1200 });
+        else setTimeout(start, 120);
+      };
+      if (document.readyState === "complete") loadExtended();
+      else window.addEventListener("load", loadExtended, { once: true });
+    })();
+  </script>
 </body>
 </html>
