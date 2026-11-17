@@ -131,7 +131,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="site.css?v=54">
+  <link rel="stylesheet" href="site.css?v=56">
   <script>
     (() => {
       try {
@@ -306,6 +306,11 @@
           <svg class="icon" aria-hidden="true"><use href="#icon-workflow"></use></svg>
           <span>教学与专题</span>
         </a>
+        <a class="nav-item" href="#statistics" data-route="statistics">
+          <svg class="icon" aria-hidden="true"><use href="#icon-scale"></use></svg>
+          <span>统计基础</span>
+          <span class="nav-count" data-stat-count>0</span>
+        </a>
         <a class="nav-item" href="#functions" data-route="functions">
           <svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg>
           <span>函数词典</span>
@@ -356,9 +361,9 @@
         </button>
         <div class="breadcrumb" id="breadcrumb">学习首页</div>
         <div class="topbar-actions">
-          <button class="search-trigger" id="open-search" type="button" aria-label="搜索函数、R 包、方法、模型、图形、符号、术语或报错">
+          <button class="search-trigger" id="open-search" type="button" aria-label="搜索函数、统计概念、R 包、方法、模型、图形、符号、术语或报错">
             <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-            <span>搜索函数、R 包、方法或图形</span>
+            <span>搜索函数、统计概念、方法或图形</span>
             <kbd>⌘ K</kbd>
           </button>
           <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深浅色主题">
@@ -394,8 +399,8 @@
   <dialog class="search-dialog" id="search-dialog" aria-labelledby="search-title">
     <div class="search-dialog-head">
       <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-      <label class="sr-only" id="search-title" for="global-search">搜索函数、方法、模型、图形、符号和报错</label>
-      <input id="global-search" type="search" autocomplete="off" placeholder="搜索 coxph、dplyr、logistic、森林图或缺失值…">
+      <label class="sr-only" id="search-title" for="global-search">搜索函数、统计概念、方法、模型、图形、符号和报错</label>
+      <input id="global-search" type="search" autocomplete="off" placeholder="搜索 coxph、标准误、p 值、logistic、森林图或缺失值…">
       <button class="close-button" id="close-search" type="button" aria-label="关闭搜索">
         <svg class="icon" aria-hidden="true"><use href="#icon-x"></use></svg>
       </button>
@@ -403,6 +408,7 @@
     <div class="search-type-row" role="group" aria-label="搜索类型">
       <button class="search-type active" type="button" data-action="search-type" data-type="全部" aria-pressed="true">全部</button>
       <button class="search-type" type="button" data-action="search-type" data-type="函数" aria-pressed="false">函数</button>
+      <button class="search-type" type="button" data-action="search-type" data-type="统计" aria-pressed="false">统计概念</button>
       <button class="search-type" type="button" data-action="search-type" data-type="R包" aria-pressed="false">R 包</button>
       <button class="search-type" type="button" data-action="search-type" data-type="符号" aria-pressed="false">符号</button>
       <button class="search-type" type="button" data-action="search-type" data-type="教程" aria-pressed="false">教程</button>
@@ -470,6 +476,6 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <aside class="learning-dock is-hidden" id="learning-dock" aria-live="polite"></aside>
-  <script src="site.js?v=97" defer></script>
+  <script src="site.js?v=101" defer></script>
 </body>
 </html>
