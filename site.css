@@ -10736,6 +10736,155 @@ body {
   transition: width 260ms ease;
 }
 
+.learning-track-section {
+  margin: 20px 0 27px;
+}
+
+.learning-track-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+  margin-top: 14px;
+}
+
+.learning-track-card {
+  position: relative;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  gap: 13px 15px;
+  padding: clamp(19px, 3vw, 27px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--brand) 24%, var(--border));
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 93% 8%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 13rem),
+    linear-gradient(145deg, var(--surface), var(--brand-pale));
+  color: var(--text);
+  box-shadow: var(--shadow-md);
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.learning-track-card:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--brand) 62%, var(--border));
+  box-shadow: 0 18px 38px color-mix(in srgb, var(--brand) 15%, transparent);
+}
+
+.learning-track-card.stats-track {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background:
+    radial-gradient(circle at 8% 3%, color-mix(in srgb, var(--brand) 16%, transparent), transparent 13rem),
+    linear-gradient(145deg, var(--surface), var(--accent-soft));
+}
+
+.learning-track-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--brand) 20%, var(--border));
+  border-radius: 15px;
+  background: color-mix(in srgb, var(--surface) 84%, transparent);
+  color: var(--brand);
+  box-shadow: var(--glass-inner);
+}
+
+.learning-track-mark .icon {
+  width: 22px;
+  height: 22px;
+}
+
+.learning-track-copy {
+  min-width: 0;
+}
+
+.learning-track-copy > span {
+  color: var(--brand);
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: .04em;
+}
+
+.learning-track-copy h3 {
+  margin: 4px 0 7px;
+  font-size: clamp(19px, 2.2vw, 25px);
+  line-height: 1.25;
+}
+
+.learning-track-copy > p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 10.5px;
+  line-height: 1.72;
+}
+
+.learning-track-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 12px;
+}
+
+.learning-track-points span {
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, var(--brand) 14%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 74%, transparent);
+  color: var(--muted);
+  font-size: 8px;
+}
+
+.learning-track-progress {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 9px;
+  align-items: end;
+  padding: 12px 13px;
+  border-radius: 11px;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.learning-track-progress > strong {
+  grid-row: 1 / span 2;
+  color: var(--brand-strong);
+  font-family: var(--mono);
+  font-size: 17px;
+}
+
+.learning-track-progress > span {
+  color: var(--muted);
+  font-size: 8.5px;
+}
+
+.learning-track-progress > .progress-track {
+  align-self: center;
+}
+
+.learning-track-progress > small {
+  grid-column: 1 / -1;
+  margin-top: 6px;
+  color: var(--text-soft);
+  font-size: 8.5px;
+  line-height: 1.45;
+}
+
+.learning-track-cta {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--brand-strong);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.learning-track-cta .icon {
+  width: 15px;
+  height: 15px;
+}
+
 .statistics-course-entry {
   position: relative;
   display: grid;
@@ -11477,6 +11626,7 @@ body {
   .statistics-hero,
   .statistics-bridge,
   .stat-concept-layout,
+  .learning-track-grid,
   .statistics-course-entry,
   .statistics-course-hero,
   .stat-course-chapter-layout {
@@ -11534,6 +11684,21 @@ body {
 
   .statistics-course-entry {
     padding: 21px 17px;
+  }
+
+  .learning-track-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    padding: 18px 15px;
+  }
+
+  .learning-track-mark {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .learning-track-copy h3 {
+    font-size: 19px;
   }
 
   .statistics-course-entry-side {

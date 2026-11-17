@@ -68112,7 +68112,7 @@ mr_pleiotropy_test(dat_mr)`,
   );
 
   window.RZH_STAT_COURSE_META = {
-    title: "统计学基础与进阶",
+    title: "卫生统计学基础与进阶",
     subtitle: "从统计思维、研究设计到回归、因果推断与高级模型，沿着一条可执行的 R 学习路线建立完整的生物统计知识体系。",
     audience: "适合公共卫生、流行病学、医学、护理与心理学学习者；可以零统计基础开始，也适合已经会做检验、但希望真正理解方法和结果解释的人。",
     outcome: "学完后能判断研究问题需要什么设计和方法，读懂常见统计量与模型输出，并在 R 中完成从数据检查到结果报告的基本流程。",
@@ -110481,8 +110481,8 @@ function teachingZoneMarkup(context = "home", limit = teachingCategories.length)
       <div class="section-title-row">
         <div>
           <span class="eyebrow">教学专区</span>
-          <h2 class="section-title" id="${context}-teaching-title">按学习目标选择内容</h2>
-          <p class="section-copy">每个入口都是独立页面。选择方向后，再进入具体课程或专题。</p>
+          <h2 class="section-title" id="${context}-teaching-title">${context === "learn" ? "继续按专题选择" : "按学习目标选择内容"}</h2>
+          <p class="section-copy">${context === "learn" ? "两大系统路线下面是数据清洗、可视化、研究方法、高级模型和机器学习等细分方向。" : "每个入口都是独立页面。选择方向后，再进入具体课程或专题。"}</p>
         </div>
         ${context === "home" ? `<a class="text-link" href="#learn">进入完整教学中心 ${icon("arrow-right")}</a>` : ""}
       </div>
@@ -110586,7 +110586,7 @@ function renderHome() {
         <div class="goal-home-copy">
           <span class="eyebrow">按目标开始</span>
           <h1>学 R，也真正读懂统计与研究</h1>
-          <p>从一个函数、一个统计概念或一个研究问题出发。你可以先系统学习统计学基础与进阶，再沿着 R 课程把数据处理、模型诊断和结果解释真正跑通。</p>
+          <p>从一个函数、一个统计概念或一个研究问题出发。你可以先系统学习卫生统计学基础与进阶，再沿着 R 课程把数据处理、模型诊断和结果解释真正跑通。</p>
           <form class="goal-search" data-search-form>
             <label>
               <span class="sr-only">搜索任务、函数、术语或符号</span>
@@ -110596,7 +110596,7 @@ function renderHome() {
             <button class="button button-primary" type="submit">查找</button>
           </form>
           <div class="hero-actions">
-            <a class="button button-primary" href="#statistics/course">进入统计学基础与进阶 ${icon("arrow-right")}</a>
+            <a class="button button-primary" href="#statistics/course">进入卫生统计学基础与进阶 ${icon("arrow-right")}</a>
             <a class="button" href="#learn/quick">先学 10 分钟 R</a>
           </div>
           <div class="home-mini-stats home-stats-inline">
@@ -111712,7 +111712,7 @@ function statisticsCourseEntryMarkup(context = "learn") {
     <section class="statistics-course-entry ${context === "home" ? "is-home" : ""}" aria-labelledby="statistics-course-entry-title">
       <div class="statistics-course-entry-copy">
         <span class="eyebrow">系统统计课</span>
-        <h2 id="statistics-course-entry-title">${escapeHtml(statCourseMeta.title || "统计学基础与进阶")}</h2>
+        <h2 id="statistics-course-entry-title">${escapeHtml(statCourseMeta.title || "卫生统计学基础与进阶")}</h2>
         <p>${escapeHtml(statCourseMeta.subtitle || "")}</p>
         <div class="statistics-course-entry-chapters">
           ${previewChapters.map((chapter, index) => `<span><b>${String(index + 1).padStart(2, "0")}</b>${escapeHtml(chapter.shortTitle)}</span>`).join("")}
@@ -111734,15 +111734,77 @@ function statisticsCourseEntryMarkup(context = "learn") {
   `;
 }
 
+function learningTracksMarkup() {
+  const rCompleted = courseProgressCount();
+  const rPercent = courseModules.length ? Math.round((rCompleted / courseModules.length) * 100) : 0;
+  const rRecommended = recommendedCourseLesson();
+  const statsProgress = statCourseProgress();
+  const statsRecommended = recommendedStatCourseChapter();
+  return `
+    <section class="learning-track-section" aria-labelledby="learning-tracks-title">
+      <div class="section-title-row">
+        <div>
+          <span class="eyebrow">两大学习入口</span>
+          <h2 class="section-title" id="learning-tracks-title">先选择学习路线</h2>
+          <p class="section-copy">R 学习和卫生统计学可以分别系统学习，也可以在课程、函数和统计概念之间互相跳转。</p>
+        </div>
+      </div>
+      <div class="learning-track-grid">
+        <a class="learning-track-card r-track" href="#learn/category/system">
+          <span class="learning-track-mark">${icon("terminal")}</span>
+          <div class="learning-track-copy">
+            <span>编程与数据应用</span>
+            <h3>R 学习</h3>
+            <p>从 RStudio 界面、基本语法和数据结构开始，继续学习数据清洗、可视化、统计建模、纵向数据、贝叶斯、机器学习和可重复报告。</p>
+            <div class="learning-track-points">
+              <span>10 分钟快速入门</span>
+              <span>${courseModules.length} 节系统课</span>
+              <span>数据与建模专题</span>
+            </div>
+          </div>
+          <div class="learning-track-progress">
+            <strong>${rCompleted} / ${courseModules.length}</strong>
+            <span>R 系统课已完成</span>
+            <div class="progress-track" role="progressbar" aria-label="R 系统课学习进度" aria-valuenow="${rPercent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${rPercent}%"></span></div>
+            <small>${rCompleted ? "继续下一课" : "从第一课开始"}：${escapeHtml(rRecommended?.title || "R 学习路线")}</small>
+          </div>
+          <span class="learning-track-cta">进入 R 学习 ${icon("arrow-right")}</span>
+        </a>
+
+        <a class="learning-track-card stats-track" href="#statistics/course">
+          <span class="learning-track-mark">${icon("scale")}</span>
+          <div class="learning-track-copy">
+            <span>统计原理与研究应用</span>
+            <h3>卫生统计学基础与进阶学习</h3>
+            <p>按 12 章学习统计思维、概率与推断、研究设计、效应量、回归、生存分析、因果方法、缺失数据和高级模型。</p>
+            <div class="learning-track-points">
+              <span>基础、进阶与应用</span>
+              <span>${statCourseChapters.length} 章系统课</span>
+              <span>公式与 R 输出对照</span>
+            </div>
+          </div>
+          <div class="learning-track-progress">
+            <strong>${statsProgress.completed} / ${statsProgress.total}</strong>
+            <span>统计课章节已完成</span>
+            <div class="progress-track" role="progressbar" aria-label="卫生统计学基础与进阶学习进度" aria-valuenow="${statsProgress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${statsProgress.percent}%"></span></div>
+            <small>${statsProgress.completed ? "继续下一章" : "从第一章开始"}：${escapeHtml(statsRecommended?.title || "统计思维：从研究问题到数据")}</small>
+          </div>
+          <span class="learning-track-cta">进入统计学习 ${icon("arrow-right")}</span>
+        </a>
+      </div>
+    </section>
+  `;
+}
+
 function renderLearnHub() {
   app.innerHTML = `
     <div class="page page-enter">
       <header class="page-header">
         <span class="eyebrow">教学专区</span>
-        <h1 class="page-title">学 R，也学统计：从入门到研究应用</h1>
-        <p class="page-subtitle">想补生物统计基础与进阶，可以按 12 章系统学习；想从代码入手，可以进入全流程 R 课程。两条路线会在函数、统计概念和研究方法页面互相连接。</p>
+        <h1 class="page-title">选择你的系统学习路线</h1>
+        <p class="page-subtitle">想学编程、数据处理和建模，从 R 学习进入；想补齐卫生统计原理与研究方法，从卫生统计学基础与进阶学习进入。下面仍可按数据清洗、可视化、研究设计等专题进一步选择。</p>
       </header>
-      ${statisticsCourseEntryMarkup("learn")}
+      ${learningTracksMarkup()}
       ${teachingZoneMarkup("learn")}
       <section class="learn-hub-footer">
         <div><strong>${courseModules.length} 节系统课</strong><span>包含数据流程、可视化、统计、高级建模、贝叶斯、综述与机器学习</span></div>
@@ -112296,7 +112358,7 @@ function renderStatCourseHome() {
       <header class="statistics-course-hero">
         <div>
           <span class="eyebrow">系统统计课</span>
-          <h1>${escapeHtml(statCourseMeta.title || "统计学基础与进阶")}</h1>
+          <h1>${escapeHtml(statCourseMeta.title || "卫生统计学基础与进阶")}</h1>
           <p>${escapeHtml(statCourseMeta.subtitle || "")}</p>
           <div class="hero-actions">
             <a class="button button-primary" href="#statistics/course/${recommended?.id || ""}">${progress.completed ? "继续下一章" : "从第一章开始"} ${icon("arrow-right")}</a>
@@ -112326,7 +112388,7 @@ function renderStatCourseHome() {
           <span>我的学习进度</span>
           <strong>${progress.completed} / ${progress.total} 章</strong>
         </div>
-        <div class="progress-track" role="progressbar" aria-label="统计学基础与进阶学习进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress.percent}%"></span></div>
+        <div class="progress-track" role="progressbar" aria-label="卫生统计学基础与进阶学习进度" aria-valuenow="${progress.percent}" aria-valuemin="0" aria-valuemax="100"><span style="width:${progress.percent}%"></span></div>
         <small>${progress.completed ? `已完成 ${progress.percent}%。每章学完后可手动标记，再点一次即可取消。` : "建议按章节顺序学习。每章先读概念，再完成 R 应用练习。"}</small>
       </section>
 
@@ -112471,7 +112533,7 @@ function renderStatisticsHome() {
           <h1>既能系统学统计，也能遇到问题时随手查</h1>
           <p>从统计思维、描述数据和研究设计，一直走到回归、生存分析、因果推断与高级模型。想按顺序学习，就进入 12 章系统统计课；只想确认一个词，也可以直接搜索概念。</p>
           <div class="hero-actions">
-            <a class="button button-primary" href="#statistics/course">进入统计学基础与进阶 ${icon("arrow-right")}</a>
+            <a class="button button-primary" href="#statistics/course">进入卫生统计学基础与进阶 ${icon("arrow-right")}</a>
             <a class="button" href="#statistics/concept/p-value">先弄懂 p 值</a>
           </div>
         </div>
@@ -112485,7 +112547,7 @@ function renderStatisticsHome() {
       <section class="statistics-course-launch">
         <div>
           <span class="eyebrow">系统学习入口</span>
-          <h2>${escapeHtml(statCourseMeta.title || "统计学基础与进阶")}</h2>
+          <h2>${escapeHtml(statCourseMeta.title || "卫生统计学基础与进阶")}</h2>
           <p>${escapeHtml(statCourseMeta.subtitle || "")}</p>
           <div class="statistics-course-parts">
             <span><strong>基础篇</strong>统计思维、描述、概率、估计与检验</span>
@@ -114223,13 +114285,13 @@ function routeMeta(route) {
     return {
       nav: "statistics",
       title: chapter?.title || "统计课程章节",
-      crumb: `统计学习 / ${statCourseMeta.title || "统计学基础与进阶"} / ${chapter?.title || "未知章节"}`,
+      crumb: `统计学习 / ${statCourseMeta.title || "卫生统计学基础与进阶"} / ${chapter?.title || "未知章节"}`,
     };
   }
   if (route === "statistics/course") {
     return {
       nav: "statistics",
-      title: statCourseMeta.title || "统计学基础与进阶",
+      title: statCourseMeta.title || "卫生统计学基础与进阶",
       crumb: `统计学习 / ${statCourseMeta.title || "系统统计课"}`,
     };
   }
