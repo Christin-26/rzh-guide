@@ -131,7 +131,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="site.css?v=59">
+  <link rel="stylesheet" href="site.css?v=61">
   <script>
     (() => {
       try {
@@ -342,10 +342,6 @@
         </a>
       </nav>
 
-      <div class="sidebar-tip">
-        <span class="tip-icon">⌘</span>
-        <p><strong>快速查找</strong><br>随时按 <kbd>⌘ K</kbd> 搜索函数、R 包、任务或符号</p>
-      </div>
     </aside>
 
     <button class="mobile-scrim" id="mobile-scrim" type="button" aria-label="关闭导航"></button>
@@ -363,7 +359,7 @@
         <div class="topbar-actions">
           <button class="search-trigger" id="open-search" type="button" aria-label="搜索函数、统计概念、R 包、方法、模型、图形、符号、术语或报错">
             <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-            <span>搜索函数、统计概念、方法或图形</span>
+            <span>搜索函数、概念或方法</span>
             <kbd>⌘ K</kbd>
           </button>
           <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深浅色主题">
@@ -383,8 +379,7 @@
       <main id="app" tabindex="-1" aria-live="polite"></main>
 
       <footer class="site-footer">
-        <span>R知 · 面向研究实践的中文 R 学习与查询工具</span>
-        <span>内容用于学习与核查，不替代正式的统计咨询。</span>
+        <span>R知 · R、统计与研究应用</span>
       </footer>
     </div>
   </div>
@@ -476,7 +471,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <aside class="learning-dock is-hidden" id="learning-dock" aria-live="polite"></aside>
-  <script src="site.js?v=107" defer></script>
+  <script src="site.js?v=109" defer></script>
   <script>
     (() => {
       const loadExtended = () => {
@@ -486,7 +481,7 @@
             return;
           }
           const script = document.createElement("script");
-          script.src = "site-extended.js?v=107";
+          script.src = "site-extended.js?v=109";
           script.onload = () => window.RZH_HYDRATE_EXTENDED?.();
           document.head.appendChild(script);
         };
