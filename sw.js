@@ -1,10 +1,10 @@
-const CACHE_NAME = "rzh-public-v135";
+const CACHE_NAME = "rzh-public-v137";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./site.css?v=65",
-  "./site.js?v=115",
-  "./site-extended.js?v=115",
+  "./site.css?v=66",
+  "./site.js?v=117",
+  "./site-extended.js?v=117",
   "./manifest.webmanifest",
   "./assets/icon.svg",
 ];

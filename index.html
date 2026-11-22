@@ -131,7 +131,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="site.css?v=65">
+  <link rel="stylesheet" href="site.css?v=66">
   <script>
     (() => {
       try {
@@ -301,6 +301,10 @@
           <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
           <span>首页</span>
         </a>
+        <a class="nav-item" href="#all-tools" data-route="all-tools">
+          <svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg>
+          <span>全部功能</span>
+        </a>
         <a class="nav-item" href="#learn" data-route="learn">
           <svg class="icon" aria-hidden="true"><use href="#icon-workflow"></use></svg>
           <span>教学与专题</span>
@@ -312,6 +316,10 @@
         <a class="nav-item" href="#functions" data-route="functions">
           <svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg>
           <span>函数词典</span>
+        </a>
+        <a class="nav-item" href="#code-parser" data-route="code-parser">
+          <svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg>
+          <span>代码解析</span>
         </a>
         <a class="nav-item" href="#workflows" data-route="workflows">
           <svg class="icon" aria-hidden="true"><use href="#icon-workflow"></use></svg>
@@ -351,6 +359,9 @@
         </button>
         <div class="breadcrumb" id="breadcrumb">学习首页</div>
         <div class="topbar-actions">
+          <a class="icon-button" href="#all-tools" data-route="all-tools" aria-label="打开全部功能" title="全部功能">
+            <svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg>
+          </a>
           <button class="search-trigger" id="open-search" type="button" aria-label="搜索函数、统计概念、R 包、方法、模型、图形、符号、术语或报错">
             <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
             <span>搜索</span>
@@ -380,6 +391,7 @@
   <nav class="mobile-tabbar" aria-label="移动端主导航">
     <a href="#home" data-route="home"><svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg><span>首页</span></a>
     <a href="#functions" data-route="functions"><svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg><span>函数</span></a>
+    <a href="#code-parser" data-route="code-parser"><svg class="icon" aria-hidden="true"><use href="#icon-sparkles"></use></svg><span>代码</span></a>
     <button id="mobile-search" type="button"><svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg><span>搜索</span></button>
     <a href="#saved" data-route="saved"><svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg><span>我的</span></a>
   </nav>
@@ -464,7 +476,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <aside class="learning-dock is-hidden" id="learning-dock" aria-live="polite"></aside>
-  <script src="site.js?v=115" defer></script>
+  <script src="site.js?v=117" defer></script>
   <script>
     (() => {
       const loadExtended = () => {
@@ -474,7 +486,7 @@
             return;
           }
           const script = document.createElement("script");
-          script.src = "site-extended.js?v=115";
+          script.src = "site-extended.js?v=117";
           script.onload = () => window.RZH_HYDRATE_EXTENDED?.();
           document.head.appendChild(script);
         };
