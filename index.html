@@ -131,7 +131,7 @@
       }
     }
   </style>
-  <link rel="stylesheet" href="site.css?v=64">
+  <link rel="stylesheet" href="site.css?v=65">
   <script>
     (() => {
       try {
@@ -297,7 +297,6 @@
       </button>
 
       <nav class="side-nav">
-        <p class="nav-label">开始</p>
         <a class="nav-item active" href="#home" data-route="home">
           <svg class="icon" aria-hidden="true"><use href="#icon-home"></use></svg>
           <span>首页</span>
@@ -309,14 +308,11 @@
         <a class="nav-item" href="#statistics" data-route="statistics">
           <svg class="icon" aria-hidden="true"><use href="#icon-scale"></use></svg>
           <span>统计基础</span>
-          <span class="nav-count" data-stat-count>0</span>
         </a>
         <a class="nav-item" href="#functions" data-route="functions">
           <svg class="icon" aria-hidden="true"><use href="#icon-grid"></use></svg>
           <span>函数词典</span>
-          <span class="nav-count" data-function-count>0</span>
         </a>
-        <p class="nav-label">查找</p>
         <a class="nav-item" href="#workflows" data-route="workflows">
           <svg class="icon" aria-hidden="true"><use href="#icon-workflow"></use></svg>
           <span>问题导航</span>
@@ -334,11 +330,9 @@
           <span>专业术语</span>
         </a>
 
-        <p class="nav-label">我的学习</p>
         <a class="nav-item" href="#saved" data-route="saved">
           <svg class="icon" aria-hidden="true"><use href="#icon-bookmark"></use></svg>
           <span>收藏与笔记</span>
-          <span class="nav-count" data-favorite-count>0</span>
         </a>
       </nav>
 
@@ -359,8 +353,7 @@
         <div class="topbar-actions">
           <button class="search-trigger" id="open-search" type="button" aria-label="搜索函数、统计概念、R 包、方法、模型、图形、符号、术语或报错">
             <svg class="icon" aria-hidden="true"><use href="#icon-search"></use></svg>
-            <span>搜索函数、概念或方法</span>
-            <kbd>⌘ K</kbd>
+            <span>搜索</span>
           </button>
           <button class="icon-button" id="theme-toggle" type="button" aria-label="切换深浅色主题">
             <svg class="icon theme-icon-moon" aria-hidden="true"><use href="#icon-moon"></use></svg>
@@ -471,7 +464,7 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <aside class="learning-dock is-hidden" id="learning-dock" aria-live="polite"></aside>
-  <script src="site.js?v=114" defer></script>
+  <script src="site.js?v=115" defer></script>
   <script>
     (() => {
       const loadExtended = () => {
@@ -481,7 +474,7 @@
             return;
           }
           const script = document.createElement("script");
-          script.src = "site-extended.js?v=114";
+          script.src = "site-extended.js?v=115";
           script.onload = () => window.RZH_HYDRATE_EXTENDED?.();
           document.head.appendChild(script);
         };
